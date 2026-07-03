@@ -1,9 +1,4 @@
-# UNI-T UT61B/D/E+ and UT60BT digital multimeter communication and data plotting tools
-The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
-
-The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
-
-The UT60BT is consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even higher resolution than the UT61X+ in both millivolt and capacitance modes, with some caveats (see below).
+# This is the digital multimeter communication and data plotting tool supporting UNI-T UT61B/D/E+, UT60BT and several OWON multimeters via Bluetooth
 
 This repository provides simple alternative to vendor data collection program. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system. 
 
@@ -16,7 +11,14 @@ The code was reworked with the following goals in mind:
  - convenient working with several devices simultaneously
  - support for USB HID and Bluetooth communication channel
 
+## Supported devices
+
+The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
 The scripts work via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel at the expense of the lower communication speed. The minimum data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter. Yet the BT adapter shows surprisingly good communication range. Its even able to communicate through the layer of reinforced concrete.
+
+The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
+
+The UT60BT is consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even higher resolution than the UT61X+ in both millivolt and capacitance modes, with some caveats (see below).
 
 ## Installation
 
@@ -125,9 +127,16 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 ## Other supported devices
 
-By default, the **ut61xp-get** tool always expects the UT61X+ multimeter as the target device. To change this, one can use *-M/--model* option.
+By default, the **ut61xp-get** tool always expects the UT61X+ multimeter as the target device. To change this, one can use *-M/--model* option. For now all additional supported devices work via Bluetooth. Therefore the *-B* option must be provided with *-M/--model* option.
 
 ### UT60BT
 The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero.
 
 To read from UT60BT one can supply *-B -M UT60BT* options right after **ut61xp-get** in the command line.
+
+### OWON multimeters
+Coming soon.
+
+### Adding your own device
+To add new device you should implement its adapter class inherited from Device and BTMixin or HIDMixin from device.py. Then the class type should be added to *_supported_devices* from ut61xp-get and that's it.
+
