@@ -14,6 +14,10 @@ from ut61xp import log, UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from data_stat import StatCollector
 from datetime import datetime
 
+_supported_devices = (
+    HIDDevice, BTDevice, UT60BTDevice
+)
+
 class Plotter:
     """Data plotter"""
     padding = .075
@@ -103,10 +107,6 @@ class Plotter:
                     axis.set_title(mode)
         self.fig.canvas.flush_events()
         self.plt.show()
-
-_supported_devices = (
-    HIDDevice, BTDevice, UT60BTDevice
-)
 
 def _device_type(is_bt, model=None):
     for T in _supported_devices:

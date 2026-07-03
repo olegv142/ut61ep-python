@@ -138,7 +138,21 @@ class UTDevice(Device):
     @staticmethod
     def get_mode(data):
         """Returns measurement mode and units description string"""
-        return UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0])
+        mode = UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0])
+        f1, f2 = data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN-1]
+        if f1 & 1:
+            mode += ' Rel'
+        if f1 & 2:
+            mode += ' Hold'
+        if f1 & 4:
+            mode += ' Min'
+        if f1 & 8:
+            mode += ' Max'
+        if f2 & 1:
+            mode += ' Err'
+        if f2 & 2:
+            mode += ' LoBatt'
+        return mode
 
 class HIDDevice(HIDMixin, UTDevice):
     """USB HID adapter (D-09A) interface class"""
@@ -281,7 +295,7 @@ if __name__ == '__main__':
                     data = dev.query_raw()
                     if data:
                         if last_data is None: print()
-                        print(data[0], ''.join([chr(d) for d in data[1:9]]), data[UTDevice.DATA_LEN-1],
+                        print(data[0], ''.join([chr(d) for d in data[1:9]]), data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN],
                             '[%d] =' % UTDevice.get_channel(data), dev.get_value(data))
                     else:
                         print('.', end='', flush=True)
