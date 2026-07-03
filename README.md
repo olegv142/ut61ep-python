@@ -1,6 +1,10 @@
-# UNI-T UT61B/D/E+ digital multimeter communication and data plotting tools
+# UNI-T UT61B/D/E+ and UT60BT digital multimeter communication and data plotting tools
 The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
-The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10uV and having some additional features like thermocouple measuring (UT61D+).
+
+The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
+
+The UT60BT is consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even higher resolution than the UT61X+ in both millivolt and capacitance modes, with some caveats (see below).
+
 This repository provides simple alternative to vendor data collection program. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system. 
 
 The project is inspired by https://github.com/ljakob/unit_ut61eplus and https://github.com/aroum/unit_ut61eplus_python.
@@ -118,3 +122,12 @@ The configuration tricks shown above work just because the auto-detected device 
 ## Using Bluetooth adapter
 
 Working with Bluetooth adapter conceptually is not different from using USB. Just add *-B/--bt* option right after *ut61xp-get* to force script to use BT adapter. Similar to USB use case the script is able to auto detect BT adapter provided that its powered on and no other adapters are in the accessible range. By means of using the *--cfg-save* option one can save the address of the adapter discovered (which plays the role of USB device path) for the subsequent reuse. One can specify BT address in the command line explicitly via *--path/--addr* option. Opening BT device by its address is significantly faster and more reliable than autodetecting it.
+
+## Other supported devices
+
+By default, the **ut61xp-get** tool always expects the UT61X+ multimeter as the target device. To change this, one can use *-M/--model* option.
+
+### UT60BT
+The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero.
+
+To read from UT60BT one can supply *-B -M UT60BT* options right after **ut61xp-get** in the command line.
