@@ -22,10 +22,12 @@ class UTDevice(Device):
     Base class for supported UNI-T devices
     """
     model_name = 'UT61X+'
-
-    DEF_TOUT    = 4
-    DATA_LEN    = 14
+    # The following is the data packet that consists of the single '^' symbol
+    # prefixed by magic, length and followed by checksum
+    # It should be sent to the device to trigger data response
     TRIGGER_CMD = [0xAB, 0xCD, 0x03, 0x5E, 0x01, 0xD9]
+    DATA_LEN    = 14 # data response packet length
+    DEF_TOUT    = 4  # default timeout in seconds
 
     """Base class for all supported UNI-T adapters"""
     def __init__(self, path):
