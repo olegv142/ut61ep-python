@@ -138,5 +138,5 @@ To read from UT60BT one can supply *-B -M UT60BT* options right after **ut61xp-g
 Coming soon.
 
 ### Adding your own device
-To add new device you should implement its adapter class inherited from Device and BTMixin or HIDMixin from device.py. Then the class type should be added to *_supported_devices* from ut61xp-get and that's it.
+To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
 
