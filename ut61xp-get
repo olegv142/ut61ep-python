@@ -10,7 +10,7 @@ import math
 import time
 import json
 import argparse
-from ut61xp import log, DEF_TOUT, DEF_VID, DEF_PID, DEF_BT_NAME, Device, HIDDevice, BTDevice
+from ut61xp import log, UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from data_stat import StatCollector
 from datetime import datetime
 
@@ -18,12 +18,13 @@ class Plotter:
     """Data plotter"""
     padding = .075
 
-    def __init__(self, args):
+    def __init__(self, args, devT):
         import matplotlib.pyplot as plt
         plt.rcParams["figure.raise_window"] = False
         plt.ion()
         self.plt = plt
         self.args = args
+        self.devT = devT
         if args.alt_file:
             nchan = 2 # dual channel plot
             self.fig, self.ax = self.plt.subplots(2, 1, sharex = True)
@@ -48,8 +49,7 @@ class Plotter:
                 color=(args.line_color, args.alt_line_color)[i]
             )[0] for i in range(nchan)]
         self.vmin, self.vmax = [float('inf')] * nchan, [float('-inf')] * nchan
-        if args.title:
-            self.fig.canvas.manager.set_window_title(args.title)
+        self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
 
     def is_closed(self):
         return not self.plt.fignum_exists(self.fig.number)
@@ -98,26 +98,54 @@ class Plotter:
                     self.update_xlim(chan, xdata[0], xdata[-1])
                 self.update_ylim(chan, *((min(ydata), max(ydata)) if wnd else (self.vmin[chan], self.vmax[chan])))
             if not (self.args.plot_title, self.args.alt_title)[chan]:
-                mode = Device.get_mode(data)
+                mode = self.devT.get_mode(data)
                 if axis.get_title() != mode:
                     axis.set_title(mode)
         self.fig.canvas.flush_events()
         self.plt.show()
 
-def do_list(args):
-    if not args.bt:
-        for path in HIDDevice.list_paths(args.VID, args.PID):
-            print(path.decode('ascii'))
-    else:
-        for addr in BTDevice.list_addrs(args.name):
-            print(addr)
-    return 0
+_supported_devices = (
+    HIDDevice, BTDevice, UT60BTDevice
+)
+
+def _device_type(is_bt, model=None):
+    for T in _supported_devices:
+        if is_bt == T.isBT:
+            if model is None:
+                return T
+            elif model == T.model_name:
+                return T
+    return None
+
+def device_type(args):
+    """Returns selected device type (class)"""
+    T = _device_type(args.bt, args.model)
+    if T is not None:
+        return T
+    assert args.model is not None
+    T = _device_type(args.bt)
+    assert T is not None
+    log.warning('model %s is not supported in %s mode, using default %s',
+            args.model, 'BT' if args.bt else 'HID', T.model_name
+        )
+    return T
 
 def open_device(args):
     """Open HID or BT device"""
+    T = device_type(args)
     if args.path:
-        return BTDevice.open_addr(args.path) if args.bt else HIDDevice.open_path(args.path)
-    return BTDevice.open(args.name) if args.bt else HIDDevice.open(args.VID, args.PID)
+        return T.open_addr(args.path) if T.isBT else T.open_path(args.path)
+    return T.open(args.name) if T.isBT else T.open(args.VID, args.PID)
+
+def do_list(args):
+    T = device_type(args)
+    if not T.isBT:
+        for path in T.list_paths(args.VID, args.PID):
+            print(path)
+    else:
+        for addr in T.list_addrs(args.name):
+            print(addr)
+    return 0
 
 def do_once(args):
     """Read and print single value"""
@@ -129,7 +157,7 @@ def do_once(args):
         if not data:
             log.error('\nno data')
             return -1
-        print(Device.get_value(data))
+        print(dev.get_value(data))
         return 0
     finally:
         dev.close()
@@ -180,7 +208,7 @@ def do_data(args):
     alt_file = None if not alt_fname else open(alt_fname, 'w')
     stat = [StatCollector(), StatCollector()]
     if args.graph:
-        plotter = Plotter(args)
+        plotter = Plotter(args, type(dev))
         sleep_fn = plotter.plt.pause
     else:
         plotter = None
@@ -205,8 +233,8 @@ def do_data(args):
             else:
                 errs_left = errs_max
             t = ts - start
-            val = Device.get_value(data)
-            val_chan = Device.get_channel(data)
+            val = dev.get_value(data)
+            val_chan = dev.get_channel(data)
             val_good = not math.isnan(val)
             # Output data
             if val_good or args.keep_nan:
@@ -277,7 +305,7 @@ def do_plot(args):
 
 def main():
     parser = argparse.ArgumentParser(
-            description='UNI-T UT61E+ data acquisition tool',
+            description='UNI-T UT61X+/UT60BT data acquisition tool',
             usage='%(prog)s [options] list|once|data [command options]'
         )
 
@@ -288,18 +316,20 @@ def main():
     parser.set_defaults(func=get_help)
 
     parser.register('type', 'hex-int', lambda s: int(s, 16))
-    parser.add_argument('--VID', type='hex-int', required=False, metavar='HEX', default=DEF_VID,
+    parser.add_argument('--VID', type='hex-int', required=False, metavar='HEX', default=None,
             help='device vendor id (optional)')
-    parser.add_argument('--PID', type='hex-int', required=False, metavar='HEX', default=DEF_PID,
+    parser.add_argument('--PID', type='hex-int', required=False, metavar='HEX', default=None,
             help='device product id (optional)')
     parser.add_argument('--path', '--addr', type=str, required=False,
             help='device path or Bluetooth mac address (optional, auto detect by default)')
-    parser.add_argument('--tout', type=float, required=False, default=DEF_TOUT, metavar='SECONDS',
-            help='device read timeout (optional, default is %.0f sec)' % DEF_TOUT)
+    parser.add_argument('--tout', type=float, required=False, default=None, metavar='SECONDS',
+            help='device read timeout (optional)')
     parser.add_argument('-B', '--bt', action='store_true',
-            help='use UT-D07B Bluetooth adapter for communicating with device')
-    parser.add_argument('--name', type=str, required=False, default=DEF_BT_NAME,
-            help='set Bluetooth adapter name (optional, default is UT-D07B)')
+            help='use Bluetooth for communicating with device')
+    parser.add_argument('-M', '--model', type=str, required=False, metavar='NAME', default=None,
+            help='BT device model (%s (default), %s)' % (UTDevice.model_name, UT60BTDevice.model_name))
+    parser.add_argument('--name', type=str, required=False, default=None,
+            help='set Bluetooth adapter name (optional)')
 
     subparsers = parser.add_subparsers()
     subparsers.add_parser('list',
