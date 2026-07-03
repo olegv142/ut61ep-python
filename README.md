@@ -1,4 +1,4 @@
-# This is the digital multimeter communication and data plotting tool supporting UNI-T UT61B/D/E+, UT60BT and several OWON multimeters via Bluetooth
+# This is the digital multimeter communication and data plotting tool supporting UNI-T UT61B/D/E+, UT60BT and several OWON Bluetooth multimeters
 
 This repository provides simple alternative to vendor data collection program. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system. 
 
