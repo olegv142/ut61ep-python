@@ -61,42 +61,24 @@ class Device(ABC):
         """Closes device on exiting 'with' block"""
         self.close()
 
-class HIDMixin(ABC):
-    """Methods specific for HID devices"""
+class USBMixin(ABC):
+    """Methods specific for USB devices"""
     isBT = False
     # The following properties should be redefined in subclasses
     device_vid = None
     device_pid = None
 
     @classmethod
-    @staticmethod
+    @abstractmethod
     def list_paths(cls, vid=None, pid=None):
-        """Returns the list of HID device paths"""
-        if vid is None:
-            vid = cls.device_vid
-        if pid is None:
-            pid = cls.device_pid
-        return [dev['path'].decode('ascii') for dev in hid.enumerate(vid, pid)]
+        """Returns the list of USB device paths"""
+        pass
 
     @classmethod
     @abstractmethod
     def open_path(cls, path):
         """Opens device instance given the path and returns it"""
         pass
-
-    @staticmethod
-    def _open_path(path):
-        """Opens hid device given the path and returns it"""
-        if isinstance(path, str):
-            path = path.encode('ascii')
-        dev = hid.device()
-        try:
-            dev.open_path(path)
-        except:
-            log.error('failed to open device %s', path)
-            return None
-        dev.set_nonblocking(True)
-        return dev
 
     @classmethod
     def open(cls, vid=None, pid=None):
@@ -113,6 +95,32 @@ class HIDMixin(ABC):
             log.error('%d devices found', len(paths))
             return None
         return cls.open_path(paths[0])
+
+class HIDMixin(USBMixin):
+    """Methods specific for USB HID devices"""
+    @classmethod
+    @staticmethod
+    def list_paths(cls, vid=None, pid=None):
+        """Returns the list of HID device paths"""
+        if vid is None:
+            vid = cls.device_vid
+        if pid is None:
+            pid = cls.device_pid
+        return [dev['path'].decode('ascii') for dev in hid.enumerate(vid, pid)]
+
+    @staticmethod
+    def _open_path(path):
+        """Opens hid device given the path and returns it"""
+        if isinstance(path, str):
+            path = path.encode('ascii')
+        dev = hid.device()
+        try:
+            dev.open_path(path)
+        except:
+            log.error('failed to open device %s', path)
+            return None
+        dev.set_nonblocking(True)
+        return dev
 
 class BTMixin(ABC):
     """Methods specific for BT devices"""
