@@ -137,7 +137,7 @@ The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter usi
 To read from UT60BT one can supply *-B -M UT60BT* options right after **ut61xp-get** in the command line.
 
 ### OWON multimeters
-To read from OWON using 'BDM' protocol one can supply *-B -M OWON* options right after **ut61xp-get** in the command line. Currently tested with CM2100B clamp meter.
+To read from OWON multimeter using 'BDM' protocol one can supply *-B -M OWON* options right after **ut61xp-get** in the command line. Currently tested with CM2100B clamp meter.
 
 ### Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
