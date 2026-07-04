@@ -158,6 +158,10 @@ class HIDDevice(HIDMixin, UTDevice):
     def __init__(self, dev, path):
         super().__init__(path)
         self.dev = dev
+        self.disconnected = False
+
+    def is_connected(self):
+        return not self.disconnected
 
     @classmethod
     def open_path(cls, path):
@@ -170,15 +174,20 @@ class HIDDevice(HIDMixin, UTDevice):
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from HID device"""
         wait = tout if tout is not None else UTDevice.DEF_TOUT
-        self.dev.write([0, len(UTDevice.TRIGGER_CMD)] + UTDevice.TRIGGER_CMD)
-        while True:
-            idle_sleep(.1)
-            buf = self.dev.read(64)
-            if buf:
-                break
-            wait -= .1
-            if wait <= 0:
-                return None
+        try:
+            self.dev.write([0, len(UTDevice.TRIGGER_CMD)] + UTDevice.TRIGGER_CMD)
+            while True:
+                idle_sleep(.1)
+                buf = self.dev.read(64)
+                if buf:
+                    break
+                wait -= .1
+                if wait <= 0:
+                    return None
+        except Exception as e:
+            self.disconnected = True
+            log.debug(e)
+            return None
         data_len = buf[0]
         if data_len <= 2 or data_len > 63:
             log.error('bad length: %d', data_len)
