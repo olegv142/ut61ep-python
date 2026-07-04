@@ -169,17 +169,15 @@ class HIDDevice(HIDMixin, UTDevice):
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from HID device"""
-        if tout is None:
-            tout = UTDevice.DEF_TOUT
-        attempts = int(10 * tout)
+        wait = tout if tout is not None else UTDevice.DEF_TOUT
         self.dev.write([0, len(UTDevice.TRIGGER_CMD)] + UTDevice.TRIGGER_CMD)
         while True:
             idle_sleep(.1)
             buf = self.dev.read(64)
             if buf:
                 break
-            attempts -= 1
-            if attempts <= 0:
+            wait -= .1
+            if wait <= 0:
                 return None
         data_len = buf[0]
         if data_len <= 2 or data_len > 63:
@@ -228,19 +226,16 @@ class BTDevice(BTMixin, UTDevice):
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from BT device"""
-        if tout is None:
-            tout = UTDevice.DEF_TOUT
-        async def a_query():
-            attempts = int(10 * tout)
-            self.last_data = None
+        wait = tout if tout is not None else UTDevice.DEF_TOUT
+        self.last_data = None
+        async def a_trigger():
             await self.dev.write_gatt_char(BTDevice.BT_TX_CHAR, bytearray(UTDevice.TRIGGER_CMD), response=False)
-            while not self.last_data and attempts:
-                attempts -= 1
-                await asyncio.sleep(.1)
-        query = bt_engine.async_exec(a_query(), wait=False)
-        while not query.done():
+            return True
+        if not bt_engine.async_exec(a_trigger()):
+            return None
+        while self.last_data is None and wait >= 0:
             idle_sleep(.1)
-        query.result()
+            wait -= .1
         if not self.last_data:
             return None
         return self._validate_raw_data(self.last_data)
