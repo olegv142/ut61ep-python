@@ -29,10 +29,6 @@ class UTDevice(Device):
     DATA_LEN    = 14 # data response packet length
     DEF_TOUT    = 4  # default timeout in seconds
 
-    """Base class for all supported UNI-T adapters"""
-    def __init__(self, path):
-        self.path = path
-
     @staticmethod
     def _validate_raw_data(data):
         """
