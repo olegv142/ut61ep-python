@@ -127,7 +127,7 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 ## Other supported devices
 
-By default, the **ut61xp-get** tool always expects the UT61X+ multimeter as the target device. To change this, one can use *-M/--model* option. For now all additional supported devices work via Bluetooth. Therefore the *-B* option must be provided with *-M/--model* option.
+By default, the **ut61xp-get** tool always expects the UT61X+ multimeter as the target device. To change this, one can use *-M/--model* option. Please note that if device works via Bluetooth, the *-B* option must be provided with *-M/--model* option.
 
 ### UT60BT
 The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero.
