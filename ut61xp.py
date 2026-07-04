@@ -134,7 +134,7 @@ class UTDevice(Device):
     @staticmethod
     def get_mode(data):
         """Returns measurement mode and units description string"""
-        mode = UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0])
+        mode = UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0], '')
         f1, f2 = data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN-1]
         if f1 & 1:
             mode += ' Rel'
