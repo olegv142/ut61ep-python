@@ -11,11 +11,12 @@ import time
 import json
 import argparse
 from ut61xp import log, UTDevice, HIDDevice, BTDevice, UT60BTDevice
+from owon import OwonBtDevice
 from data_stat import StatCollector
 from datetime import datetime
 
 _supported_devices = (
-    HIDDevice, BTDevice, UT60BTDevice
+    HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice
 )
 
 class Plotter:

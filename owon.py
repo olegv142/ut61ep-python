@@ -1,0 +1,140 @@
+"""
+OWON digital multimeters communication helper
+"""
+
+import time
+import bt_engine
+from device import Device, BTMixin
+
+class OwonBtDevice(BTMixin, Device):
+    """OWON Bluetooth multimeter interface class"""
+    model_name  = 'OWON'
+    device_name = 'BDM'
+    BT_RX_CHAR  = 'FFF4'
+    DATA_LEN    = 6 # data response packet length
+    DEF_TOUT    = 4 # default timeout in seconds
+
+    def __init__(self, dev, addr):
+        super().__init__(addr)
+        self.dev = dev
+        self.last_data = None
+
+    def _notify_cb(self, char, val):
+        """BT adapter data changed notification callback"""
+        if len(val) == OwonBtDevice.DATA_LEN:
+            self.last_data = val
+
+    @classmethod
+    def open_addr(cls, addr):
+        """Opens BT device given its mac address"""
+        from bleak import BleakClient
+        clnt = BleakClient(addr)
+        inst = cls(clnt, addr)
+        async def a_connect():
+            await clnt.connect()
+            if clnt.is_connected:
+                await clnt.start_notify(OwonBtDevice.BT_RX_CHAR, inst._notify_cb)
+        bt_engine.async_exec(a_connect())
+        if not clnt.is_connected:
+            log.error('failed to connect to device %s', addr)
+            return None
+        return inst
+
+    def query_raw(self, tout=None, idle_sleep=time.sleep):
+        """Queries raw data packet from BT device"""
+        if not self.dev.is_connected:
+            return None
+        wait = tout if tout is not None else OwonBtDevice.DEF_TOUT
+        self.last_data = None
+        while self.last_data is None and wait >= 0:
+            idle_sleep(.1)
+            wait -= .1
+        if not self.last_data:
+            return None
+        return self.last_data
+
+    @classmethod
+    def get_value(cls, data):
+        """
+        Converts raw data to the floating point value. Here we don't
+        care about units since the caller should be aware of them.
+        It set mode dial manually after all. So in the mV mode the
+        result is expressed in mV rather than volts.
+        """
+        mt = OwonBtDevice.mode_tag(data)
+        _, scale = OwonBtDevice._scale_map.get(mt, (mt, 0))
+        shift = data[0] & 7
+        if shift == 7:
+            return float('nan')
+        val = data[-2] + 256 * (data[-1] & 0x7f)
+        if data[-1] & 0x80:
+            val = -val
+        return val * (.1 ** (shift - scale))
+
+    @staticmethod
+    def mode_tag(data):
+        return (data[0] & 0xF8) + (data[1] & 0x7)
+
+    _mode_map = {
+        0x18 : 'dc mV',
+        0x20 : 'dc V',
+        0x60 : 'ac V',
+        0xe0 : 'ac A',
+        0xa0 : 'dc A',
+        0x63 : 'NCV',
+        0x31 : 'MOhm',
+        0x29 : 'kOhm',
+        0x21 : 'Ohm',
+        0x49 : 'nF',
+        0x51 : 'µF',
+        0xa2 : 'diode V',
+        0xe2 : 'Ohm',
+        0xa1 : 'Hz',
+        0xe1 : 'pw %',
+    }
+
+    _scale_map = {
+        0x18 : (0x20, -3), # mV   -> V
+        0x31 : (0x21, 6),  # MOhm -> Ohm
+        0x29 : (0x21, 3),  # kOhm -> Ohm
+        0x51 : (0x49, 3),  # µF   -> nF
+    }
+
+    @staticmethod
+    def get_mode(data):
+        """Returns measurement mode and units description string"""
+        mt    = OwonBtDevice.mode_tag(data)
+        mt, _ = OwonBtDevice._scale_map.get(mt, (mt, 0))
+        mode  = OwonBtDevice._mode_map.get(mt, '')
+        flags = data[2]
+        if flags & 1:
+            mode += ' Hold'
+        if flags & 2:
+            mode += ' Rel'
+        if flags & 8:
+            mode += ' LoBatt'
+        return mode
+
+    def close(self):
+        """Closes device if its still open"""
+        if self.dev is None:
+            return
+        bt_engine.async_exec(self.dev.disconnect())
+        self.dev = None
+
+if __name__ == '__main__':
+    try:
+        dev = OwonBtDevice.open()
+        if dev:
+            with dev:
+                last_data = None
+                while True:
+                    data = dev.query_raw()
+                    if data:
+                        if last_data is None: print()
+                        print(' '.join(['%02x' % b for b in data]), 'm%02x' % dev.mode_tag(data), '=', dev.get_value(data), dev.get_mode(data))
+                    else:
+                        print('.', end='', flush=True)
+                    last_data = data
+    except KeyboardInterrupt:
+        pass

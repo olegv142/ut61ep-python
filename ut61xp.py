@@ -115,8 +115,8 @@ class UTDevice(Device):
             9  : 'nF',
             10 : '°C',
             11 : '°F',
-            12 : 'dc uA',
-            13 : 'ac uA',
+            12 : 'dc µA',
+            13 : 'ac µA',
             14 : 'dc mA',
             15 : 'ac mA',
             16 : 'dc A',
@@ -287,7 +287,7 @@ if __name__ == '__main__':
                     if data:
                         if last_data is None: print()
                         print(data[0], ''.join([chr(d) for d in data[1:9]]), data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN],
-                            '[%d] =' % UTDevice.get_channel(data), dev.get_value(data))
+                            '[%d] =' % UTDevice.get_channel(data), dev.get_value(data), dev.get_mode(data))
                     else:
                         print('.', end='', flush=True)
                     last_data = data
