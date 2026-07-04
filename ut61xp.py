@@ -1,5 +1,5 @@
 """
-The UNI-T UT61B/D/E+ and UT60BT digital multimeter communication helper.
+The UNI-T UT61B/D/E+ and UT60BT digital multimeter communication adapters.
 Its inspired by:
  https://github.com/ljakob/unit_ut61eplus
  https://github.com/aroum/unit_ut61eplus_python
@@ -203,6 +203,9 @@ class BTDevice(BTMixin, UTDevice):
         self.dev = dev
         self.last_data = None
 
+    def is_connected(self):
+        return self.dev.is_connected
+
     def _notify_cb(self, char, val):
         """BT adapter data changed notification callback"""
         if len(val) == 3 + UTDevice.DATA_LEN + 2:
@@ -282,7 +285,7 @@ if __name__ == '__main__':
         if dev:
             with dev:
                 last_data = None
-                while True:
+                while dev.is_connected():
                     data = dev.query_raw()
                     if data:
                         if last_data is None: print()

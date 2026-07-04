@@ -219,6 +219,9 @@ def do_data(args):
     try:
         start = ts = time.time()
         while True:
+            if not dev.is_connected():
+                log.error('\ndisconnected')
+                return -1
             # Query data
             data = dev.query_raw(args.tout, sleep_fn)
             if not data:

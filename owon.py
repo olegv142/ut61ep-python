@@ -1,5 +1,5 @@
 """
-OWON digital multimeters communication helper
+OWON digital multimeters communication adapter
 """
 
 import time
@@ -18,6 +18,9 @@ class OwonBtDevice(BTMixin, Device):
         super().__init__(addr)
         self.dev = dev
         self.last_data = None
+
+    def is_connected(self):
+        return self.dev.is_connected
 
     def _notify_cb(self, char, val):
         """BT adapter data changed notification callback"""
@@ -128,7 +131,7 @@ if __name__ == '__main__':
         if dev:
             with dev:
                 last_data = None
-                while True:
+                while dev.is_connected():
                     data = dev.query_raw()
                     if data:
                         if last_data is None: print()

@@ -18,6 +18,10 @@ class Device(ABC):
     def __init__(self, path):
         self.path = path
 
+    def is_connected(self):
+        """Subclasses may redefine this method to indicate disconnection"""
+        return True
+
     @abstractmethod
     def query_raw(self, tout, idle_sleep):
         """Reads raw data packet from device and returns it"""
