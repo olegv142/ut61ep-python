@@ -220,12 +220,12 @@ def do_data(args):
     try:
         start = ts = time.time()
         while True:
-            if not dev.is_connected():
-                log.error('\ndisconnected')
-                return -1
             # Query data
             data = dev.query_raw(args.tout, sleep_fn)
             if not data:
+                if not dev.is_connected():
+                    log.error('\ndisconnected')
+                    return -1
                 if fname and args.progress:
                     print('~', end='', flush=True)
                 if plotter and plotter.is_closed():
