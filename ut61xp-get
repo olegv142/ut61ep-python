@@ -207,6 +207,7 @@ def do_data(args):
     out_fmt = '%.3f%s %f'
     out_file = sys.stdout if not fname else open(fname, 'w')
     alt_file = None if not alt_fname else open(alt_fname, 'w')
+    out_empty, alt_empty = True, True
     stat = [StatCollector(), StatCollector()]
     if args.graph:
         plotter = Plotter(args, type(dev))
@@ -245,8 +246,15 @@ def do_data(args):
                 if val_chan == 0:
                     if val_good: # apply value transformation
                         val = (val - args.offset) * args.mult
+                    if out_empty:
+                        out_empty = False
+                        if fname:
+                            print('#', dev.get_mode(data), file=out_file)
                     print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=out_file)
                 elif alt_file:
+                    if alt_empty:
+                        alt_empty = False
+                        print('#', dev.get_mode(data), file=alt_file)
                     print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=alt_file)
             if fname and args.progress:
                 # Show progress
@@ -287,8 +295,12 @@ def do_plot(args):
     import matplotlib.pyplot as plt
     for fname in args.input_files:
         xdata, ydata = [], []
+        mode = None
         with open(fname, 'r') as f:
             for line in f:
+                if line[:1] == '#':
+                    mode = line[1:].strip()
+                    continue
                 xy = line.split()
                 if len(xy) != 2:
                     continue
@@ -300,6 +312,8 @@ def do_plot(args):
                 ydata.append(y)
         name = os.path.basename(fname)
         name = os.path.splitext(name)[0]
+        if mode:
+            name += ' [' + mode + ']'
         plt.plot(xdata, ydata, label=name)
     if len(args.input_files) == 1:
         plt.title(args.input_files[0])
