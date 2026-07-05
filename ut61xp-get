@@ -55,6 +55,8 @@ class Plotter:
             )[0] for i in range(nchan)]
         self.vmin, self.vmax = [float('inf')] * nchan, [float('-inf')] * nchan
         self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
+        if args.full_screen:
+            self.fig.canvas.manager.full_screen_toggle()
 
     def is_closed(self):
         return not self.plt.fignum_exists(self.fig.number)
@@ -324,7 +326,8 @@ def do_plot(args):
 def main():
     parser = argparse.ArgumentParser(
             description='UNI-T UT61X+/UT60BT data acquisition tool',
-            usage='%(prog)s [options] list|once|data [command options]'
+            usage='%(prog)s [options] list|once|data [command options]',
+            formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
         )
 
     def get_help(args):
@@ -394,6 +397,8 @@ def main():
             help='set data plot title')
     data_parser.add_argument('--alt-title', type=str, required=False, metavar='TEXT',
             help='set alternative channel data plot title')
+    data_parser.add_argument('--full-screen', action='store_true',
+            help='display the graph on the entire screen')
     data_parser.add_argument('--hline', type=float, metavar='VAL', action='append',
             help='draw horizontal line through the specified vertical axis value (may be used multiple times)')
     data_parser.add_argument('--alt-hline', type=float, metavar='VAL', action='append',
