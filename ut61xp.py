@@ -135,7 +135,7 @@ class UTDevice(Device):
     def get_mode(data):
         """Returns measurement mode and units description string"""
         mode = UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0], '')
-        f1, f2 = data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN-1]
+        f1, f2, f3 = data[UTDevice.DATA_LEN-3:]
         if f1 & 1:
             mode += ' Rel'
         if f1 & 2:
@@ -148,6 +148,13 @@ class UTDevice(Device):
             mode += ' Err'
         if f2 & 2:
             mode += ' LoBatt'
+        # f2 & 4 means manual mode
+        # f3 & 1 means current polarity is negative
+        if f3 & 2:
+            mode += ' P-Min'
+        if f3 & 4:
+            mode += ' P-Max'
+        # f3 & 8 means AC channel in DC+AC mode
         return mode
 
 class HIDDevice(HIDMixin, UTDevice):
