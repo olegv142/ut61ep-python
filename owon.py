@@ -93,6 +93,8 @@ class OwonBtDevice(BTMixin, Device):
         0xa2 : 'diode V',
         0xe2 : 'Ohm',
         0xa1 : 'Hz',
+        0xa9 : 'kHz',
+        0xb1 : 'MHz',
         0xe1 : 'pw %',
     }
 
@@ -101,6 +103,8 @@ class OwonBtDevice(BTMixin, Device):
         0x31 : (0x21, 6),  # MOhm -> Ohm
         0x29 : (0x21, 3),  # kOhm -> Ohm
         0x51 : (0x49, 3),  # µF   -> nF
+        0xa9 : (0xa1, 3),  # kHz  -> Hz
+        0xb1 : (0xa1, 6),  # MHz  -> Hz
     }
 
     @staticmethod
