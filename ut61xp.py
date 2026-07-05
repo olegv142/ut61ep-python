@@ -145,7 +145,7 @@ class UTDevice(Device):
         if f1 & 8:
             mode += ' Max'
         if f2 & 1:
-            mode += ' Err'
+            mode += ' Caution!'
         if f2 & 2:
             mode += ' LoBatt'
         # f2 & 4 means manual mode
