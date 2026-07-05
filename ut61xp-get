@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-The UNI-T UT61B/D/E+ digital multimeter data acquisition and plotting tool
+The UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool
 """
 
 import os
@@ -338,7 +338,7 @@ def do_plot(args):
 
 def main():
     parser = argparse.ArgumentParser(
-            description='UNI-T UT61X+/UT60BT data acquisition tool',
+            description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool',
             usage='%(prog)s [options] list|once|data [command options]',
             formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
         )
