@@ -55,6 +55,10 @@ class Plotter:
             )[0] for i in range(nchan)]
         self.vmin, self.vmax = [float('inf')] * nchan, [float('-inf')] * nchan
         self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
+        def on_click(e):
+            if e.dblclick:
+                self.fig.canvas.manager.full_screen_toggle()
+        self.fig.canvas.mpl_connect('button_press_event', on_click)
         if args.full_screen:
             self.fig.canvas.manager.full_screen_toggle()
 
@@ -398,7 +402,7 @@ def main():
     data_parser.add_argument('--alt-title', type=str, required=False, metavar='TEXT',
             help='set alternative channel data plot title')
     data_parser.add_argument('--full-screen', action='store_true',
-            help='display the graph on the entire screen')
+            help='display the graph on the entire screen (use dbl-click to toggle)')
     data_parser.add_argument('--hline', type=float, metavar='VAL', action='append',
             help='draw horizontal line through the specified vertical axis value (may be used multiple times)')
     data_parser.add_argument('--alt-hline', type=float, metavar='VAL', action='append',
