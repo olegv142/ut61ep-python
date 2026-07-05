@@ -103,7 +103,6 @@ class USBMixin(ABC):
 class HIDMixin(USBMixin):
     """Methods specific for USB HID devices"""
     @classmethod
-    @staticmethod
     def list_paths(cls, vid=None, pid=None):
         """Returns the list of HID device paths"""
         if vid is None:
@@ -133,7 +132,6 @@ class BTMixin(ABC):
     device_name = None
 
     @classmethod
-    @staticmethod
     def list_addrs(cls, name=None):
         """Returns the list of BT device addresses"""
         if name is None:
