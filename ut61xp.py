@@ -59,6 +59,11 @@ class UTDevice(Device):
 
     @staticmethod
     def get_scale(mode):
+        """
+        The UT61X+ reports measurement mode (say voltage) set by the user. The actual measurement units
+        may be different across models. For example the UT61E+ reports volts in voltage mode while UT60BT
+        reports millivolts. The purpose of this function is to fix scale differences across models.
+        """
         return 1
 
     @classmethod

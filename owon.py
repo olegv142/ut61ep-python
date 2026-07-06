@@ -109,8 +109,15 @@ class OwonBtDevice(BTMixin, Device):
 
     @staticmethod
     def get_mode(data):
-        """Returns measurement mode and units description string"""
-        mt    = OwonBtDevice.mode_tag(data)
+        """
+        Returns measurement mode and units description string.
+        """
+        mt = OwonBtDevice.mode_tag(data)
+        # Different vendors use different approaches to reporting measurement mode. The UNI-T reports
+        # mode set by user. OWON reports units chosen by auto-range (say millivolts) within the mode
+        # set by user (say voltage). So the units may be voluntary switched right in the middle of the
+        # data collection which is quite undesirable. Therefore we first map current units to some
+        # 'base units' by _scale_map and then retrieve the corresponding label from _mode_map.
         mt, _ = OwonBtDevice._scale_map.get(mt, (mt, 0))
         mode  = OwonBtDevice._mode_map.get(mt, '')
         flags = data[2]
