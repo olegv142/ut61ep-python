@@ -284,6 +284,8 @@ class UT60BTDevice(BTDevice):
             0 : 2, # ac V
             2 : 2, # dc V
             6 : 2, # Ohms
+            14: 2, # dc mA
+            15: 2, # ac mA
         }.get(mode)
 
     @staticmethod
@@ -310,7 +312,7 @@ if __name__ == '__main__':
                     data = dev.query_raw()
                     if data:
                         if last_data is None: print()
-                        print(data[0], ''.join([chr(d) for d in data[1:9]]), data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN],
+                        print(data[0], ''.join([chr(d) for d in data[1:9]]), list(data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN]),
                             '[%d] =' % UTDevice.get_channel(data), dev.get_value(data), dev.get_mode(data))
                     else:
                         print('.', end='', flush=True)
