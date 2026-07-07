@@ -57,6 +57,10 @@ The **ut61xp-get data** command will plot data read from device in separate wind
 
 The **ut61xp-get plot** command followed by the list of filenames plots the data sets reading them from the given files. It is just a convenient tool for viewing the collected data without any complex charting features. You can use plot navigation bar as usual and use double click to toggle full screen mode.
 
+## Data units and scaling
+
+The data reported by multimeter typically contains information about measurement mode (say voltage) and/or measurement units (say millivolts). The units may be voluntary changed by the device as a result of the automatic range selection (for ex. millivolts to volts). Many vendor provided and third party data readout applications just save data in the units reported by device. This practice is bad since the data with sudden change of units will show abrupt jump with several orders of magnitude and will look as a mess overall. The **ut61xp-get** tool takes special care to guarantee that the units of the data will be the same no matter how auto-ranging works on the particular device. The particular units used for the data representation will be shown as the default plot title with *-g* option and will be saved as the first line of the output file with *-f* or *-a* options.
+
 ## Using configurations
 
 The configuration is the file storing the full set of command line options in the form of json dictionary. Use *--cfg-save* option with **ut61xp-get data** command to create such file filled with options specified in the current command line and *-c/--cfg-load* option to load such file back. They may be handy to save typing and even more importantly to make data acquisition from several devices easier. Several examples of using them while reading data from several devices simultaneously will be given below.
