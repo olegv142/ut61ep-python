@@ -68,6 +68,7 @@ With *-s/--stat* the **ut61xp-get data** command will print various collected da
  - the min / max values
  - the median and pure average values
  - the standard deviation (absolute and relative)
+ - the integral in val * sec units
  - the 3rd central moment relative to the standard deviation (*skewness*)
  - the 4th central moment relative to the standard deviation minus 3 (*kurtosis exess*)
 
