@@ -103,10 +103,10 @@ if __name__ == '__main__':
     assert abs(m4-st.cm4) < max_err
 
     stat = StatCollector()
-    stat.account(1, 0)
-    stat.account(2, 2)
-    stat.account(float('nan'), 4)
-    stat.account(3, 6)
+    stat.account(1, 100)
+    stat.account(2, 102)
+    stat.account(float('nan'), 104)
+    stat.account(3, 106)
     assert stat.integral == 8
 
 
