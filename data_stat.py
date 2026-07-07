@@ -51,21 +51,21 @@ class StatCollector:
         cm4     = self.total_sum4 / self.total_valid - aver * (aver * (aver_2 + 6 * sigma_2) + 4 * cm3)
         return Stat(aver, sigma, cm3, cm4)
 
-    def print(self):
-        print('total samples  : %d' % self.total_samples)
-        print('valid samples  : %d' % self.total_valid)
+    def print(self, outf):
+        print('total samples  : %d' % self.total_samples, file=outf)
+        print('valid samples  : %d' % self.total_valid, file=outf)
         if self.total_valid:
             st = self.get_stat()
-            print('min  value     : %f' % self.total_min)
-            print('max  value     : %f' % self.total_max)
-            print('median average : %f' % self.get_median())
-            print('aver value     : %f' % st.aver)
-            print('std deviation  : %f' % st.std_dev)
+            print('min  value     : %f' % self.total_min, file=outf)
+            print('max  value     : %f' % self.total_max, file=outf)
+            print('median average : %f' % self.get_median(), file=outf)
+            print('aver value     : %f' % st.aver, file=outf)
+            print('std deviation  : %f' % st.std_dev, file=outf)
             if st.aver:
-                print('rel. dev. [%%]  : %.2f' % (100 * st.std_dev / abs(st.aver)))
+                print('rel. dev. [%%]  : %.2f' % (100 * st.std_dev / abs(st.aver)), file=outf)
             if st.std_dev:
-                print('skewness       : %.2f' % (st.cm3 / (st.std_dev ** 3)))
-                print('kurtosis exess : %.2f' % (st.cm4 / (st.std_dev ** 4) - 3))
+                print('skewness       : %.2f' % (st.cm3 / (st.std_dev ** 3)), file=outf)
+                print('kurtosis exess : %.2f' % (st.cm4 / (st.std_dev ** 4) - 3), file=outf)
 
 if __name__ == '__main__':
     import numpy

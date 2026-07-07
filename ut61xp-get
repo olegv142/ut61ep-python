@@ -289,19 +289,19 @@ def do_data(args):
             else:
                 ts = now
     finally:
+        if args.stat:
+            print('\n--- data statistics:', file=sys.stderr)
+            stat[0].print(sys.stderr)
+            if alt_file:
+                print('\n--- alternative channel:', file=sys.stderr)
+                stat[1].print(sys.stderr)
         dev.close()
         if fname:
-            out_file.close()
             if args.progress:
                 print(file=sys.stderr)
-        if alt_fname:
+            out_file.close()
+        if alt_file:
             alt_file.close()
-        if args.stat:
-            print('\n--- data statistics:')
-            stat[0].print()
-            if alt_fname:
-                print('\n--- alternative channel:')
-                stat[1].print()
 
 def do_plot(args):
     """Just plots input files"""
