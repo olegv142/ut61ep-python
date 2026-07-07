@@ -274,7 +274,7 @@ def do_data(args):
                 print('.' if val_good else '!', end='', file=sys.stderr, flush=True)
             if args.stat:
                 # Update stat
-                stat[val_chan].account(val)
+                stat[val_chan].account(val, t)
             if plotter:
                 if plotter.is_closed():
                     return 0

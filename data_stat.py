@@ -1,4 +1,5 @@
 import math
+import time
 from collections import namedtuple
 
 Stat = namedtuple('Stat', ('aver', 'std_dev', 'cm3', 'cm4'))
@@ -14,11 +15,25 @@ class StatCollector:
         self.total_max = -self.total_min
         self.median_sum, self.median_cnt = 0, 0
         self.median_buff = []
+        self.last_ts = None
+        self.last_val = None
+        self.integral = 0.
 
-    def account(self, val):
+    def account(self, val, t=None):
         self.total_samples += 1
+        now = t if t is not None else time.monotonic()
+        if self.last_ts is not None:
+            elapsed = now - self.last_ts
+        else:
+            elapsed = 0
+        self.last_ts = now
+        if self.last_val is not None:
+            self.integral += self.last_val * elapsed / 2
         if math.isnan(val):
+            self.last_val = None
             return
+        self.integral += val * elapsed / 2
+        self.last_val = val
         v2 = val * val
         self.total_valid += 1
         self.total_sum   += val
@@ -66,6 +81,7 @@ class StatCollector:
             if st.std_dev:
                 print('skewness       : %.2f' % (st.cm3 / (st.std_dev ** 3)), file=outf)
                 print('kurtosis exess : %.2f' % (st.cm4 / (st.std_dev ** 4) - 3), file=outf)
+            print('integral       : %f' % self.integral)
 
 if __name__ == '__main__':
     import numpy
@@ -85,3 +101,12 @@ if __name__ == '__main__':
     assert abs(m2-st.std_dev*st.std_dev) < max_err
     assert abs(m3-st.cm3) < max_err
     assert abs(m4-st.cm4) < max_err
+
+    stat = StatCollector()
+    stat.account(1, 0)
+    stat.account(2, 2)
+    stat.account(float('nan'), 4)
+    stat.account(3, 6)
+    assert stat.integral == 8
+
+
