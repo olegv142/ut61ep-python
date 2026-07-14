@@ -13,14 +13,18 @@ The code was reworked with the following goals in mind:
 
 ## Supported devices
 
-The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
-The scripts work via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel at the expense of the lower communication speed. The minimum data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter. Yet the BT adapter shows surprisingly good communication range. Its even able to communicate through the layer of reinforced concrete.
+### UNI-T multimeters
+- The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
+The tool works via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel at the expense of the lower communication speed. The minimum data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter. The BT adapter shows surprisingly good communication range. Its even able to communicate through the layer of reinforced concrete.
+- The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
+- The UT60BT is consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even higher resolution than the UT61X+ in both millivolt and capacitance modes, with some caveats (see below).
 
-The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
+### OWON multimeters
+The tool supports the number of Bluetooth multimeters using the same 'BDM' protocol. In particular its tested with the following devices:
+- The CM2100B clamp meter is inexpensive and quite versatile device capable of measuring AC or DC current without any electrical contact.
+- The B41T+ is a multimeter with 22,000 counts and built-in Bluetooth. However, it's relatively expensive and has a number of usability issues, with the most annoying is the display quality.
 
-The UT60BT is consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even higher resolution than the UT61X+ in both millivolt and capacitance modes, with some caveats (see below).
-
-OWON Bluetooth multimeters using the same 'BDM' protocol should work as well. Currently tested with CM2100B clamp meter.
+Other compatible OWON multimeters like B35T+ should work as well
 
 ## Installation
 
@@ -142,7 +146,7 @@ The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter usi
 To read from UT60BT one can supply *-B -M UT60BT* options right after **ut61xp-get** in the command line.
 
 ### OWON multimeters
-To read from OWON multimeter using 'BDM' protocol one can supply *-B -M OWON* options right after **ut61xp-get** in the command line. Currently tested with CM2100B clamp meter.
+To read from OWON multimeter using 'BDM' protocol one can supply *-B -M OWON* options right after **ut61xp-get** in the command line.
 
 ### Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
