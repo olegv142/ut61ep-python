@@ -95,7 +95,14 @@ class OwonBtDevice(BTMixin, Device):
         0xa1 : 'Hz',
         0xa9 : 'kHz',
         0xb1 : 'MHz',
-        0xe1 : 'pw %',
+        0xe1 : 'duty %',
+        0xc1 : 'duty %',
+        0x22 : '°C',
+        0x62 : '°F',
+        0x90 : 'dc µA',
+        0xd0 : 'ac µA',
+        0x98 : 'dc mA',
+        0xd8 : 'ac mA',
     }
 
     _scale_map = {
@@ -127,6 +134,10 @@ class OwonBtDevice(BTMixin, Device):
             mode += ' Rel'
         if flags & 8:
             mode += ' LoBatt'
+        if flags & 0x10:
+            mode += ' Min'
+        if flags & 0x20:
+            mode += ' Max'
         return mode
 
     def close(self):

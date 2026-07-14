@@ -113,7 +113,7 @@ class UTDevice(Device):
             2  : 'dc V',
             3  : 'dc mV',
             4  : 'Hz',
-            5  : 'pw %',
+            5  : 'duty %',
             6  : 'Ohm',
             7  : 'Ohm',
             8  : 'diode V',
