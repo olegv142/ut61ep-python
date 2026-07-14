@@ -24,7 +24,7 @@ The tool supports the number of Bluetooth multimeters using the same 'BDM' proto
 - The CM2100B clamp meter is inexpensive and quite versatile device capable of measuring AC or DC current without any electrical contact.
 - The B41T+ is a multimeter with 22,000 counts and built-in Bluetooth. However, it's relatively expensive and has a number of usability issues, with the most annoying is the display quality.
 
-Other compatible OWON multimeters like B35T+ should work as well
+Other compatible OWON multimeters like B35T+ should work with this tool as well
 
 ## Installation
 
