@@ -136,7 +136,7 @@ The configuration tricks shown above work just because the auto-detected device 
 
 Working with Bluetooth adapter conceptually is not different from using USB. Just add *-B/--bt* option right after *ut61xp-get* to force script to use BT adapter. Similar to USB use case the script is able to auto detect BT adapter provided that its powered on and no other adapters are in the accessible range. By means of using the *--cfg-save* option one can save the address of the adapter discovered (which plays the role of USB device path) for the subsequent reuse. One can specify BT address in the command line explicitly via *--path/--addr* option. Opening BT device by its address is significantly faster and more reliable than autodetecting it.
 
-## Other supported devices
+## Working with other supported devices
 
 By default, the **ut61xp-get** tool always expects the UT61X+ multimeter as the target device. To change this, one can use *-M/--model* option. Please note that if device works via Bluetooth, the *-B* option must be provided with *-M/--model* option.
 
