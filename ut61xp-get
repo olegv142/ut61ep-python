@@ -55,9 +55,18 @@ class Plotter:
             )[0] for i in range(nchan)]
         self.vmin, self.vmax = [float('inf')] * nchan, [float('-inf')] * nchan
         self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
+        self.init_window_icon(self.fig.canvas)
         self.init_dbl_click_handler(self.fig.canvas)
         if args.full_screen:
             self.fig.canvas.manager.full_screen_toggle()
+
+    @staticmethod
+    def init_window_icon(canvas):
+        if hasattr(canvas.manager.window, 'iconphoto'):
+            import tkinter as tk
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            img = tk.PhotoImage(file=script_dir + '/meter.png')
+            canvas.manager.window.iconphoto(False, img)
 
     @staticmethod
     def init_dbl_click_handler(canvas):
@@ -332,6 +341,7 @@ def do_plot(args):
         plt.title(args.input_files[0])
     else:
         plt.legend()
+    Plotter.init_window_icon(plt.gcf().canvas)
     Plotter.init_dbl_click_handler(plt.gcf().canvas)
     plt.show()
 
