@@ -62,11 +62,12 @@ class Plotter:
 
     @staticmethod
     def init_window_icon(canvas):
-        if hasattr(canvas.manager.window, 'iconphoto'):
+        icon_path = os.path.dirname(os.path.realpath(__file__)) + '/meter.png'
+        if hasattr(canvas.manager.window, 'set_icon_from_file'):
+            canvas.manager.window.set_icon_from_file(icon_path)
+        elif hasattr(canvas.manager.window, 'iconphoto'):
             import tkinter as tk
-            script_dir = os.path.dirname(os.path.realpath(__file__))
-            img = tk.PhotoImage(file=script_dir + '/meter.png')
-            canvas.manager.window.iconphoto(False, img)
+            canvas.manager.window.iconphoto(False, tk.PhotoImage(file=icon_path))
 
     @staticmethod
     def init_dbl_click_handler(canvas):
