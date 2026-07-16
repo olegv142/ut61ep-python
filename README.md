@@ -22,7 +22,7 @@ The tool works via USB HID adapter D-09A commonly supplied with UT61X+ multimete
 ### OWON multimeters
 The tool supports the number of Bluetooth multimeters using the same 'BDM' protocol. In particular its tested with the following devices:
 - The CM2100B clamp meter is inexpensive and quite versatile device capable of measuring AC or DC current without any electrical contact.
-- The B41T+ is a multimeter with 22,000 counts and built-in Bluetooth. However, it's relatively expensive and has a number of usability issues, with the most annoying is the display quality.
+- The B41T+ is a multimeter with 22,000 counts and built-in Bluetooth. However, it's relatively expensive and has a number of usability issues, display quality in particular.
 
 Other compatible OWON multimeters like B35T+ should work with this tool as well
 
