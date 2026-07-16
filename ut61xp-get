@@ -339,7 +339,7 @@ def do_plot(args):
             name += ' [' + mode + ']'
         plt.plot(xdata, ydata, label=name)
     if len(args.input_files) == 1:
-        plt.title(args.input_files[0])
+        plt.title(name)
     else:
         plt.legend()
     Plotter.init_window_icon(plt.gcf().canvas)
