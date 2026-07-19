@@ -71,7 +71,7 @@ The configuration is the file storing the full set of command line options in th
 
 ## Printing data statistics
 
-With *-s/--stat* the **ut61xp-get data** command will print various collected data statistic metrics upon acquisition termination. In particular:
+With *-s/--stat* option the **ut61xp-get data** command will print various collected data statistic metrics upon acquisition termination. In particular:
  - the number of data samples (total and valid)
  - the min / max values
  - the median and pure average values
@@ -84,7 +84,7 @@ The last two metrics may be used to characterize deviations from the mean. The s
 
 ### Print statistics while plotting data
 
-With *-S/--plot-stat* the **ut61xp-get data** command will print
+With *-S/--plot-stat* option the **ut61xp-get data** command will print data statistics on the plot window and update it on every new data sample. The *--plot-stat-loc* option may be used to specify the particular location on the plot where the statistics box will be placed. The default is 'lower left'. With *--plot-stat-loc "best"* options the location will be chosen automatically to minimize overlapping with data curve.
 
 ### Print statistics given the existing data file
 
