@@ -108,5 +108,3 @@ if __name__ == '__main__':
     stat.account(float('nan'), 104)
     stat.account(3, 106)
     assert stat.integral == 8
-
-

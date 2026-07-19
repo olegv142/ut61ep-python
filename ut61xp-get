@@ -356,6 +356,22 @@ def do_plot(args):
     Plotter.init_dbl_click_handler(canvas)
     plt.show()
 
+def do_stat(args):
+    stat = StatCollector()
+    with open(args.input_file, 'r') as f:
+        for line in f:
+            if line[:1] == '#':
+                continue
+            xy = line.split()
+            if len(xy) != 2:
+                continue
+            try:
+                x, y = float(xy[0]), float(xy[1])
+            except ValueError:
+                continue
+            stat.account(y, x)
+    stat.print(sys.stdout)
+
 def main():
     parser = argparse.ArgumentParser(
             description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool',
@@ -454,6 +470,10 @@ def main():
     plot_parser = subparsers.add_parser('plot', help='plot data file(s)')
     plot_parser.set_defaults(func=do_plot)
     plot_parser.add_argument('input_files', nargs='+', help='list of input files')
+
+    stat_parser = subparsers.add_parser('stat', help='print stat for existing data file')
+    stat_parser.set_defaults(func=do_stat)
+    stat_parser.add_argument('input_file', help='input file')
 
     args = parser.parse_args()
 
