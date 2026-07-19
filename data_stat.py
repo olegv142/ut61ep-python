@@ -81,7 +81,7 @@ class StatCollector:
             if st.std_dev:
                 print('skewness       : %.2f' % (st.cm3 / (st.std_dev ** 3)), file=outf)
                 print('kurtosis exess : %.2f' % (st.cm4 / (st.std_dev ** 4) - 3), file=outf)
-            print('integral       : %f' % self.integral)
+            print('integral       : %f' % self.integral, file=outf)
 
 if __name__ == '__main__':
     import numpy

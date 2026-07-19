@@ -5,6 +5,7 @@ The UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool
 """
 
 import os
+import io
 import sys
 import math
 import time
@@ -108,7 +109,22 @@ class Plotter:
             vmax = ymax + vrange * self.padding
         ax.set_ylim(vmin, vmax)
 
-    def update(self, t, data, val, chan):
+    def show_stat(self, ax, stat):
+        buff = io.StringIO()
+        stat.print(buff)
+        ax.legend(
+            [buff.getvalue().strip()], 
+            loc=self.args.plot_stat_loc,
+            handlelength=0,      # Removes the line symbol 
+            handletextpad=0,     # Removes padding between the symbol and text
+            facecolor='white',   # Background color of the text box
+            edgecolor='black',   # Border color
+            framealpha=.5,       # Background opacity (1.0 = fully opaque)
+            fancybox=True,
+            prop={'family': 'monospace'} # Use monospace font
+        )
+
+    def update(self, t, data, val, chan, stat):
         if not math.isnan(val) and chan < len(self.ax):
             axis = self.ax[chan]
             self.vmin[chan] = min(self.vmin[chan], val)
@@ -130,6 +146,8 @@ class Plotter:
                 mode = self.devT.get_mode(data)
                 if axis.get_title() != mode:
                     axis.set_title(mode)
+            if self.args.plot_stat:
+                self.show_stat(axis, stat)
         self.fig.canvas.flush_events()
         self.plt.show()
 
@@ -285,14 +303,13 @@ def do_data(args):
             if fname and args.progress:
                 # Show progress
                 print('.' if val_good else '!', end='', file=sys.stderr, flush=True)
-            if args.stat:
-                # Update stat
-                stat[val_chan].account(val, t)
+            # Update stat
+            stat[val_chan].account(val, t)
             if plotter:
                 if plotter.is_closed():
                     return 0
                 # Update plot
-                plotter.update(t, data, val, val_chan)
+                plotter.update(t, data, val, val_chan, stat[val_chan])
             # Introduce delay according to acquisition interval
             now = time.time()
             elapsed = now - ts
@@ -432,14 +449,18 @@ def main():
             help='use epoch timestamps (optional, use time since start by default)')
     data_parser.add_argument('-d', '--delimiter', type=str, default='', metavar='SYMBOL',
             help='data delimiter on output (optional, space by default)')
-    data_parser.add_argument('-s', '--stat', action='store_true',
-            help='output statistic upon termination')
     data_parser.add_argument('-g', '--graph', action='store_true',
             help='show data graph')
     data_parser.add_argument('-w', '--wnd', type=int, required=False, metavar='SAMPLES',
             help='data graph window samples (optional, show all samples by default)')
     data_parser.add_argument('-z', '--with-zero', action='store_true',
             help='make sure zero is within data graph vertical axis range')
+    data_parser.add_argument('-s', '--stat', action='store_true',
+            help='output statistic upon termination')
+    data_parser.add_argument('-S', '--plot-stat', action='store_true',
+            help='show statistic while plotting data')
+    data_parser.add_argument('--plot-stat-loc', default='lower left', metavar='LOC',
+            help='statistic box location on plot (optional, default is \'lower left\')')
     data_parser.add_argument('-t', '--title', type=str, required=False, metavar='TEXT',
             help='set data graph window title')
     data_parser.add_argument('--plot-title', type=str, required=False, metavar='TEXT',
