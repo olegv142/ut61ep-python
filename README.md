@@ -82,6 +82,14 @@ With *-s/--stat* the **ut61xp-get data** command will print various collected da
 
 The last two metrics may be used to characterize deviations from the mean. The smaller they are the close the values distribution to the standard one with *Gaussian* noise.
 
+### Print statistics while plotting data
+
+With *-S/--plot-stat* the **ut61xp-get data** command will print
+
+### Print statistics given the existing data file
+
+The **ut61xp-get stat input_file** command prints statistics of the data stored in the given *input_file*.
+
 ## Getting help
 
 Execute **ut61xp-get** tool with *-h* option to get detailed information about command line options. On Windows:
