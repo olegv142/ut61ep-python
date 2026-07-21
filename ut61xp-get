@@ -13,7 +13,7 @@ import json
 import argparse
 from ut61xp import log, UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from owon import OwonBtDevice
-from data_stat import StatCollector
+from data_stat import StatCollector, histogram
 from datetime import datetime
 
 _supported_devices = (
@@ -333,34 +333,56 @@ def do_data(args):
                 print('\n--- alternative channel:', file=sys.stderr)
                 stat[1].print(sys.stderr)
 
+def load_data_file(fname, skip_nan=False):
+    """
+    Load x, y data from the file and info from the header.
+    Returns X, Y, info tuple.
+    """
+    xdata, ydata, info = [], [], None
+    with open(fname, 'r') as f:
+        for line in f:
+            if line[:1] == '#' and not info:
+                info = line[1:].strip()
+                continue
+            xy = line.split()
+            if len(xy) != 2:
+                continue
+            try:
+                x, y = float(xy[0]), float(xy[1])
+            except ValueError:
+                continue
+            if math.isnan(y) and skip_nan:
+                continue
+            xdata.append(x)
+            ydata.append(y)
+    return xdata, ydata, info
+
+def split_file_info(info):
+    """Returns units, model pair"""
+    if not info:
+        return '', ''
+    infos = info.split('|')
+    return infos[0].strip(), (infos[1].strip() if len(infos) > 1 else '')
+
+def get_file_base_name(fname):
+    """Returns file base name without extension"""
+    if not fname:
+        return ''
+    name = os.path.basename(fname)
+    return os.path.splitext(name)[0]
+
 def do_plot(args):
     """Just plots input files"""
     import matplotlib.pyplot as plt
     models = set()
     for fname in args.input_files:
-        xdata, ydata = [], []
-        info = None
-        with open(fname, 'r') as f:
-            for line in f:
-                if line[:1] == '#':
-                    info = line[1:].strip()
-                    continue
-                xy = line.split()
-                if len(xy) != 2:
-                    continue
-                try:
-                    x, y = float(xy[0]), float(xy[1])
-                except ValueError:
-                    continue
-                xdata.append(x)
-                ydata.append(y)
-        name = os.path.basename(fname)
-        name = os.path.splitext(name)[0]
+        xdata, ydata, info = load_data_file(fname)
+        name = get_file_base_name(fname)
         if info:
-            infos = info.split('|')
-            name += ' [' + infos[0].strip() + ']'
-            if len(infos) > 1:
-                models.add(infos[1].strip())
+            units, model = split_file_info(info)
+            name += ' [' + units + ']'
+            if model:
+                models.add(model)
         plt.plot(xdata, ydata, label=name)
     if len(args.input_files) == 1:
         plt.title(name)
@@ -388,6 +410,39 @@ def do_stat(args):
                 continue
             stat.account(y, x)
     stat.print(sys.stdout)
+
+def do_hist(args):
+    xdata, ydata, info = load_data_file(args.input_file, skip_nan=True)
+    N = args.bins
+    if not N: # provides meaningful default
+        N = min(2 + len(xdata) // 4, 100)
+    H, Cnt = histogram(ydata, N)
+    outf = sys.stdout if not args.out_file else open(args.out_file, 'w')
+    if args.out_file:
+        outf = open(args.out_file, 'w')
+        if info:
+            print('#', info + ' [histogram]', file=outf)
+    else:
+        outf = sys.stdout
+    for i in range(N):
+        print('%f%s %f' % (H[i], args.delimiter, Cnt[i]), file=outf)
+    if args.out_file:
+        outf.close()
+    if args.graph:
+        import matplotlib.pyplot as plt
+        plt.plot(H, Cnt)
+        name = get_file_base_name(args.input_file)
+        if info:
+            units, model = split_file_info(info)
+            name += ' [' + units + ']'
+        else:
+            model = ''
+        plt.title(name)
+        canvas = plt.gcf().canvas
+        canvas.manager.set_window_title(model + ' [histogram]')
+        Plotter.init_window_icon(canvas)
+        Plotter.init_dbl_click_handler(canvas)
+        plt.show()
 
 def main():
     parser = argparse.ArgumentParser(
@@ -495,6 +550,21 @@ def main():
     stat_parser = subparsers.add_parser('stat', help='print stat for existing data file')
     stat_parser.set_defaults(func=do_stat)
     stat_parser.add_argument('input_file', help='input file')
+
+    hist_parser = subparsers.add_parser('hist',
+            help='make histogram for given data file',
+            formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
+        )
+    hist_parser.set_defaults(func=do_hist)
+    hist_parser.add_argument('input_file', help='input file')
+    hist_parser.add_argument('-g', '--graph', action='store_true',
+            help='plot histogram graph')
+    hist_parser.add_argument('-f', '--out-file', type=str, required=False, metavar='FILENAME',
+            help='output file (optional, stdout by default)')
+    hist_parser.add_argument('-b', '--bins', type=int, required=False, metavar='CNT',
+            help='the number of bins')
+    hist_parser.add_argument('-d', '--delimiter', type=str, default='', metavar='SYMBOL',
+            help='data delimiter on output (optional, space by default)')
 
     args = parser.parse_args()
 

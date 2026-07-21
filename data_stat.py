@@ -83,6 +83,20 @@ class StatCollector:
                 print('kurtosis exess : %.2f' % (st.cm4 / (st.std_dev ** 4) - 3), file=outf)
             print('integral       : %f' % self.integral, file=outf)
 
+def histogram(Y, N):
+    """
+    Returns histogram of the dataset Y with N bins as pair of lists (Yc, Cnt),
+    where Yc is the coordinate of the bin center, Cnt is the number of samples in the bin
+    """
+    if not Y:
+        return [], []
+    Y0, Y1 = min(Y), max(Y)
+    dY = (Y1 - Y0) / N
+    Cnt = [0] * N
+    for y in Y:
+        Cnt[min(int((y - Y0) / dY), N - 1)] += 1
+    return [Y0 + dY / 2 + dY * i for i in range(N)], Cnt
+
 if __name__ == '__main__':
     import numpy
     from scipy import stats
@@ -108,3 +122,5 @@ if __name__ == '__main__':
     stat.account(float('nan'), 104)
     stat.account(3, 106)
     assert stat.integral == 8
+
+    assert histogram([-.5, 0, 1, 2, 3, 4, 4.5], 5) == ([0, 1, 2, 3, 4], [2, 1, 1, 1, 2])
