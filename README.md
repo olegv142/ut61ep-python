@@ -55,7 +55,7 @@ Dual channel mode is handy while reading data in DC+AC mode of UT61E+. To use th
 
 ## Graph plotting
 
-The **ut61xp-get data** command will plot data read from device in separate window if *-g* option is provided. To terminate data reading in such mode one can just close graph window. With dual channel mode the graph window will contain two plots. The *-w/--wnd* option may be used to limit the number of recent data samples utilized to produce the plot by the specific number. You can use pan/zoom controls of the graph window while reading the data or use the dedicated button to save plot to the file, yet the acquisition will be paused until you done with plot saving. One can add any number of additional horizontal lines at specific levels to mark some specific value boundaries with *--hline* and *--alt-hline* options (the latter draws them on the second channel plot). These options may be used multiple times to add multiple horizontal lines. There are several other options that can be used for styling the graph window. One can set window title (*-t/--title*), plot title (*--plot-title, --alt-title*), data line style (*--line-style*), horizontal line style (*--hline-style*), data line colors (*--line-color, --alt-line-color*), horizontal line color (*--hline-color*). In case plot title is not provided as command line argument the current measuring mode reported by multimeter will be used as the title. You can use plot navigation bar as usual. Additionally double clicking the plot will toggle full screen mode. To open the graph window in full screen mode from the start, you can use the *--full-screen* command line option.
+The **ut61xp-get data** command will plot data read from device in separate window if *-g/--graph* option is provided. To terminate data reading in such mode one can just close graph window. With dual channel mode the graph window will contain two plots. The *-w/--wnd* option may be used to limit the number of recent data samples utilized to produce the plot by the specific number. You can use pan/zoom controls of the graph window while reading the data or use the dedicated button to save plot to the file, yet the acquisition will be paused until you done with plot saving. One can add any number of additional horizontal lines at specific levels to mark some specific value boundaries with *--hline* and *--alt-hline* options (the latter draws them on the second channel plot). These options may be used multiple times to add multiple horizontal lines. There are several other options that can be used for styling the graph window. One can set window title (*-t/--title*), plot title (*--plot-title, --alt-title*), data line style (*--line-style*), horizontal line style (*--hline-style*), data line colors (*--line-color, --alt-line-color*), horizontal line color (*--hline-color*). In case plot title is not provided as command line argument the current measuring mode reported by multimeter will be used as the title. You can use plot navigation bar as usual. Additionally double clicking the plot will toggle full screen mode. To open the graph window in full screen mode from the start, you can use the *--full-screen* command line option.
 
 ## Plotting already collected data
 
@@ -90,17 +90,23 @@ With *-S/--plot-stat* option the **ut61xp-get data** command will print data sta
 
 The **ut61xp-get stat input_file** command prints statistics of the data stored in the given *input_file*.
 
+## Working with data histograms
+
+The **ut61xp-get hist input_file** command creates histogram for the given input file. It either prints it to standard output or saves to the file if *-f/--out-file* option is given. The output data formatting may be customized by *-d/--delimiter* option. The *-b/--bins* option may be used to set the required number of bins in the histogram. With *-g/--graph* the histogram will be plotted in the separate window. One can plot the histogram saved to the file by  **ut61xp-get plot** command as any other data file.
+
 ## Getting help
 
 Execute **ut61xp-get** tool with *-h* option to get detailed information about command line options. On Windows:
 ```
 python ut61xpy/ut61xp-get -h
 python ut61xpy/ut61xp-get data -h
+python ut61xpy/ut61xp-get hist -h
 ```
 On Linux the following will work either:
 ```
 ./ut61xpy/ut61xp-get -h
 ./ut61xpy/ut61xp-get data -h
+./ut61xpy/ut61xp-get hist -h
 ```
 
 ## Working with several devices simultaneously
