@@ -371,29 +371,38 @@ def get_file_base_name(fname):
     name = os.path.basename(fname)
     return os.path.splitext(name)[0]
 
-def do_plot(args):
-    """Just plots input files"""
+def plot_data(Xs, Ys, Names, Infos, title_suffix=''):
+    """Plot one or more datasets"""
     import matplotlib.pyplot as plt
-    models = set()
-    for fname in args.input_files:
-        xdata, ydata, info = load_data_file(fname)
-        name = get_file_base_name(fname)
+    models = {}
+    for xdata, ydata, name, info in zip(Xs, Ys, Names, Infos):
         if info:
             units, model = split_file_info(info)
             name += ' [' + units + ']'
             if model:
-                models.add(model)
+                models[model] = None
         plt.plot(xdata, ydata, label=name)
-    if len(args.input_files) == 1:
-        plt.title(name)
+    if len(Names) == 1:
+        plt.title(Names[0])
     else:
         plt.legend()
     canvas = plt.gcf().canvas
     if models:
-        canvas.manager.set_window_title(' '.join(list(models)))
+        canvas.manager.set_window_title(', '.join(list(models.keys())) + title_suffix)
     Plotter.init_window_icon(canvas)
     Plotter.init_dbl_click_handler(canvas)
     plt.show()
+
+def do_plot(args):
+    """Just plots input files"""
+    Xs, Ys, Names, Infos = [], [], [], []
+    for fname in args.input_files:
+        xdata, ydata, info = load_data_file(fname)
+        Xs.append(xdata)
+        Ys.append(ydata)
+        Infos.append(info)
+        Names.append(get_file_base_name(fname))
+    plot_data(Xs, Ys, Names, Infos)
 
 def do_stat(args):
     stat = StatCollector()
@@ -429,20 +438,7 @@ def do_hist(args):
     if args.out_file:
         outf.close()
     if args.graph:
-        import matplotlib.pyplot as plt
-        plt.plot(H, Cnt)
-        name = get_file_base_name(args.input_file)
-        if info:
-            units, model = split_file_info(info)
-            name += ' [' + units + ']'
-        else:
-            model = ''
-        plt.title(name)
-        canvas = plt.gcf().canvas
-        canvas.manager.set_window_title(model + ' [histogram]')
-        Plotter.init_window_icon(canvas)
-        Plotter.init_dbl_click_handler(canvas)
-        plt.show()
+        plot_data([H], [Cnt], [get_file_base_name(args.input_file)], [info], ' [histogram]')
 
 def main():
     parser = argparse.ArgumentParser(
