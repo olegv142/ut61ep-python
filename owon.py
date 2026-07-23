@@ -81,6 +81,7 @@ class OwonBtDevice(BTMixin, Device):
     _mode_map = {
         0x18 : 'dc mV',
         0x20 : 'dc V',
+        0x58 : 'ac mV',
         0x60 : 'ac V',
         0xe0 : 'ac A',
         0xa0 : 'dc A',
@@ -103,10 +104,12 @@ class OwonBtDevice(BTMixin, Device):
         0xd0 : 'ac µA',
         0x98 : 'dc mA',
         0xd8 : 'ac mA',
+        0x23 : 'hFE',
     }
 
     _scale_map = {
-        0x18 : (0x20, -3), # mV   -> V
+        0x18 : (0x20, -3), # dc mV -> dc V
+        0x58 : (0x60, -3), # ac mV -> ac V
         0x31 : (0x21, 6),  # MOhm -> Ohm
         0x29 : (0x21, 3),  # kOhm -> Ohm
         0x51 : (0x49, 3),  # µF   -> nF
