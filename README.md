@@ -86,6 +86,8 @@ The last two metrics may be used to characterize deviations from the mean. The s
 
 With *-S/--plot-stat* option the **ut61xp-get data** command will print data statistics on the plot window and update it on every new data sample. The *--plot-stat-loc* option may be used to specify the particular location on the plot where the statistics box will be placed. The default is 'lower left'. With *--plot-stat-loc "best"* options the location will be chosen automatically to minimize overlapping with data curve.
 
+Another way to view current statistics is to press the space bar in the chart window. This will display the statistics on the terminal. This doesn't require any special configuration.
+
 ### Print statistics given the existing data file
 
 The **ut61xp-get stat input_file** command prints statistics of the data stored in the given *input_file*.
