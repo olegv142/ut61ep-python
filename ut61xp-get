@@ -27,13 +27,14 @@ class Plotter:
     """Data plotter"""
     padding = .075
 
-    def __init__(self, args, devT):
+    def __init__(self, args, devT, stat):
         import matplotlib.pyplot as plt
         plt.rcParams["figure.raise_window"] = False
         plt.ion()
         self.plt = plt
         self.args = args
         self.devT = devT
+        self.stat = stat
         if args.alt_file:
             nchan = 2 # dual channel plot
             self.fig, self.ax = self.plt.subplots(2, 1, sharex = True)
@@ -61,6 +62,7 @@ class Plotter:
         self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
         self.init_window_icon(self.fig.canvas)
         self.init_dbl_click_handler(self.fig.canvas)
+        self.init_stat_handler(self.fig.canvas)
         if args.full_screen:
             self.fig.canvas.manager.full_screen_toggle()
 
@@ -83,6 +85,13 @@ class Plotter:
                 canvas.manager.full_screen_toggle()
             last_click = ts
         canvas.mpl_connect('button_press_event', on_click)
+
+    def init_stat_handler(self, canvas):
+        def on_key_press(e):
+            if e.key == ' ':
+                print_stat(self.args, self.stat)
+        canvas.mpl_connect('key_press_event', on_key_press)
+        log.info('press space to print data statistics')
 
     def is_closed(self):
         return not self.plt.fignum_exists(self.fig.number)
@@ -127,7 +136,7 @@ class Plotter:
             prop={'family': 'monospace'} # Use monospace font
         )
 
-    def update(self, t, data, val, chan, stat):
+    def update(self, t, data, val, chan):
         if not math.isnan(val) and chan < len(self.ax):
             axis = self.ax[chan]
             self.vmin[chan] = min(self.vmin[chan], val)
@@ -150,7 +159,7 @@ class Plotter:
                 if axis.get_title() != mode:
                     axis.set_title(mode)
             if self.args.plot_stat:
-                self.show_stat(axis, stat)
+                self.show_stat(axis, self.stat[chan])
         self.fig.canvas.flush_events()
         self.plt.show()
 
@@ -222,6 +231,13 @@ def maybe_save_cfg(args, dev_path):
         with open(cfg_save_fname, 'w') as f:
             f.write(json.dumps(opts))
 
+def print_stat(args, stats):
+    print('\n--- data statistics:', file=sys.stderr)
+    stats[0].print(sys.stderr)
+    if args.alt_file:
+        print('\n--- alternative channel:', file=sys.stderr)
+        stats[1].print(sys.stderr)
+
 def update_measuring_defaults(args):
     if args.interval is None:
         args.interval = 1 if not args.alt_file else 0
@@ -261,7 +277,7 @@ def do_data(args):
     out_empty, alt_empty = True, True
     stat = [StatCollector(), StatCollector()]
     if args.graph:
-        plotter = Plotter(args, type(dev))
+        plotter = Plotter(args, type(dev), stat)
         sleep_fn = plotter.plt.pause
     else:
         plotter = None
@@ -315,7 +331,7 @@ def do_data(args):
                 if plotter.is_closed():
                     return 0
                 # Update plot
-                plotter.update(t, data, val, val_chan, stat[val_chan])
+                plotter.update(t, data, val, val_chan)
             # Introduce delay according to acquisition interval
             now = time.time()
             elapsed = now - ts
@@ -333,11 +349,7 @@ def do_data(args):
         if alt_file:
             alt_file.close()
         if args.stat:
-            print('\n--- data statistics:', file=sys.stderr)
-            stat[0].print(sys.stderr)
-            if alt_file:
-                print('\n--- alternative channel:', file=sys.stderr)
-                stat[1].print(sys.stderr)
+            print_stat(args, stat)
 
 def load_data_file(fname, skip_nan=False):
     """
