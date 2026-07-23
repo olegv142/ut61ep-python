@@ -189,10 +189,11 @@ def open_device(args):
     """Open HID or BT device"""
     T = device_type(args)
     if args.path:
-        return T.open_addr(args.path) if T.isBT else T.open_path(args.path)
-    dev = T.open(args.name) if T.isBT else T.open(args.VID, args.PID)
+        dev = T.open_addr(args.path) if T.isBT else T.open_path(args.path)
+    else:
+        dev = T.open(args.name) if T.isBT else T.open(args.VID, args.PID)
     if dev:
-        log.info('found %s at %s', dev.model_name, dev.path)
+        log.info('%s %s at %s', 'open' if args.path else 'found', dev.model_name, dev.path)
     return dev
 
 def do_list(args):
