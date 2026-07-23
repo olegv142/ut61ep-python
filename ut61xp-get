@@ -11,10 +11,13 @@ import math
 import time
 import json
 import argparse
-from ut61xp import log, UTDevice, HIDDevice, BTDevice, UT60BTDevice
+import logging
+from ut61xp import UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from owon import OwonBtDevice
 from data_stat import StatCollector, histogram
 from datetime import datetime
+
+log = logging.getLogger('DEV')
 
 _supported_devices = (
     HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice
@@ -178,7 +181,10 @@ def open_device(args):
     T = device_type(args)
     if args.path:
         return T.open_addr(args.path) if T.isBT else T.open_path(args.path)
-    return T.open(args.name) if T.isBT else T.open(args.VID, args.PID)
+    dev = T.open(args.name) if T.isBT else T.open(args.VID, args.PID)
+    if dev:
+        log.info('found %s at %s', dev.model_name, dev.path)
+    return dev
 
 def do_list(args):
     T = device_type(args)
@@ -444,6 +450,8 @@ def do_hist(args):
             no_yticks=True, title_suffix=' [histogram]')
 
 def main():
+    logging.basicConfig(format='%(message)s', level=logging.INFO)
+
     parser = argparse.ArgumentParser(
             description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool',
             usage='%(prog)s [options] list|once|data [command options]',
