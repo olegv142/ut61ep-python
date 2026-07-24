@@ -94,15 +94,21 @@ class Plotter:
             elif e.key == 'w' or e.key == 'W':
                 if self.args.wnd:
                     self.args.wnd, wnd = None, self.args.wnd
-                    print('\nwnd off', file=sys.stderr)
+                    log.info('\nwnd off')
                 elif wnd:
                     self.args.wnd = wnd
-                    print('\nwnd[%u] on' % wnd, file=sys.stderr)
+                    log.info('\nwnd[%u] on' % wnd)
             elif e.key == 'z' or e.key == 'Z':
                 self.args.with_zero = not self.args.with_zero
+            elif e.key == 't' or e.key == 'T':
+                if self.args.plot_stat:
+                    for ax in self.ax:
+                        if l := ax.get_legend():
+                            l.remove()
+                self.args.plot_stat = not self.args.plot_stat
 
         canvas.mpl_connect('key_press_event', on_key_press)
-        log.info('press space to print data statistics, z / w to toggle with-zero / wnd modes, q to exit')
+        log.info('press space to print data statistics, z to toggle zero axis display, w to toggle data window, t to toggle stat display, q to exit')
 
     def is_closed(self):
         return not self.plt.fignum_exists(self.fig.number)
