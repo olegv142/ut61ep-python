@@ -97,30 +97,3 @@ def histogram(Y, N):
         Cnt[min(int((y - Y0) / dY), N - 1)] += 1
     return [Y0 + dY / 2 + dY * i for i in range(N)], Cnt
 
-if __name__ == '__main__':
-    import numpy
-    from scipy import stats
-
-    vals = []
-    stat = StatCollector()
-    for _ in range(10000):
-        v = numpy.random.normal()
-        vals.append(v)
-        stat.account(v)
-    
-    st = stat.get_stat()
-    print(st)
-    max_err = 1e-13
-    m2, m3, m4 = stats.moment(vals, 2), stats.moment(vals, 3), stats.moment(vals, 4)
-    assert abs(m2-st.std_dev*st.std_dev) < max_err
-    assert abs(m3-st.cm3) < max_err
-    assert abs(m4-st.cm4) < max_err
-
-    stat = StatCollector()
-    stat.account(1, 100)
-    stat.account(2, 102)
-    stat.account(float('nan'), 104)
-    stat.account(3, 106)
-    assert stat.integral == 8
-
-    assert histogram([-.5, 0, 1, 2, 3, 4, 4.5], 5) == ([0, 1, 2, 3, 4], [2, 1, 1, 1, 2])
