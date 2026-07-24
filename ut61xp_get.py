@@ -464,10 +464,11 @@ def do_hist(args):
 def main(argv=None):
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
+    formatter = lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
     parser = argparse.ArgumentParser(
             description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool',
             usage='%(prog)s [options] list|once|data [command options]',
-            formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
+            formatter_class=formatter
         )
 
     def get_help(args):
@@ -495,15 +496,16 @@ def main(argv=None):
             help='wait Enter on exit')
 
     subparsers = parser.add_subparsers()
-    subparsers.add_parser('list',
+    subparser_prog = sys.argv[0] if argv else None
+    subparsers.add_parser('list', prog=subparser_prog,
             help='list path for connected devices'
         ).set_defaults(func=do_list)
-    subparsers.add_parser('once',
+    subparsers.add_parser('once', prog=subparser_prog,
             help='get single reading'
         ).set_defaults(func=do_once)
-    data_parser = subparsers.add_parser('data',
+    data_parser = subparsers.add_parser('data', prog=subparser_prog,
             help='read data continuously',
-            formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
+            formatter_class=formatter
         )
     data_parser.set_defaults(func=do_data)
 
@@ -564,17 +566,21 @@ def main(argv=None):
     data_parser.add_argument('-c', '--cfg-load', type=str, required=False, metavar='FILENAME',
             help='load command line options from the file with given name')
 
-    plot_parser = subparsers.add_parser('plot', help='plot data file(s)')
+    plot_parser = subparsers.add_parser('plot', prog=subparser_prog,
+            help='plot data file(s)'
+        )
     plot_parser.set_defaults(func=do_plot)
     plot_parser.add_argument('input_files', nargs='+', help='list of input files')
 
-    stat_parser = subparsers.add_parser('stat', help='print stat for existing data file')
+    stat_parser = subparsers.add_parser('stat', prog=subparser_prog,
+            help='print stat for existing data file'
+        )
     stat_parser.set_defaults(func=do_stat)
     stat_parser.add_argument('input_file', help='input file')
 
-    hist_parser = subparsers.add_parser('hist',
+    hist_parser = subparsers.add_parser('hist', prog=subparser_prog,
             help='make histogram for given data file',
-            formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
+            formatter_class=formatter
         )
     hist_parser.set_defaults(func=do_hist)
     hist_parser.add_argument('input_file', help='input file')
