@@ -521,7 +521,7 @@ def main(argv=None):
             help='wait Enter on exit')
 
     subparsers = parser.add_subparsers()
-    subparser_prog = sys.argv[0] if argv else None
+    subparser_prog = os.path.basename(sys.argv[0]) if argv else None
     subparsers.add_parser('list', prog=subparser_prog,
             help='list path for connected devices'
         ).set_defaults(func=do_list)
