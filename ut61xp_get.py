@@ -551,10 +551,10 @@ def main(argv=None):
             help='data graph window samples (optional, show all samples by default); press w to toggle')
     data_parser.add_argument('-z', '--with-zero', action='store_true',
             help='make sure the zero is within data graph vertical axis range; press z to toggle')
+    data_parser.add_argument('-S', '--plot-stat', action='store_true',
+            help='show statistic while plotting data; press t to toggle')
     data_parser.add_argument('-s', '--stat', action='store_true',
             help='output statistic upon termination')
-    data_parser.add_argument('-S', '--plot-stat', action='store_true',
-            help='show statistic while plotting data')
     data_parser.add_argument('--plot-stat-loc', default='lower left', metavar='LOC',
             help='statistic box location on plot (optional, default is \'lower left\')')
     data_parser.add_argument('-t', '--title', type=str, required=False, metavar='TEXT',
