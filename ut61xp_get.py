@@ -24,6 +24,7 @@ _supported_devices = (
 class Plotter:
     """Data plotter"""
     padding = .075
+    dual_with_stat_min_h = 7
 
     def __init__(self, args, devT, stat):
         import matplotlib.pyplot as plt
@@ -33,6 +34,7 @@ class Plotter:
         self.args = args
         self.devT = devT
         self.stat = stat
+        self.expanded = False
         if args.alt_file:
             nchan = 2 # dual channel plot
             self.fig, self.ax = self.plt.subplots(2, 1, sharex = True)
@@ -152,6 +154,11 @@ class Plotter:
             fancybox=True,
             prop={'family': 'monospace'} # Use monospace font
         )
+        if len(self.ax) > 1 and not self.expanded:
+            h = self.fig.get_figheight()
+            if h < self.dual_with_stat_min_h:
+                self.fig.set_figheight(self.dual_with_stat_min_h)
+                self.expanded = True
 
     def update(self, t, data, val, chan):
         if not math.isnan(val) and chan < len(self.ax):
