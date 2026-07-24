@@ -60,7 +60,7 @@ class Plotter:
         self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
         self.init_window_icon(self.fig.canvas)
         self.init_dbl_click_handler(self.fig.canvas)
-        self.init_stat_handler(self.fig.canvas)
+        self.init_hot_keys(self.fig.canvas)
         if args.full_screen:
             self.fig.canvas.manager.full_screen_toggle()
 
@@ -84,13 +84,25 @@ class Plotter:
             last_click = ts
         canvas.mpl_connect('button_press_event', on_click)
 
-    def init_stat_handler(self, canvas):
+    def init_hot_keys(self, canvas):
+        wnd = None
         def on_key_press(e):
+            nonlocal wnd
             if e.key == ' ':
                 print_stat(self.args, self.stat)
                 print(file=sys.stderr)
+            elif e.key == 'w' or e.key == 'W':
+                if self.args.wnd:
+                    self.args.wnd, wnd = None, self.args.wnd
+                    print('\nwnd off', file=sys.stderr)
+                elif wnd:
+                    self.args.wnd = wnd
+                    print('\nwnd[%u] on' % wnd, file=sys.stderr)
+            elif e.key == 'z' or e.key == 'Z':
+                self.args.with_zero = not self.args.with_zero
+
         canvas.mpl_connect('key_press_event', on_key_press)
-        log.info('press space to print data statistics')
+        log.info('press space to print data statistics, z / w to toggle with-zero / wnd modes, q to exit')
 
     def is_closed(self):
         return not self.plt.fignum_exists(self.fig.number)
@@ -530,9 +542,9 @@ def main(argv=None):
     data_parser.add_argument('-g', '--graph', action='store_true',
             help='show data graph')
     data_parser.add_argument('-w', '--wnd', type=int, required=False, metavar='SAMPLES',
-            help='data graph window samples (optional, show all samples by default)')
+            help='data graph window samples (optional, show all samples by default); press w to toggle')
     data_parser.add_argument('-z', '--with-zero', action='store_true',
-            help='make sure zero is within data graph vertical axis range')
+            help='make sure the zero is within data graph vertical axis range; press z to toggle')
     data_parser.add_argument('-s', '--stat', action='store_true',
             help='output statistic upon termination')
     data_parser.add_argument('-S', '--plot-stat', action='store_true',
