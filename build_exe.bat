@@ -1,1 +1,1 @@
-pyinstaller ut61xp-get --noconfirm --add-data meter.png:. --icon meter.ico --contents-directory=.internal
+pyinstaller dmm-tools.spec --noconfirm

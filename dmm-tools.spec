@@ -1,0 +1,147 @@
+# -*- mode: python ; coding: utf-8 -*-
+
+a1 = Analysis(
+    ['ut61xp-get'],
+    pathex=[],
+    binaries=[],
+    datas=[('meter.png', '.')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+
+a2 = Analysis(
+    ['ut61xp-plot'],
+    pathex=[],
+    binaries=[],
+    datas=[('meter.png', '.')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+
+a3 = Analysis(
+    ['ut61xp-hist'],
+    pathex=[],
+    binaries=[],
+    datas=[('meter.png', '.')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+
+a4 = Analysis(
+    ['ut61xp-stat'],
+    pathex=[],
+    binaries=[],
+    datas=[('meter.png', '.')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+
+exe1 = EXE(
+    PYZ(a1.pure),
+    a1.scripts,
+    [],
+    exclude_binaries=True,
+    name='ut61xp-get',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=True,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['meter.ico'],
+    contents_directory='.internal',
+)
+
+exe2 = EXE(
+    PYZ(a2.pure),
+    a2.scripts,
+    [],
+    exclude_binaries=True,
+    name='ut61xp-plot',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['meter.ico'],
+    contents_directory='.internal',
+)
+
+exe3 = EXE(
+    PYZ(a3.pure),
+    a3.scripts,
+    [],
+    exclude_binaries=True,
+    name='ut61xp-hist',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['meter.ico'],
+    contents_directory='.internal',
+)
+
+exe4 = EXE(
+    PYZ(a4.pure),
+    a4.scripts,
+    [],
+    exclude_binaries=True,
+    name='ut61xp-stat',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=True,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['meter.ico'],
+    contents_directory='.internal',
+)
+
+coll = COLLECT(
+    exe1, exe2, exe3, exe4, 
+    a1.binaries, a2.binaries, a3.binaries, a4.binaries,
+    a1.datas, a2.datas, a3.datas, a4.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='dmm-tools',
+)
