@@ -88,6 +88,7 @@ class Plotter:
         def on_key_press(e):
             if e.key == ' ':
                 print_stat(self.args, self.stat)
+                print(file=sys.stderr)
         canvas.mpl_connect('key_press_event', on_key_press)
         log.info('press space to print data statistics')
 
@@ -490,6 +491,8 @@ def main(argv=None):
             help='BT device model (%s (default), %s)' % (UTDevice.model_name, UT60BTDevice.model_name))
     parser.add_argument('--name', type=str, required=False, default=None,
             help='set Bluetooth adapter name (optional)')
+    parser.add_argument('--exit-prompt', action='store_true',
+            help='wait Enter on exit')
 
     subparsers = parser.add_subparsers()
     subparsers.add_parser('list',
@@ -594,6 +597,10 @@ def main(argv=None):
         args = parser.parse_args(argv)
 
     try:
-        return args.func(args)
+        rc = args.func(args)
+        if args.exit_prompt:
+            print('\npress Enter to exit', file=sys.stderr)
+            input()
+        return rc
     except KeyboardInterrupt:
         return 0
