@@ -70,6 +70,8 @@ class Plotter:
 
     @staticmethod
     def init_window_icon(canvas):
+        if not hasattr(canvas.manager, 'window'):
+            return
         icon_path = os.path.dirname(os.path.realpath(__file__)) + '/meter.png'
         if hasattr(canvas.manager.window, 'set_icon_from_file'):
             canvas.manager.window.set_icon_from_file(icon_path)
