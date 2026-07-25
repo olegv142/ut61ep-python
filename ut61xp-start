@@ -79,7 +79,7 @@ class Launcher:
             cfg = self.conn.recv()
             log.debug('started with cfg=%s', cfg)
             self.set_status('ready')
-        except BrokenPipeError:
+        except (BrokenPipeError, EOFError):
             self.set_status('start failed', color='darkred')
         self.detach_child()
 
