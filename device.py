@@ -2,7 +2,11 @@
 Device adapters abstract base classes
 """
 
-import hid
+try:
+    import hid
+except:
+    import hidapi as hid
+
 from abc import ABC, abstractmethod
 import bt_engine
 import logging
