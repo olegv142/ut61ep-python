@@ -13,12 +13,46 @@ import tkinter as tk
 from tkinter import ttk
 import multiprocessing
 from multiprocessing import Process, Pipe
+from abc import ABC, abstractmethod
 from ut61xp_get import _main
 
 log = logging.getLogger('APP')
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 log_queue = None
+
+class Setting(ABC):
+    @abstractmethod
+    def create(self, launcher):
+        """Create and place controls to launcher window"""
+        pass
+
+    @abstractmethod
+    def get_opts(self):
+        """
+        Get pair of string arrays. The first contains global options that should be passed to child process
+        before 'data' command. The second one contains options that should be placed after 'data' command.
+        """
+        return [], []
+
+    @abstractmethod
+    def get_config(self):
+        """Returns its own configuration as dictionary"""
+        return {}
+
+    @abstractmethod
+    def update_config(self, cfg):
+        """Updates its own config from the global configuration dictionary"""
+        pass
+
+    def update_config_from_options(self, opts_dict):
+        """
+        Updates its own config from the options received from child acquisition process.
+        The particular subclass may just do nothing if no changes expected there.
+        """
+        pass
+
+
 
 class Launcher:
     def __init__(self):
