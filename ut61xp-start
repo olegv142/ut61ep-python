@@ -14,6 +14,7 @@ from tkinter import ttk
 import multiprocessing
 from multiprocessing import Process, Pipe
 from abc import ABC, abstractmethod
+from enum import Enum
 from ut61xp_get import _main
 
 log = logging.getLogger('APP')
@@ -21,19 +22,25 @@ log = logging.getLogger('APP')
 module_dir = os.path.dirname(os.path.abspath(__file__))
 log_queue = None
 
+LauncherEvent = Enum('LauncherEvent', 'Create Created Launched')
+
 class Setting(ABC):
+
+    def __init__(self, launcher):
+        self.launcher = launcher
+
     @abstractmethod
-    def create(self, launcher):
-        """Create and place controls to launcher window"""
+    def notify(self, evt):
+        """
+        With LauncherEvent.Create triggers controls placing and initialization.
+        Other events may be ignored by most subclasses.
+        """
         pass
 
     @abstractmethod
     def get_opts(self):
-        """
-        Get pair of string arrays. The first contains global options that should be passed to child process
-        before 'data' command. The second one contains options that should be placed after 'data' command.
-        """
-        return [], []
+        """Get list of strings that should be passed to child process as arguments to its main function"""
+        return []
 
     @abstractmethod
     def get_config(self):
@@ -45,7 +52,7 @@ class Setting(ABC):
         """Updates its own config from the global configuration dictionary"""
         pass
 
-    def update_config_from_options(self, opts_dict):
+    def update_from_options(self, opts_dict):
         """
         Updates its own config from the options received from child acquisition process.
         The particular subclass may just do nothing if no changes expected there.
