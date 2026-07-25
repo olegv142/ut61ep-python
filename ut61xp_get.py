@@ -249,7 +249,7 @@ def do_once(args):
     finally:
         dev.close()
 
-def update_cfg(args, dev_path):
+def update_cfg(args, dev_path, fname, alt_fname):
     """Save configuration if necessary"""
     opts = args.__dict__.copy()
     del opts['func']
@@ -259,7 +259,9 @@ def update_cfg(args, dev_path):
         with open(cfg_save_fname, 'w') as f:
             f.write(json.dumps(opts))
     if _parent_conn:
-       _parent_conn.send(opts)
+        opts['_file'] = fname 
+        opts['_alt_file'] = alt_fname
+        _parent_conn.send(opts)
 
 def print_stat(args, stats):
     print('\n--- data statistics:', file=sys.stderr)
@@ -298,9 +300,10 @@ def do_data(args):
     if dev is None:
         return -1
 
-    update_cfg(args, dev.path)
-    update_measuring_defaults(args)
     fname, alt_fname = get_fname(args.file), get_fname(args.alt_file)
+    update_cfg(args, dev.path, fname, alt_fname)
+    update_measuring_defaults(args)
+
     out_fmt = '%.3f%s %f'
     out_file = sys.stdout if not fname else open(fname, 'w')
     alt_file = None if not alt_fname else open(alt_fname, 'w')
