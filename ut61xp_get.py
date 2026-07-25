@@ -489,15 +489,15 @@ def do_hist(args):
         plot_data([H], [Cnt], [get_file_base_name(args.input_file)], [info],
             no_yticks=True, title_suffix=' [histogram]')
 
-def main():
+def main(argv=None):
     logging.basicConfig(format='%(message)s', level=logging.INFO)
-    main_impl()
+    main_impl(argv)
 
 def main_impl(argv=None):
     formatter = lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
     parser = argparse.ArgumentParser(
             description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool',
-            usage='%(prog)s [options] list|once|data [command options]',
+            usage='%(prog)s [options] COMMAND [command options]',
             formatter_class=formatter
         )
 
@@ -525,7 +525,7 @@ def main_impl(argv=None):
     parser.add_argument('--exit-prompt', action='store_true',
             help='wait Enter on exit')
 
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(metavar='COMMAND')
     subparser_prog = os.path.basename(sys.argv[0]) if argv else None
     subparsers.add_parser('list', prog=subparser_prog,
             help='list path for connected devices'
