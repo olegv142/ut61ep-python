@@ -97,6 +97,7 @@ def mkdir_safe(path):
 
 if __name__ == '__main__':
     multiprocessing.freeze_support()
+    multiprocessing.set_start_method('spawn')
     current_dir = module_dir
     if frozen := getattr(sys, 'frozen', False):
         current_dir += '/..'
