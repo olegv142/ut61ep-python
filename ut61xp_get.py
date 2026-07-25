@@ -301,6 +301,10 @@ def do_data(args):
         return -1
 
     fname, alt_fname = get_fname(args.file), get_fname(args.alt_file)
+    if fname != args.file:
+        log.info('saving data to %s', fname)
+    if alt_fname != args.alt_file:
+        log.info('saving alternative channel to %s', alt_fname)
     update_cfg(args, dev.path, fname, alt_fname)
     update_measuring_defaults(args)
 
