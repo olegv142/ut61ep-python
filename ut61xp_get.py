@@ -17,6 +17,8 @@ from datetime import datetime
 
 log = logging.getLogger('DEV')
 
+_parent_conn = None
+
 _supported_devices = (
     HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice
 )
@@ -245,16 +247,17 @@ def do_once(args):
     finally:
         dev.close()
 
-def maybe_save_cfg(args, dev_path):
+def update_cfg(args, dev_path):
     """Save configuration if necessary"""
-    cfg_save_fname = getattr(args, 'cfg_save', None)
-    if cfg_save_fname:
-        opts = args.__dict__.copy()
-        del opts['func']
-        opts['cfg_save'] = None
-        opts['path'] = dev_path
+    opts = args.__dict__.copy()
+    del opts['func']
+    opts['cfg_save'] = None
+    opts['path'] = dev_path
+    if cfg_save_fname := getattr(args, 'cfg_save', None):
         with open(cfg_save_fname, 'w') as f:
             f.write(json.dumps(opts))
+    if _parent_conn:
+       _parent_conn.send(opts)
 
 def print_stat(args, stats):
     print('\n--- data statistics:', file=sys.stderr)
@@ -293,7 +296,7 @@ def do_data(args):
     if dev is None:
         return -1
 
-    maybe_save_cfg(args, dev.path)
+    update_cfg(args, dev.path)
     update_measuring_defaults(args)
     fname, alt_fname = get_fname(args.file), get_fname(args.alt_file)
     out_fmt = '%.3f%s %f'
@@ -486,9 +489,11 @@ def do_hist(args):
         plot_data([H], [Cnt], [get_file_base_name(args.input_file)], [info],
             no_yticks=True, title_suffix=' [histogram]')
 
-def main(argv=None):
+def main():
     logging.basicConfig(format='%(message)s', level=logging.INFO)
+    main_impl()
 
+def main_impl(argv=None):
     formatter = lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
     parser = argparse.ArgumentParser(
             description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool',
@@ -635,3 +640,17 @@ def main(argv=None):
         return rc
     except KeyboardInterrupt:
         return 0
+
+def _main(conn, args, log_queue):
+    global _parent_conn
+    _parent_conn = conn
+    if log_queue:
+        sys.stdout = sys.stderr = open('.logs/dmm_out.log', 'w', encoding='utf-8')
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+        logger.handlers = []
+        handler = logging.handlers.QueueHandler(log_queue)
+        logger.addHandler(handler)
+    else:
+        logging.basicConfig(format='%(message)s', level=logging.INFO)
+    main_impl(args)

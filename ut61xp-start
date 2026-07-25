@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+
+"""
+Data acquisition GUI.
+It manages configurations and launch data acquisition.
+"""
+
+import os
+import sys
+import logging
+import logging.handlers
+import tkinter as tk
+from tkinter import ttk
+import multiprocessing
+from multiprocessing import Process, Pipe
+from ut61xp_get import _main
+
+log = logging.getLogger('APP')
+
+module_dir = os.path.dirname(os.path.abspath(__file__))
+log_queue = None
+
+class Launcher:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title('Data acquisition launcher')
+        self.root.iconphoto(True, tk.PhotoImage(file=module_dir + '/meter.png'))
+        self.cur_row = 0
+        self.conn = None
+        self.proc = None
+
+        self.settings = tk.Frame(self.root)
+        self.settings.pack(side=tk.TOP)
+
+        btn = ttk.Button(self.root, text='Start', command=self.on_start_bt)
+        btn.pack(side=tk.TOP, pady=15)
+
+        self.status_label = tk.Label(self.root,
+                bd=1, relief=tk.SUNKEN, anchor=tk.W, padx=10
+            )
+        self.status_label.pack(side=tk.BOTTOM, fill=tk.X)
+
+    def get_start_args(self):
+        return ['-B', '-M', 'OWON', 'data', '-g']
+
+    def on_start_bt(self):
+        if self.conn is not None:
+            return
+        self.set_status('starting...', color='grey')
+        self.conn, child_conn = Pipe()
+        self.proc = Process(target=_main, args=(
+                child_conn, self.get_start_args(), log_queue
+            ), daemon=True)
+        self.proc.start()
+
+    def pack_control(self, ctl, col, cspan=1, sticky="w"):
+        ctl.grid(row=self.cur_row, column=col, padx=10, pady=5, columnspan=cspan, sticky=sticky)
+        self.cur_row += 1
+
+    def set_status(self, status_str, color='darkgreen'):
+        log.debug('set_status(%s)', status_str)
+        self.status_label.config(text=status_str, fg=color)
+
+    def detach_child(self):
+        self.conn.close()
+        self.conn = None
+        self.proc = None
+
+    def idle_work(self):
+        self.root.after(50, self.idle_work)
+        self.do_idle()
+
+    def do_idle(self):
+        if not self.conn:
+            return
+        try:
+            if not self.conn.poll(0):
+                return
+            cfg = self.conn.recv()
+            log.debug('started with cfg=%s', cfg)
+            self.set_status('ready')
+        except BrokenPipeError:
+            self.set_status('start failed', color='darkred')
+        self.detach_child()
+
+    def run(self):
+        self.set_status('ready')
+        self.root.after_idle(self.idle_work)
+        self.root.mainloop()
+
+
+def mkdir_safe(path):
+    try:
+        os.mkdir(path)
+    except:
+        pass
+
+if __name__ == '__main__':
+    multiprocessing.freeze_support()
+    current_dir = module_dir
+    if frozen := getattr(sys, 'frozen', False):
+        current_dir += '/..'
+    os.chdir(current_dir)
+    mkdir_safe('.logs')
+    mkdir_safe('.cfg')
+    mkdir_safe('data')
+    if frozen:
+        sys.stdout = sys.stderr = open('.logs/launcher_out.log', 'w', encoding='utf-8')
+    logging.basicConfig(
+        format='%(asctime)s %(message)s',
+        level=logging.DEBUG, handlers=[
+            logging.handlers.RotatingFileHandler('.logs/launcher.log', 'a', 128*1024, 2)
+        ])
+    if frozen:
+        log_queue = multiprocessing.Manager().Queue()
+        file_handler = logging.handlers.RotatingFileHandler(".logs/dmm.log", 'a', 128*1024, 2)
+        file_handler.setFormatter(logging.Formatter("%(asctime)s %(name)s %(message)s"))
+        listener = logging.handlers.QueueListener(log_queue, file_handler)
+        listener.start()
+
+    Launcher().run()
+
+    if frozen:
+        listener.stop()

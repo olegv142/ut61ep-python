@@ -56,6 +56,20 @@ a4 = Analysis(
     optimize=0,
 )
 
+a5 = Analysis(
+    ['ut61xp-start'],
+    pathex=[],
+    binaries=[],
+    datas=[('meter.png', '.')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+
 exe1 = EXE(
     PYZ(a1.pure),
     a1.scripts,
@@ -136,10 +150,30 @@ exe4 = EXE(
     contents_directory='.internal',
 )
 
+exe5 = EXE(
+    PYZ(a5.pure),
+    a5.scripts,
+    [],
+    exclude_binaries=True,
+    name='ut61xp-start',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['meter.ico'],
+    contents_directory='.internal',
+)
+
 coll = COLLECT(
-    exe1, exe2, exe3, exe4, 
-    a1.binaries, a2.binaries, a3.binaries, a4.binaries,
-    a1.datas, a2.datas, a3.datas, a4.datas,
+    exe1, exe2, exe3, exe4, exe5,
+    a1.binaries, a2.binaries, a3.binaries, a4.binaries, a5.binaries,
+    a1.datas, a2.datas, a3.datas, a4.datas, a5.datas,
     strip=False,
     upx=True,
     upx_exclude=[],
