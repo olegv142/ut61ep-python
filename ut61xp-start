@@ -14,7 +14,7 @@ from tkinter import ttk
 import multiprocessing
 from multiprocessing import Process, Pipe
 from abc import ABC, abstractmethod
-from enum import Enum
+from enum import IntEnum
 from ut61xp_get import _main
 
 log = logging.getLogger('APP')
@@ -22,18 +22,23 @@ log = logging.getLogger('APP')
 module_dir = os.path.dirname(os.path.abspath(__file__))
 log_queue = None
 
-LauncherEvent = Enum('LauncherEvent', 'Create Created Launched')
+class LauncherState(IntEnum):
+    Uninitialized = 0
+    Creating      = 1
+    Created       = 2
+    Starting      = 3
+    Started       = 4
 
 class Setting(ABC):
-
+    """The base class for every launcher setting"""
     def __init__(self, launcher):
         self.launcher = launcher
 
     @abstractmethod
-    def notify(self, evt):
+    def notify_state(self, state):
         """
-        With LauncherEvent.Create triggers controls placing and initialization.
-        Other events may be ignored by most subclasses.
+        The state == LauncherState.Creating triggers controls placing and initialization.
+        Other states may be ignored by most subclasses.
         """
         pass
 
