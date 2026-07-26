@@ -36,7 +36,8 @@ class Setting(ABC):
     def notify(self, event):
         """
         The following event notifications must/may be handled:
-          - on LauncherState.Created the instance must initialize itself with defaults and place its controls on the launcher window
+          - on LauncherState.Created the instance must initialize itself with defaults and place its controls on the launcher window;
+            the particular implementation may do it in constructor instead of event handler
           - on LauncherState.Changed the instance must call launcher's get_config and update its settings accordingly
           - on LauncherState.Started the instance may call launcher's get_started_options and update its settings accordingly
           - on LauncherState.Terminating the instance may save its configuration
@@ -66,6 +67,24 @@ class ModelSelector(Setting):
     def get_config(self):
         return {}
 
+class CheckOption(Setting):
+    def __init__(self, launcher, option, text):
+        self.launcher = launcher
+        self.opt = '--' + option
+        self.key = option.replace('-', '_')
+        self.checked = tk.BooleanVar(value=False)
+        self.control = ttk.Checkbutton(launcher.settings_frame, text=text, variable=self.checked)
+        launcher.pack_control(self.control, 0, 2)
+
+    def get_opts(self):
+        return [] if not self.checked.get() else [self.opt]
+
+    def get_config(self):
+        return {self.key : self.checked.get()}
+
+    def notify(self, event):
+        if event == LauncherEvent.Changed:
+            self.checked.set(self.launcher.get_config()[self.key])
 
 class Launcher:
     def __init__(self):
@@ -93,7 +112,15 @@ class Launcher:
 
     def create_settings(self):
         self.settings = [
-            ModelSelector(self)
+            ModelSelector(self),
+            CheckOption(self, 'epoch',
+                'use epoch timestamps'),
+            CheckOption(self, 'with-zero',
+                'make sure the zero is within data graph vertical axis range (press z to toggle)'),
+            CheckOption(self, 'plot-stat',
+                'show statistic while plotting data (press t to toggle)'),
+            CheckOption(self, 'full-screen',
+                'display the graph on the entire screen (use dbl-click to toggle)'),
         ]
 
     def on_start_bt(self):
@@ -107,7 +134,7 @@ class Launcher:
         proc.start()
 
     def pack_control(self, ctl, col, cspan=1, sticky="w"):
-        ctl.grid(row=self.cur_row, column=col, padx=10, pady=5, columnspan=cspan, sticky=sticky)
+        ctl.grid(row=self.cur_row, column=col, padx=10, pady=3, columnspan=cspan, sticky=sticky)
         self.cur_row += 1
 
     def set_status(self, status_str, color='darkgreen'):
