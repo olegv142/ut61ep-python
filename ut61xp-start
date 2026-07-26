@@ -46,8 +46,11 @@ class Setting(ABC):
 
     @abstractmethod
     def get_opts(self):
-        """Get list of strings that should be passed to child process as arguments to its main function"""
-        return []
+        """
+        Get list of strings that should be passed to child process as arguments to its main function.
+        The particular implementation may return None if current settings are invalid.
+        """
+        return None
 
     @abstractmethod
     def get_config(self):
@@ -128,10 +131,13 @@ class Launcher:
     def on_start_bt(self):
         if self.conn is not None:
             return
+        opts = self.collect_opts()
+        if opts is None:
+            return
         self.notify(LauncherEvent.Starting)
         self.conn, child_conn = Pipe()
         proc = Process(target=_main, args=(
-                child_conn, self.collect_opts(), log_queue
+                child_conn, opts, log_queue
             ), daemon=True)
         proc.start()
 
@@ -190,7 +196,11 @@ class Launcher:
     def collect_opts(self):
         opts = []
         for se in self.settings:
-            opts += se.get_opts()
+            se_opts = se.get_opts()
+            if se_opts is None:
+                opts = None
+                break
+            opts += se_opts
         log.debug('collect_opts: %s', opts)
         return opts
 
