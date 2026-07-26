@@ -121,6 +121,8 @@ class Launcher:
                 'show statistic while plotting data (press t to toggle)'),
             CheckOption(self, 'full-screen',
                 'display the graph on the entire screen (use dbl-click to toggle)'),
+            CheckOption(self, 'keep-nan',
+                'keep invalid data values (NaN) resulting from overload'),
         ]
 
     def on_start_bt(self):
