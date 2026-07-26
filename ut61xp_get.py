@@ -274,11 +274,14 @@ def update_measuring_defaults(args):
     if args.interval is None:
         args.interval = 1 if not args.alt_file else 0
 
-def get_fname(fname_str):
+def get_fname(dev, fname):
     """Makes filename from parameter string and makes sure folder part exists"""
-    if not fname_str:
+    if not fname:
         return None
-    fname = datetime.now().strftime(fname_str) if '%' in fname_str else fname_str
+    if '$' in fname:
+        fname = fname.replace('${MODEL}', dev.model_name)
+    if '%' in fname:
+        fname = datetime.now().strftime(fname)
     dirname = os.path.dirname(fname)
     if dirname:
         try:
@@ -300,7 +303,7 @@ def do_data(args):
     if dev is None:
         return -1
 
-    fname, alt_fname = get_fname(args.file), get_fname(args.alt_file)
+    fname, alt_fname = get_fname(dev, args.file), get_fname(dev, args.alt_file)
     if fname != args.file:
         log.info('saving data to %s', fname)
     if alt_fname != args.alt_file:
@@ -551,7 +554,7 @@ def main_impl(argv=None):
     data_parser.add_argument('-i', '--interval', type=float, required=False, default=None, metavar='SECONDS',
             help='data acquisition interval (default is 1 sec)')
     data_parser.add_argument('-f', '--file', type=str, required=False, metavar='FILENAME',
-            help='output file (optional, stdout by default), may have folder part and/or date time pattern, like %%Y-%%m-%%d/%%H%%M%%S.data')
+            help='output file (optional, stdout by default), may have folder part and/or date time pattern and model name, like %%Y-%%m-%%d/%%H%%M%%S-${MODEL}.data')
     data_parser.add_argument('-a', '--alt-file', type=str, required=False, metavar='FILENAME',
             help='alternative channel output file name (for storing AC voltage in DC mode)')
     data_parser.add_argument('--keep-nan', action='store_true',
