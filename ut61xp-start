@@ -14,7 +14,7 @@ from tkinter import ttk
 import multiprocessing
 from multiprocessing import Process, Pipe
 from abc import ABC, abstractmethod
-from enum import IntEnum
+from enum import Enum
 from ut61xp_get import _main
 
 log = logging.getLogger('APP')
@@ -22,23 +22,24 @@ log = logging.getLogger('APP')
 module_dir = os.path.dirname(os.path.abspath(__file__))
 log_queue = None
 
-class LauncherState(IntEnum):
-    Uninitialized = 0
-    Creating      = 1
-    Created       = 2
-    Starting      = 3
-    Started       = 4
+class LauncherEvent(Enum):
+    Created       = 0
+    Changed       = 1
+    Starting      = 2
+    Started       = 3
+    StartFailed   = 4
+    Terminating   = 5
 
 class Setting(ABC):
     """The base class for every launcher setting"""
-    def __init__(self, launcher):
-        self.launcher = launcher
-
     @abstractmethod
-    def notify_state(self, state):
+    def notify(self, event):
         """
-        The state == LauncherState.Creating triggers controls placing and initialization.
-        Other states may be ignored by most subclasses.
+        The following event notifications must/may be handled:
+          - on LauncherState.Created the instance must initialize itself with defaults and place its controls on the launcher window
+          - on LauncherState.Changed the instance must call launcher's get_config and update its settings accordingly
+          - on LauncherState.Started the instance may call launcher's get_started_options and update its settings accordingly
+          - on LauncherState.Terminating the instance may save its configuration
         """
         pass
 
@@ -52,18 +53,18 @@ class Setting(ABC):
         """Returns its own configuration as dictionary"""
         return {}
 
-    @abstractmethod
-    def update_config(self, cfg):
-        """Updates its own config from the global configuration dictionary"""
+class ModelSelector(Setting):
+    def __init__(self, launcher):
+        self.launcher = launcher
+
+    def notify(self, event):
         pass
 
-    def update_from_options(self, opts_dict):
-        """
-        Updates its own config from the options received from child acquisition process.
-        The particular subclass may just do nothing if no changes expected there.
-        """
-        pass
+    def get_opts(self):
+        return ['-B', '-M', 'OWON', 'data', '-g']
 
+    def get_config(self):
+        return {}
 
 
 class Launcher:
@@ -73,10 +74,13 @@ class Launcher:
         self.root.iconphoto(True, tk.PhotoImage(file=module_dir + '/meter.png'))
         self.cur_row = 0
         self.conn = None
-        self.proc = None
+        self.curr_evt = None
+        self.cfg = None
+        self.cfg_ = None
+        self.started_opts = None
 
-        self.settings = tk.Frame(self.root)
-        self.settings.pack(side=tk.TOP)
+        self.settings_frame = tk.Frame(self.root)
+        self.settings_frame.pack(side=tk.TOP)
 
         btn = ttk.Button(self.root, text='Start', command=self.on_start_bt)
         btn.pack(side=tk.TOP, pady=15)
@@ -85,32 +89,88 @@ class Launcher:
                 bd=1, relief=tk.SUNKEN, anchor=tk.W, padx=10
             )
         self.status_label.pack(side=tk.BOTTOM, fill=tk.X)
+        self.create_settings()
 
-    def get_start_args(self):
-        return ['-B', '-M', 'OWON', 'data', '-g']
+    def create_settings(self):
+        self.settings = [
+            ModelSelector(self)
+        ]
 
     def on_start_bt(self):
         if self.conn is not None:
             return
-        self.set_status('starting...', color='grey')
+        self.notify(LauncherEvent.Starting)
         self.conn, child_conn = Pipe()
-        self.proc = Process(target=_main, args=(
-                child_conn, self.get_start_args(), log_queue
+        proc = Process(target=_main, args=(
+                child_conn, self.collect_opts(), log_queue
             ), daemon=True)
-        self.proc.start()
+        proc.start()
 
     def pack_control(self, ctl, col, cspan=1, sticky="w"):
         ctl.grid(row=self.cur_row, column=col, padx=10, pady=5, columnspan=cspan, sticky=sticky)
         self.cur_row += 1
 
     def set_status(self, status_str, color='darkgreen'):
-        log.debug('set_status(%s)', status_str)
+        log.debug('set_status: %s', status_str)
         self.status_label.config(text=status_str, fg=color)
+
+    def update_status(self, event):
+        if event in (LauncherEvent.Created, LauncherEvent.Started):
+            self.set_status('ready')
+        elif event == LauncherEvent.Starting:
+            self.set_status('starting...', color='grey')
+        elif event == LauncherEvent.StartFailed:
+            self.set_status('start failed', color='darkred')
+
+    def notify(self, event):
+        log.debug('notify: %s', event)
+        assert self.curr_evt is None
+        assert self.cfg_ is None
+        self.curr_evt = event
+        for se in self.settings:
+            se.notify(event)
+        self.curr_evt = None
+        if self.cfg_ is not None:
+            cfg, self.cfg_ = self.cfg_, None
+            self.set_config_(cfg)
+            assert self.cfg_ is None
+        self.update_status(event)
+
+    def set_config(self, cfg):
+        log.debug('set_config: %s', cfg)
+        if self.curr_evt is None:
+            self.set_config_(cfg)
+        else:
+            assert self.cfg_ is None
+            self.cfg_ = cfg
+
+    def set_config_(self, cfg):
+        self.cfg = cfg
+        self.notify(LauncherEvent.Changed)
+
+    def get_config(self):
+        return self.cfg
+
+    def collect_config(self):
+        cfg = {}
+        for se in self.settings:
+            cfg = {**cfg, **se.get_config()}
+        log.debug('collect_config: %s', cfg)
+        return cfg
+
+    def collect_opts(self):
+        opts = []
+        for se in self.settings:
+            opts += se.get_opts()
+        log.debug('collect_opts: %s', opts)
+        return opts
+
+    def get_started_opts(self):
+        return self.started_opts
 
     def detach_child(self):
         self.conn.close()
         self.conn = None
-        self.proc = None
 
     def idle_work(self):
         self.root.after(50, self.idle_work)
@@ -122,18 +182,19 @@ class Launcher:
         try:
             if not self.conn.poll(0):
                 return
-            cfg = self.conn.recv()
-            log.debug('started with cfg=%s', cfg)
-            self.set_status('ready')
+            opts = self.conn.recv()
+            log.debug('started with opts=%s', opts)
+            self.started_opts = opts
+            self.notify(LauncherEvent.Started)
         except (BrokenPipeError, EOFError):
-            self.set_status('start failed', color='darkred')
+            self.notify(LauncherEvent.StartFailed)
         self.detach_child()
 
     def run(self):
-        self.set_status('ready')
+        self.notify(LauncherEvent.Created)
         self.root.after_idle(self.idle_work)
         self.root.mainloop()
-
+        self.notify(LauncherEvent.Terminating)
 
 def mkdir_safe(path):
     try:
