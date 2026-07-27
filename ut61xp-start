@@ -2,7 +2,7 @@
 
 """
 Data acquisition GUI.
-It manages configurations and launch data acquisition.
+It manages configurations and launches data acquisition.
 """
 
 import os
@@ -71,6 +71,7 @@ class Setting(ABC):
         return {}
 
 class DummyOption(Setting):
+    """Option with no functionality other than perhaps visual appearance"""
     def notify(self, event):
         pass
 
@@ -79,6 +80,14 @@ class DummyOption(Setting):
 
     def get_config(self):
         return {}
+
+class OptionSeparator(DummyOption):
+    """Separate option list by horizontal line and label"""
+    def __init__(self, launcher, text):
+        sep = ttk.Separator(launcher.settings_frame, orient="horizontal")
+        label = ttk.Label(launcher.settings_frame, text=text, font=("Arial", 9, "italic"), foreground='grey')
+        launcher.pack_control(sep, 0, 1, sticky="ew", pady=3*VERT_PAD)
+        launcher.pack_control(label, 1, padx=2*HORIZ_PAD, pady=3*VERT_PAD)
 
 class ModelSelector(Setting):
     def __init__(self, launcher):
@@ -94,6 +103,7 @@ class ModelSelector(Setting):
         return {}
 
 class CheckOption(Setting):
+    """Boolean option with checkbox"""
     def __init__(self, launcher, option, text):
         self.launcher = launcher
         self.opt = option
@@ -113,6 +123,7 @@ class CheckOption(Setting):
             self.checked.set(self.launcher.get_config()[self.key])
 
 class FileNameOption(Setting):
+    """Option for output filename"""
     def __init__(self, launcher, option, defval, text, actual_text):
         self.launcher = launcher
         self.opt = option
@@ -152,6 +163,7 @@ class FileNameOption(Setting):
             self.aval.set(val if val else '')
 
 class FileNameOptionWithChkbox(FileNameOption):
+    """Option for output filename that can be toggled on and off using a checkbox"""
     def create_controls(self, text, actual_text):
         self.checked = tk.BooleanVar(value=False)
         label = ttk.Checkbutton(self.launcher.settings_frame, text=text, variable=self.checked, command=self.on_enable)
@@ -181,6 +193,7 @@ class FileNameOptionWithChkbox(FileNameOption):
         super().notify(event)
 
 class TextOption(Setting):
+    """Text option with validator"""
     def __init__(self, launcher, option, text, validator=None):
         self.launcher = launcher
         self.opt = option
@@ -214,14 +227,17 @@ class TextOption(Setting):
             self.val.set(self.launcher.get_config()[self.key])
 
 class NaturalNumberOption(TextOption):
+    """Option for positive integer"""
     def __init__(self, launcher, option, text):
         super().__init__(launcher, option, text, validator=lambda v: not v or int(v) > 0)
 
 class RealNumberOption(TextOption):
+    """Option for real number"""
     def __init__(self, launcher, option, text):
         super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
 
 class NonNegativeRealNumberOption(TextOption):
+    """Option for non-negative real number"""
     def __init__(self, launcher, option, text):
         super().__init__(launcher, option, text, validator=lambda v: not v or float(v) >= 0)
 
@@ -251,15 +267,8 @@ class RealNumbersOption(ValueListOption):
     def __init__(self, launcher, option, text):
         super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
 
-class OptionSeparator(DummyOption):
-    def __init__(self, launcher, text):
-        sep = ttk.Separator(launcher.settings_frame, orient="horizontal")
-        label = ttk.Label(launcher.settings_frame, text=text, font=("Arial", 9, "italic"))
-        launcher.pack_control(sep, 0, 1, sticky="ew", pady=3*VERT_PAD)
-        launcher.pack_control(label, 1, padx=2*HORIZ_PAD, pady=3*VERT_PAD)
-
-
 class Launcher:
+    """The launcher UI"""
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Data acquisition launcher')
@@ -311,8 +320,8 @@ class Launcher:
             TextOption(self, 'plot-title', 'data plot title'),
             TextOption(self, 'alt-title', 'alternative channel data plot title'),
 
-            RealNumbersOption(self, 'hline', 'draw horizontal line through given value(s) (comma separated)'),
-            RealNumbersOption(self, 'alt-hline', 'draw horizontal line through given alt-channel value(s)'),
+            RealNumbersOption(self, 'hline', 'draw horizontal line(s) through given value(s), comma separated'),
+            RealNumbersOption(self, 'alt-hline', 'draw horizontal line(s) through given alt-channel value(s)'),
 
             TextOption(self, 'line-style', 'line style specifier'),
             TextOption(self, 'hline-style', 'horizontal line style specifier'),
