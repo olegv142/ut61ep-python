@@ -52,7 +52,7 @@ The CLI workflow is built around **ut61xp-get** script which implements several 
 
 ## Basic usage
 
-The **ut61xp-get** will auto detect UT-D09A USB adapter provided that there is exactly one such adapter connected to your computer. The **ut61xp-get list** command prints paths for all connected adapters. The **ut61xp-get once** reads single value from the connected device and prints it to standard output. The **ut61xp-get data** reads values continuously from the connected device and either prints them or saves to the file if *-f/--file* option is provided. With *-p/--progress* option the tool will output dots to standard output while saving values to the file to indicate progress. In case the current reading is invalid (overflowed) the dot will be replaced by exclamation mark. To terminate data reading one can press Ctrl-C. The output file will contain time in seconds since readout start as the first column. With *-e/--epoch* option the epoch time will be used instead. One can use *-d/--delimiter* option to set additional delimiter to be used between columns which is the single space by default. With *-o/--offset, -m/--mult* options the data will be linearly scaled before saving / plotting. These options are handy to remove fixed offset from the data or to convert voltage across current sensing resistor to actual current value. The *-i/--interval* option may be used to specify data reading interval in seconds. Using zero value will result in reading with maximal possible rate.
+The **ut61xp-get** will auto detect UT-D09A USB adapter provided that there is exactly one such adapter connected to your computer. The **ut61xp-get list** command prints paths for all connected adapters. The **ut61xp-get once** reads single value from the connected device and prints it to standard output. The **ut61xp-get data** reads values continuously from the connected device and either prints them or saves to the file if *-f/--file* option is provided. With *-p/--progress* option the tool will output dots to standard output while saving values to the file to indicate progress. In case the current reading is invalid (overflowed) the dot will be replaced by exclamation mark. To terminate data reading one can press Ctrl-C. The output file will contain time in seconds since readout start as the first column. With *-e/--epoch* option the epoch time will be used instead. One can use *-d/--delimiter* option to set additional delimiter to be used between columns which is the single space by default. With *-o/--offset, -m/--mult* options the data will be linearly scaled before saving / plotting. These options are handy to remove fixed offset from the data or to convert voltage across current sensing resistor to actual current value. The *-i/--interval* option may be used to specify data reading interval in seconds. Using zero value will result in reading with maximal possible rate. With '-z/--with-zero' the zero value will always be included in the displayed vertical axis range. This will help to understand the scale of the signal fluctuations with respect to the signal value.
 
 ## Automatic file naming
 
@@ -102,6 +102,17 @@ Another way to view current statistics is to press the space bar in the chart wi
 ### Print statistics given the existing data file
 
 The **ut61xp-get stat input_file** command prints statistics of the data stored in the given *input_file*.
+
+## Plot window hotkeys
+The following keys (partially discussed above) have special meaning when pressed in the data plot window:
+| key   | meaning |
+|-------|---------|
+| space | print current statistics to terminal so you can easily copy/paste them                     |
+| t     | show / hide statistics display area on the plot                                            |
+| w     | turn data window on / off (provided that it was initially configured by *-w/--wnd* option) |
+| z     | turn on / off 'with-zero' mode                                                             |
+| s     | opens file chooser dialog to save plot as an image                                         |
+| q     | close plot window                                                                          |
 
 ## Working with data histograms
 
