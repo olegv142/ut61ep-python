@@ -194,3 +194,21 @@ In case the device is using already supported protocol but having different USB 
 The GUI workflow is built around **ut61xp-start** script that provides convenient UI for setting **ut61xp-get** options and launching data acquisition in separate processes. The single instance of **ut61xp-start** UI can launch any number of data acquisition processes working in parallel, saving data to separate files and showing collected data in their own data plot windows. The following figure illustrates using data acquisition GUI reading data from 3 multimeters simultaneously on Raspberry Pi5.
 
 ![ut61xp-start tool collecting data from 3 multimeters on RPi5](/misc/rpi.png)
+
+## Data acquisition launcher
+
+
+## Packaging
+On windows the build_exe.bat script builds standalone executables in dist/dmm-tools folder. They can be copied to any folder on the target system including the flash drive and used without installing anything. The same script may be used on Linux like
+```
+bash build_exe.bat
+```
+It will produce executables on Linux as well but the resulting size of that executables on Linux is drastically larger than on windows which makes this installation method practically meaningless.
+
+## Other UI tools
+
+## Known issues
+
+### Window does not have dedicated icon on some Linux systems
+
+### Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
