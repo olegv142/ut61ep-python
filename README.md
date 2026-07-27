@@ -37,7 +37,7 @@ git clone https://github.com/olegv142/ut61xpy.git
 ```
 
 Alternatively you can download source code archive and unpack it. 
-The code uses *hid/hidapi* package for communicating with USB multimeters, *bleak* package for communicating with Bluetooth spectrometers and *matplotlib* package for data chart plotting. The can be installed by various ways depending on you operating system. To install the with pip (Windows):
+The code uses *hid/hidapi* package for communicating with USB multimeters, *bleak* package for communicating with Bluetooth multimeters and *matplotlib* package for data chart plotting. The can be installed by various ways depending on you operating system. To install the with pip (Windows):
 ```
 pip install hidapi bleak matplotlib
 ```
@@ -67,7 +67,7 @@ Dual channel mode is handy while reading data in DC+AC mode of UT61E+. To use th
 
 ## Graph plotting
 
-The **ut61xp-get data** command will plot data read from device in separate window if *-g/--graph* option is provided. To terminate data reading in such mode one can just close graph window. With dual channel mode the graph window will contain two plots. The *-w/--wnd* option may be used to limit the number of recent data samples utilized to produce the plot by the specific number. You can use pan/zoom controls of the graph window while reading the data or use the dedicated button to save plot to the file, yet the acquisition will be paused until you done with plot saving. One can add any number of additional horizontal lines at specific levels to mark some specific value boundaries with *--hline* and *--alt-hline* options (the latter draws them on the second channel plot). These options may be used multiple times to add multiple horizontal lines. There are several other options that can be used for styling the graph window. One can set window title (*-t/--title*), plot title (*--plot-title, --alt-title*), data line style (*--line-style*), horizontal line style (*--hline-style*), data line colors (*--line-color, --alt-line-color*), horizontal line color (*--hline-color*). In case plot title is not provided as command line argument the current measuring mode reported by multimeter will be used as the title. You can use plot navigation bar as usual. Additionally double clicking the plot will toggle full screen mode. To open the graph window in full screen mode from the start, you can use the *--full-screen* command line option.
+The **ut61xp-get data** command will plot data read from device in separate window if *-g/--graph* option is provided. To terminate data reading in such mode one can just close graph window. With dual channel mode the graph window will contain two plots. The *-w/--wnd* option may be used to limit the number of recent data samples utilized to produce the plot by the specific number. You can use pan/zoom controls of the graph window while reading the data or use the dedicated button to save plot to the file, yet the acquisition will be paused until you done with plot saving. One can add any number of additional horizontal lines at specific levels to mark some specific value boundaries with *--hline* and *--alt-hline* options (the latter draws them on the second channel plot). These options may be used multiple times to add multiple horizontal lines. There are several other options that can be used for styling the graph window. One can set window title (*-t/--title*), plot title (*--plot-title, --alt-title*), data line style (*--line-style*), horizontal line style (*--hline-style*), data line colors (*--line-color, --alt-line-color*), horizontal line color (*--hline-color*). In case plot title is not provided as command line argument the current measuring mode reported by multimeter will be used as the title. In case window title is not provided as command line argument the multimeter model will be used as the title. You can use plot navigation bar as usual. Additionally double clicking the plot will toggle full screen mode. To open the graph window in full screen mode from the start, you can use the *--full-screen* command line option.
 
 ## Plotting already collected data
 
@@ -96,9 +96,8 @@ The last two metrics may be used to characterize deviations from the mean. The s
 
 ### Print statistics while plotting data
 
-With *-S/--plot-stat* option the **ut61xp-get data** command will print data statistics on the plot window and update it on every new data sample. The *--plot-stat-loc* option may be used to specify the particular location on the plot where the statistics box will be placed. The default is 'lower left'. With *--plot-stat-loc "best"* options the location will be chosen automatically to minimize overlapping with data curve.
-
-Another way to view current statistics is to press the space bar in the chart window. This will display the statistics on the terminal. This doesn't require any special configuration.
+With *-S/--plot-stat* option the **ut61xp-get data** command will show data statistics on the plot window and update it on every new data sample. The *--plot-stat-loc* option may be used to specify the particular location on the plot where the statistics box will be placed. The default is 'lower left'. With *--plot-stat-loc "best"* options the location will be chosen automatically to minimize overlapping with data curve. The statistic display area may be shown / hidden while plotting by pressing 't' key. This hot key works regardless of the *-S/--plot-stat* option.
+Another way to view current statistics is to press the space bar in the chart window. This will print the statistics on the terminal so you can easily copy / paste them.
 
 ### Print statistics given the existing data file
 
