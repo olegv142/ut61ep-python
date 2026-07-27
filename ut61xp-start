@@ -120,7 +120,10 @@ class CheckOption(Setting):
 
     def notify(self, event):
         if event == LauncherEvent.Changed:
-            self.checked.set(self.launcher.get_config()[self.key])
+            try:
+                self.checked.set(self.launcher.get_config()[self.key])
+            except KeyError:
+                log.debug('key %s not found in config', self.key)
 
 class FileNameOption(Setting):
     """Option for output filename"""
@@ -154,7 +157,10 @@ class FileNameOption(Setting):
 
     def notify(self, event):
         if event == LauncherEvent.Changed:
-            self.val.set(self.launcher.get_config()[self.key])
+            try:
+                self.val.set(self.launcher.get_config()[self.key])
+            except KeyError:
+                log.debug('key %s not found in config', self.key)
             self.aval.set('')
         elif event == LauncherEvent.Starting:
             self.aval.set('')
@@ -188,7 +194,10 @@ class FileNameOptionWithChkbox(FileNameOption):
 
     def notify(self, event):
         if event == LauncherEvent.Changed:
-            self.checked.set(self.launcher.get_config()[self.key + '_en'])
+            try:
+                self.checked.set(self.launcher.get_config()[self.key + '_en'])
+            except KeyError:
+                log.debug('key %s not found in config', self.key + '_en')
             self.on_enable()
         super().notify(event)
 
@@ -224,7 +233,10 @@ class TextOption(Setting):
 
     def notify(self, event):
         if event == LauncherEvent.Changed:
-            self.val.set(self.launcher.get_config()[self.key])
+            try:
+                self.val.set(self.launcher.get_config()[self.key])
+            except KeyError:
+                log.debug('key %s not found in config', self.key)
 
 class NaturalNumberOption(TextOption):
     """Option for positive integer"""
