@@ -8,6 +8,7 @@ It manages configurations and launches data acquisition.
 import os
 import sys
 import math
+import zlib
 import json
 import logging
 import logging.handlers
@@ -352,22 +353,25 @@ class ModelSelector(Setting):
             self.start_model = self.selector.get()
             self.start_cfg = self.launcher.collect_config()
         elif event == LauncherEvent.Started:
-            path = self.launcher.get_started_opts()['path']
+            opts = self.launcher.get_started_opts()
+            path = opts['path']
             if 'path' not in self.start_cfg:
-                model_path = self.start_model + ' ' + path
+                tag = '#%08x' % zlib.crc32(path.encode('utf-8')) if not opts['bt'] else path
+                model_tag = self.start_model + ' ' + tag
                 self.cfg['models'][self.start_model] = self.start_cfg
-                self.cfg['models'][model_path] = {
+                self.cfg['models'][model_tag] = {
                         **self.start_cfg, 'path' : path
                     }
+                self.cfg['model'] = model_tag
                 models = list(self.selector['values'])
-                if model_path not in models:
-                    models.append(model_path)
+                if model_tag not in models:
+                    models.append(model_tag)
                     self.selector['values'] = models
-                self.selector.current(models.index(model_path))
+                self.selector.current(models.index(model_tag))
             else:
                 assert path == self.start_cfg['path']
                 self.cfg['models'][self.start_model] = self.start_cfg
-            self.cfg['model'] = self.start_model
+                self.cfg['model'] = self.start_model
             self.save_config(self.cfg)
 
     def get_opts(self):
