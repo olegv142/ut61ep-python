@@ -62,7 +62,8 @@ class Setting(ABC):
     def get_opts(self):
         """
         Get list of strings that should be passed to child process as arguments to its main function.
-        The particular implementation may return None if current settings are invalid.
+        The particular implementation may return None if current settings are invalid. Note that
+        notify(LauncherEvent.Starting) is always called before corresponding get_opts() call.
         """
         return None
 
@@ -268,6 +269,10 @@ class RealNumbersOption(ValueListOption):
         super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
 
 class ModelSelector(Setting):
+    """
+    The model selector setting object. In addition to providing model selector UI it also
+    manages configuration for all models.
+    """
     models = [t.model_name + ' ' + ('BT' if t.isBT else 'USB') for t in _supported_devices]
     cfg_path = '.config'
 
