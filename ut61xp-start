@@ -7,6 +7,7 @@ It manages configurations and launch data acquisition.
 
 import os
 import sys
+import math
 import logging
 import logging.handlers
 import tkinter as tk
@@ -17,6 +18,12 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from ut61xp_get import _main
 
+try:
+    from ctypes import windll
+    windll.shcore.SetProcessDpiAwareness(2)
+except:
+    pass
+
 log = logging.getLogger('APP')
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
@@ -25,6 +32,7 @@ log_queue = None
 DEF_FNAME        = 'data/%Y-%m-%d/%H%M%S-${MODEL}.dat'
 DEF_ALT_FNAME    = 'data/%Y-%m-%d/%H%M%S-${MODEL}_.dat'
 TEXT_ENTRY_WIDTH = len(DEF_ALT_FNAME)
+VERT_PAD         = 1
 
 class LauncherEvent(Enum):
     Created       = 0
@@ -161,6 +169,79 @@ class FileNameOptionWithChkbox(FileNameOption):
             self.on_enable()
         super().notify(event)
 
+class TextOption(Setting):
+    def __init__(self, launcher, option, text, validator=None):
+        self.launcher = launcher
+        self.opt = option
+        self.key = option.replace('-', '_')
+        self.val = tk.StringVar()
+        self.validator = validator
+        label = ttk.Label(self.launcher.settings_frame, text=text)
+        self.launcher.pack_control(label, 0)
+        entry = ttk.Entry(self.launcher.settings_frame, textvariable=self.val, width=TEXT_ENTRY_WIDTH, font='TkFixedFont')
+        self.launcher.pack_control(entry, 1)
+
+    def get_config(self):
+        return {self.key : self.val.get()}
+
+    def get_opts(self):
+        val = self.val.get()
+        if not val:
+            return []
+        if self.validator:
+            try:
+                valid = self.validator(val)
+            except ValueError:
+                valid = False
+            if not valid:
+                self.launcher.show_warning(('value %s is invalid for --' % val) + self.opt)
+                return None
+        return ['--' + self.opt, val]
+
+    def notify(self, event):
+        if event == LauncherEvent.Changed:
+            self.val.set(self.launcher.get_config()[self.key])
+
+class NaturalNumberOption(TextOption):
+    def __init__(self, launcher, option, text):
+        super().__init__(launcher, option, text, validator=lambda v: not v or int(v) > 0)
+
+class RealNumberOption(TextOption):
+    def __init__(self, launcher, option, text):
+        super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
+
+class NonNegativeRealNumberOption(TextOption):
+    def __init__(self, launcher, option, text):
+        super().__init__(launcher, option, text, validator=lambda v: not v or float(v) >= 0)
+
+class ValueListOption(TextOption):
+    """Option represented by comma separated list of values"""
+    separator = ':'
+    def get_opts(self):
+        val = self.val.get()
+        if not val:
+            return []
+        opts = []
+        for v in val.split(self.separator):
+            if self.validator:
+                try:
+                    valid = self.validator(v)
+                except ValueError:
+                    valid = False
+                if not valid:
+                    self.launcher.show_warning(('value %s is invalid for --' % v) + self.opt)
+                    return None
+            opts += ['--' + self.opt, v]
+        return opts
+
+
+class RealNumbersOption(ValueListOption):
+    """Option represented by comma separated list of real numbers"""
+    separator = ','
+    def __init__(self, launcher, option, text):
+        super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
+
+
 class Launcher:
     def __init__(self):
         self.root = tk.Tk()
@@ -188,20 +269,34 @@ class Launcher:
     def create_settings(self):
         self.settings = [
             ModelSelector(self),
-            CheckOption(self, 'epoch',
-                'use epoch timestamps'),
-            CheckOption(self, 'with-zero',
-                'make sure the zero is within data graph vertical axis range (press z to toggle)'),
-            CheckOption(self, 'plot-stat',
-                'show statistic while plotting data (press t to toggle)'),
-            CheckOption(self, 'full-screen',
-                'display the graph on the entire screen (use dbl-click to toggle)'),
-            CheckOption(self, 'keep-nan',
-                'keep invalid data values (NaN) resulting from overload'),
+            CheckOption(self, 'epoch', 'use epoch timestamps'),
+            CheckOption(self, 'with-zero', 'make sure the zero is within data graph vertical axis range (press z to toggle)'),
+            CheckOption(self, 'plot-stat', 'show statistic while plotting data (press t to toggle)'),
+            CheckOption(self, 'full-screen', 'display the graph on the entire screen (use dbl-click to toggle)'),
+            CheckOption(self, 'keep-nan', 'keep invalid data values (NaN) resulting from overload'),
+
             FileNameOption(self, 'file', DEF_FNAME,
                 'output filename or filename template', 'actual output filename'),
             FileNameOptionWithChkbox(self, 'alt-file', DEF_ALT_FNAME,
                 'alternative channel output filename or template', 'actual alternative channel output filename'),
+
+            NonNegativeRealNumberOption(self, 'interval', 'data acquisition interval in seconds'),
+            NaturalNumberOption(self, 'wnd', 'data graph window sample count (press w to toggle)'),
+            RealNumberOption(self, 'offset', 'data offset on output'),
+            RealNumberOption(self, 'mult', 'data multiplier on output'),
+            RealNumbersOption(self, 'hline', 'draw horizontal line through given value(s) (comma separated)'),
+            RealNumbersOption(self, 'alt-hline', 'draw horizontal line through given alt-channel value(s)'),
+
+            TextOption(self, 'delimiter', 'data delimiter on output'),
+            TextOption(self, 'title', 'data graph window title'),
+            TextOption(self, 'plot-title', 'data plot title'),
+            TextOption(self, 'alt-title', 'alternative channel data plot title'),
+
+            TextOption(self, 'line-style', 'line style specifier'),
+            TextOption(self, 'hline-style', 'horizontal line style specifier'),
+            TextOption(self, 'line-color', 'line color specifier'),
+            TextOption(self, 'alt-line-color', 'alternative channel line color specifier'),
+            TextOption(self, 'hline-color',  'horizontal line color specifier'),
         ]
 
     def on_start_bt(self):
@@ -220,7 +315,7 @@ class Launcher:
     def pack_control(self, ctl, col, cspan=1, sticky='w'):
         if not col:
             self.cur_row += 1
-        ctl.grid(row=self.cur_row, column=col, padx=10, pady=3, columnspan=cspan, sticky=sticky)
+        ctl.grid(row=self.cur_row, column=col, padx=10, pady=VERT_PAD, columnspan=cspan, sticky=sticky)
 
     def show_status(self, status_str, color='darkgreen'):
         log.debug('show_status: %s', status_str)
