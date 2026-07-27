@@ -296,6 +296,7 @@ class ModelSelector(Setting):
         model_spec = self.selector.get()
         log.debug('on_model_selected: %s', model_spec)
         self.launcher.set_config(self.cfg['models'][model_spec])
+        self.selector.selection_clear()
 
     def init_config(self):
         try:
@@ -353,6 +354,7 @@ class ModelSelector(Setting):
         elif event == LauncherEvent.Starting:
             self.start_model = self.selector.get()
             self.start_cfg = self.launcher.collect_config()
+            self.selector.selection_clear()
         elif event == LauncherEvent.Started:
             opts = self.launcher.get_started_opts()
             path = opts['path']
