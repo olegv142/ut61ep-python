@@ -3,8 +3,11 @@ OWON digital multimeters communication adapter
 """
 
 import time
+import logging
 import bt_engine
 from device import Device, BTMixin
+
+log = logging.getLogger('DEV')
 
 class OwonBtDevice(BTMixin, Device):
     """OWON Bluetooth multimeter interface class"""
