@@ -2,16 +2,22 @@
 Device adapters abstract base classes
 """
 
-try:
-    import hid
-except:
-    import hidapi as hid
-
 from abc import ABC, abstractmethod
 import bt_engine
 import logging
 
 log = logging.getLogger('DEV')
+
+hid = None
+
+def import_hid():
+    global hid
+    if hid is not None:
+        return
+    try:
+        import hid as hid
+    except:
+        import hidapi as hid
 
 class Device(ABC):
     """Base class for all device adapters"""
@@ -109,6 +115,7 @@ class HIDMixin(USBMixin):
     @classmethod
     def list_paths(cls, vid=None, pid=None):
         """Returns the list of HID device paths"""
+        import_hid()
         if vid is None:
             vid = cls.device_vid
         if pid is None:
@@ -118,6 +125,7 @@ class HIDMixin(USBMixin):
     @staticmethod
     def _open_path(path):
         """Opens hid device given the path and returns it"""
+        import_hid()
         if isinstance(path, str):
             path = path.encode('ascii')
         dev = hid.device()
