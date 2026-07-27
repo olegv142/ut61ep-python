@@ -135,14 +135,17 @@ class FileNameOption(Setting):
 class FileNameOptionWithChkbox(FileNameOption):
     def create_controls(self, text, actual_text):
         self.checked = tk.BooleanVar(value=False)
-        label = ttk.Checkbutton(self.launcher.settings_frame, text=text, variable=self.checked)
+        label = ttk.Checkbutton(self.launcher.settings_frame, text=text, variable=self.checked, command=self.on_enable)
         self.launcher.pack_control(label, 0)
-        entry = ttk.Entry(self.launcher.settings_frame, textvariable=self.val, width=TEXT_ENTRY_WIDTH, font='TkFixedFont')
-        self.launcher.pack_control(entry, 1)
+        self.entry = ttk.Entry(self.launcher.settings_frame, textvariable=self.val, width=TEXT_ENTRY_WIDTH, font='TkFixedFont', state='readonly')
+        self.launcher.pack_control(self.entry, 1)
         alabel = ttk.Label(self.launcher.settings_frame, text=actual_text)
         self.launcher.pack_control(alabel, 0)
         aentry = ttk.Entry(self.launcher.settings_frame, textvariable=self.aval, width=TEXT_ENTRY_WIDTH, font='TkFixedFont', state='readonly')
         self.launcher.pack_control(aentry, 1)
+
+    def on_enable(self):
+        self.entry.config(state='normal' if self.checked.get() else 'readonly')
 
     def get_config(self):
         return {self.key : self.val.get(), self.key + '_en' : self.checked.get()}
@@ -155,6 +158,7 @@ class FileNameOptionWithChkbox(FileNameOption):
     def notify(self, event):
         if event == LauncherEvent.Changed:
             self.checked.set(self.launcher.get_config()[self.key + '_en'])
+            self.on_enable()
         super().notify(event)
 
 class Launcher:
@@ -213,7 +217,7 @@ class Launcher:
             ), daemon=True)
         proc.start()
 
-    def pack_control(self, ctl, col, cspan=1, sticky="w"):
+    def pack_control(self, ctl, col, cspan=1, sticky='w'):
         if not col:
             self.cur_row += 1
         ctl.grid(row=self.cur_row, column=col, padx=10, pady=3, columnspan=cspan, sticky=sticky)
@@ -336,8 +340,8 @@ if __name__ == '__main__':
         ])
     if frozen:
         log_queue = multiprocessing.Manager().Queue()
-        file_handler = logging.handlers.RotatingFileHandler(".logs/dmm.log", 'a', 128*1024, 2)
-        file_handler.setFormatter(logging.Formatter("%(asctime)s %(name)s %(message)s"))
+        file_handler = logging.handlers.RotatingFileHandler('.logs/dmm.log', 'a', 128*1024, 2)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(message)s'))
         listener = logging.handlers.QueueListener(log_queue, file_handler)
         listener.start()
 
