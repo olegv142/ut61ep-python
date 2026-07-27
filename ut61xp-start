@@ -22,6 +22,10 @@ log = logging.getLogger('APP')
 module_dir = os.path.dirname(os.path.abspath(__file__))
 log_queue = None
 
+DEF_FNAME        = 'data/%Y-%m-%d/%H%M%S-${MODEL}.dat'
+DEF_ALT_FNAME    = 'data/%Y-%m-%d/%H%M%S-${MODEL}_.dat'
+TEXT_ENTRY_WIDTH = len(DEF_ALT_FNAME)
+
 class LauncherEvent(Enum):
     Created       = 0
     Changed       = 1
@@ -73,14 +77,14 @@ class ModelSelector(Setting):
 class CheckOption(Setting):
     def __init__(self, launcher, option, text):
         self.launcher = launcher
-        self.opt = '--' + option
+        self.opt = option
         self.key = option.replace('-', '_')
         self.checked = tk.BooleanVar(value=False)
-        self.control = ttk.Checkbutton(launcher.settings_frame, text=text, variable=self.checked)
-        launcher.pack_control(self.control, 0, 2)
+        control = ttk.Checkbutton(launcher.settings_frame, text=text, variable=self.checked)
+        launcher.pack_control(control, 0, 2)
 
     def get_opts(self):
-        return [] if not self.checked.get() else [self.opt]
+        return [] if not self.checked.get() else ['--' + self.opt]
 
     def get_config(self):
         return {self.key : self.checked.get()}
@@ -89,12 +93,76 @@ class CheckOption(Setting):
         if event == LauncherEvent.Changed:
             self.checked.set(self.launcher.get_config()[self.key])
 
+class FileNameOption(Setting):
+    def __init__(self, launcher, option, defval, text, actual_text):
+        self.launcher = launcher
+        self.opt = option
+        self.key = option.replace('-', '_')
+        self.val = tk.StringVar(value=defval)
+        self.aval = tk.StringVar()
+        self.create_controls(text, actual_text)
+
+    def create_controls(self, text, actual_text):
+        label = ttk.Label(self.launcher.settings_frame, text=text)
+        self.launcher.pack_control(label, 0)
+        entry = ttk.Entry(self.launcher.settings_frame, textvariable=self.val, width=TEXT_ENTRY_WIDTH, font='TkFixedFont')
+        self.launcher.pack_control(entry, 1)
+        alabel = ttk.Label(self.launcher.settings_frame, text=actual_text)
+        self.launcher.pack_control(alabel, 0)
+        aentry = ttk.Entry(self.launcher.settings_frame, textvariable=self.aval, width=TEXT_ENTRY_WIDTH, font='TkFixedFont', state='readonly')
+        self.launcher.pack_control(aentry, 1)
+
+    def get_config(self):
+        return {self.key : self.val.get()}
+
+    def get_opts(self):
+        fname = self.val.get()
+        if not fname:
+            self.launcher.show_warning('filename can not be empty with --' + self.opt)
+            return None
+        return ['--' + self.opt, fname]
+
+    def notify(self, event):
+        if event == LauncherEvent.Changed:
+            self.val.set(self.launcher.get_config()[self.key])
+            self.aval.set('')
+        elif event == LauncherEvent.Starting:
+            self.aval.set('')
+        elif event == LauncherEvent.Started:
+            val = self.launcher.get_started_opts()['_' + self.key]
+            self.aval.set(val if val else '')
+
+class FileNameOptionWithChkbox(FileNameOption):
+    def create_controls(self, text, actual_text):
+        self.checked = tk.BooleanVar(value=False)
+        label = ttk.Checkbutton(self.launcher.settings_frame, text=text, variable=self.checked)
+        self.launcher.pack_control(label, 0)
+        entry = ttk.Entry(self.launcher.settings_frame, textvariable=self.val, width=TEXT_ENTRY_WIDTH, font='TkFixedFont')
+        self.launcher.pack_control(entry, 1)
+        alabel = ttk.Label(self.launcher.settings_frame, text=actual_text)
+        self.launcher.pack_control(alabel, 0)
+        aentry = ttk.Entry(self.launcher.settings_frame, textvariable=self.aval, width=TEXT_ENTRY_WIDTH, font='TkFixedFont', state='readonly')
+        self.launcher.pack_control(aentry, 1)
+
+    def get_config(self):
+        return {self.key : self.val.get(), self.key + '_en' : self.checked.get()}
+
+    def get_opts(self):
+        if not self.checked.get():
+            return []
+        return super().get_opts()
+
+    def notify(self, event):
+        if event == LauncherEvent.Changed:
+            self.checked.set(self.launcher.get_config()[self.key + '_en'])
+        super().notify(event)
+
 class Launcher:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Data acquisition launcher')
         self.root.iconphoto(True, tk.PhotoImage(file=module_dir + '/meter.png'))
-        self.cur_row = 0
+        self.cur_row = -1
         self.conn = None
         self.curr_evt = None
         self.cfg = None
@@ -126,6 +194,10 @@ class Launcher:
                 'display the graph on the entire screen (use dbl-click to toggle)'),
             CheckOption(self, 'keep-nan',
                 'keep invalid data values (NaN) resulting from overload'),
+            FileNameOption(self, 'file', DEF_FNAME,
+                'output filename or filename template', 'actual output filename'),
+            FileNameOptionWithChkbox(self, 'alt-file', DEF_ALT_FNAME,
+                'alternative channel output filename or template', 'actual alternative channel output filename'),
         ]
 
     def on_start_bt(self):
@@ -142,20 +214,24 @@ class Launcher:
         proc.start()
 
     def pack_control(self, ctl, col, cspan=1, sticky="w"):
+        if not col:
+            self.cur_row += 1
         ctl.grid(row=self.cur_row, column=col, padx=10, pady=3, columnspan=cspan, sticky=sticky)
-        self.cur_row += 1
 
-    def set_status(self, status_str, color='darkgreen'):
-        log.debug('set_status: %s', status_str)
+    def show_status(self, status_str, color='darkgreen'):
+        log.debug('show_status: %s', status_str)
         self.status_label.config(text=status_str, fg=color)
+
+    def show_warning(self, msg):
+        self.show_status(msg, color='darkred')
 
     def update_status(self, event):
         if event in (LauncherEvent.Created, LauncherEvent.Started):
-            self.set_status('ready')
+            self.show_status('ready')
         elif event == LauncherEvent.Starting:
-            self.set_status('starting...', color='grey')
+            self.show_status('starting...', color='grey')
         elif event == LauncherEvent.StartFailed:
-            self.set_status('start failed', color='darkred')
+            self.show_status('start failed', color='darkred')
 
     def notify(self, event):
         log.debug('notify: %s', event)
