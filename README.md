@@ -196,7 +196,12 @@ The GUI workflow is built around **ut61xp-start** script that provides convenien
 ![ut61xp-start tool collecting data from 3 multimeters on RPi5](/misc/rpi.png)
 
 ## Data acquisition launcher
-
+The **ut61xp-start** script opens window with controls providing convenient way of setting data acquisition and plotting options and launching data acquisition in separate windows as if they will be opened by running **ut61xp-get** tool from command line. The launcher window consists of the following major parts:
+ - the multimeter model selector
+ - the data acquisition options (for ex. output file name)
+ - the plot styling options (for ex the plot title)
+ - the acquisition start button
+Initially the model list contains only 'unbounded' models. Once the tool connects to the particular multimeter by autodetecting it, the 'bounded' model with particular USB path / BT address assigned is added to the list of models. So you can easily connect to the same multimeter later by choosing the particular bounded model. The full set of configured options is saved and restored whenever you select the particular model. Pressing Start button launches data acquisition process in separate window. This window has the same set of useful hot keys as described in [Plot window hotkeys](#plot-window-hotkeys). The data collected is being saved to the file with the path configured in the launcher window. By default the output file is located in 'data' folder next to the **ut61xp-start** tool in subfolder with current data as the name. Its name is made by concatenation of the start time and multimeter model name. To stop data acquisition one can just close the acquisition window.
 
 ## Packaging
 On windows the build_exe.bat script builds standalone executables in dist/dmm-tools folder. They can be copied to any folder on the target system including the flash drive and used without installing anything. The same script may be used on Linux like
@@ -206,9 +211,17 @@ bash build_exe.bat
 It will produce executables on Linux as well but the resulting size of that executables on Linux is drastically larger than on windows which makes this installation method practically meaningless.
 
 ## Other UI tools
+There are several other tools that are actually wrappers around **ut61xp-get** tool. They make using particular functionality easy especially on windows as described in the following table.
+| Tools           |  What it does  |
+|-----------------|----------------|
+| **ut61xp-plot** | Plot one or more files given as command line arguments similar to **ut61xp-get plot** command. On windows one can drag and drop one or more files to this tool to plot them.       |
+| **ut61xp-hist** | Plot histogram for the file passed as command line arguments similar to **ut61xp-get hist** command. On windows one can drag and drop file to this tool to plot its histogram.     |
+| **ut61xp-stat** | Print statistics for the file passed as command line arguments similar to **ut61xp-get stat** command. On windows one can drag and drop file to this tool to print its statistics. |
 
 ## Known issues
 
 ### Window does not have dedicated icon on some Linux systems
+Various distributions have different matplotlib backends each with its own method of assigning icon to the window. Forcing the particular backend in the code is not an option since it introduces a lot more compatibility pain that just the absence of an icon on some distributions.
 
 ### Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
+The multimeter becomes available for reconnect after dropping of the previous connection. The problem here is that its the operating system that maintains connection. It may not drop connection if application that initiated it was terminated not gracefully, especially on Linux. So the multimeter thinks its still connected to already terminated application. The problem occurs if one close **ut61xp-start** window while some data acquisition windows are still open. In case all such windows are closed before closing **ut61xp-start** window the Bluetooth connection are terminated as expected.
