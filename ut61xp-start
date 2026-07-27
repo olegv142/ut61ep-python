@@ -33,6 +33,7 @@ DEF_FNAME        = 'data/%Y-%m-%d/%H%M%S-${MODEL}.dat'
 DEF_ALT_FNAME    = 'data/%Y-%m-%d/%H%M%S-${MODEL}_.dat'
 TEXT_ENTRY_WIDTH = len(DEF_ALT_FNAME)
 VERT_PAD         = 1
+HORIZ_PAD        = 8
 
 class LauncherEvent(Enum):
     Created       = 0
@@ -67,6 +68,16 @@ class Setting(ABC):
     @abstractmethod
     def get_config(self):
         """Returns its own configuration as dictionary"""
+        return {}
+
+class DummyOption(Setting):
+    def notify(self, event):
+        pass
+
+    def get_opts(self):
+        return []
+
+    def get_config(self):
         return {}
 
 class ModelSelector(Setting):
@@ -240,6 +251,13 @@ class RealNumbersOption(ValueListOption):
     def __init__(self, launcher, option, text):
         super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
 
+class OptionSeparator(DummyOption):
+    def __init__(self, launcher, text):
+        sep = ttk.Separator(launcher.settings_frame, orient="horizontal")
+        label = ttk.Label(launcher.settings_frame, text=text, font=("Arial", 9, "italic"))
+        launcher.pack_control(sep, 0, 1, sticky="ew", pady=3*VERT_PAD)
+        launcher.pack_control(label, 1, padx=2*HORIZ_PAD, pady=3*VERT_PAD)
+
 
 class Launcher:
     def __init__(self):
@@ -260,7 +278,7 @@ class Launcher:
         btn.pack(side=tk.TOP, pady=15)
 
         self.status_label = tk.Label(self.root,
-                bd=1, relief=tk.SUNKEN, anchor=tk.W, padx=10
+                bd=1, relief=tk.SUNKEN, anchor=tk.W, padx=HORIZ_PAD
             )
         self.status_label.pack(side=tk.BOTTOM, fill=tk.X)
         self.create_settings()
@@ -268,10 +286,8 @@ class Launcher:
     def create_settings(self):
         self.settings = [
             ModelSelector(self),
-            CheckOption(self, 'epoch', 'use epoch timestamps'),
-            CheckOption(self, 'with-zero', 'make sure the zero is within data graph vertical axis range (press z to toggle)'),
-            CheckOption(self, 'plot-stat', 'show statistic while plotting data (press t to toggle)'),
-            CheckOption(self, 'full-screen', 'display the graph on the entire screen (use dbl-click to toggle)'),
+
+            OptionSeparator(self, 'acquisition options:'),
 
             FileNameOption(self, 'file', DEF_FNAME,
                 'output filename or filename template', 'actual output filename'),
@@ -282,13 +298,21 @@ class Launcher:
             NaturalNumberOption(self, 'wnd', 'data graph window sample count (press w to toggle)'),
             RealNumberOption(self, 'offset', 'data offset on output'),
             RealNumberOption(self, 'mult', 'data multiplier on output'),
-            RealNumbersOption(self, 'hline', 'draw horizontal line through given value(s) (comma separated)'),
-            RealNumbersOption(self, 'alt-hline', 'draw horizontal line through given alt-channel value(s)'),
-
             TextOption(self, 'delimiter', 'data delimiter on output'),
+            CheckOption(self, 'epoch', 'use epoch timestamps'),
+
+            OptionSeparator(self, 'style options:'),
+
+            CheckOption(self, 'full-screen', 'display the graph on the entire screen (use dbl-click to toggle)'),
+            CheckOption(self, 'with-zero', 'make sure the zero is within data graph vertical axis range (press z to toggle)'),
+            CheckOption(self, 'plot-stat', 'show statistic while plotting data (press t to toggle)'),
+
             TextOption(self, 'title', 'data graph window title'),
             TextOption(self, 'plot-title', 'data plot title'),
             TextOption(self, 'alt-title', 'alternative channel data plot title'),
+
+            RealNumbersOption(self, 'hline', 'draw horizontal line through given value(s) (comma separated)'),
+            RealNumbersOption(self, 'alt-hline', 'draw horizontal line through given alt-channel value(s)'),
 
             TextOption(self, 'line-style', 'line style specifier'),
             TextOption(self, 'hline-style', 'horizontal line style specifier'),
@@ -310,10 +334,10 @@ class Launcher:
             ), daemon=True)
         proc.start()
 
-    def pack_control(self, ctl, col, cspan=1, sticky='w'):
+    def pack_control(self, ctl, col, cspan=1, sticky='w', padx=HORIZ_PAD, pady=VERT_PAD):
         if not col:
             self.cur_row += 1
-        ctl.grid(row=self.cur_row, column=col, padx=10, pady=VERT_PAD, columnspan=cspan, sticky=sticky)
+        ctl.grid(row=self.cur_row, column=col, padx=padx, pady=pady, columnspan=cspan, sticky=sticky)
 
     def show_status(self, status_str, color='darkgreen'):
         log.debug('show_status: %s', status_str)
