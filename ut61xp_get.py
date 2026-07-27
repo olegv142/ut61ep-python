@@ -13,6 +13,7 @@ import logging
 from ut61xp import UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from owon import OwonBtDevice
 from data_stat import StatCollector, histogram
+from version import version_str
 from datetime import datetime
 
 log = logging.getLogger('DEV')
@@ -508,7 +509,7 @@ def main(argv=None):
 def main_impl(argv=None):
     formatter = lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
     parser = argparse.ArgumentParser(
-            description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool',
+            description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool v.' + version_str,
             usage='%(prog)s [options] COMMAND [command options]',
             formatter_class=formatter
         )

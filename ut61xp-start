@@ -19,6 +19,7 @@ from multiprocessing import Process, Pipe
 from abc import ABC, abstractmethod
 from enum import Enum
 from ut61xp_get import _main, _supported_devices
+from version import version_str
 
 try:
     from ctypes import windll
@@ -286,7 +287,7 @@ class ModelSelector(Setting):
         label = ttk.Label(launcher.settings_frame, text=text)
         launcher.pack_control(label, 0)
         model_list = list(self.cfg['models'].keys())
-        self.selector = ttk.Combobox(launcher.settings_frame, values=model_list, state="readonly", width=40)
+        self.selector = ttk.Combobox(launcher.settings_frame, values=model_list, state="readonly", width=30)
         self.selector.current(model_list.index(self.cfg['model']))
         self.selector.bind("<<ComboboxSelected>>", self.notify_selected)
         launcher.pack_control(self.selector, 1)
@@ -421,6 +422,8 @@ class Launcher:
 
     def create_settings(self):
         self.settings = [
+            OptionSeparator(self, 'version ' + version_str),
+
             ModelSelector(self, 'Multimeter model'),
 
             OptionSeparator(self, 'acquisition options:'),
