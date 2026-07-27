@@ -216,7 +216,7 @@ class NonNegativeRealNumberOption(TextOption):
 
 class ValueListOption(TextOption):
     """Option represented by comma separated list of values"""
-    separator = ':'
+    separator = ','
     def get_opts(self):
         val = self.val.get()
         if not val:
@@ -237,7 +237,6 @@ class ValueListOption(TextOption):
 
 class RealNumbersOption(ValueListOption):
     """Option represented by comma separated list of real numbers"""
-    separator = ','
     def __init__(self, launcher, option, text):
         super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
 
@@ -273,7 +272,6 @@ class Launcher:
             CheckOption(self, 'with-zero', 'make sure the zero is within data graph vertical axis range (press z to toggle)'),
             CheckOption(self, 'plot-stat', 'show statistic while plotting data (press t to toggle)'),
             CheckOption(self, 'full-screen', 'display the graph on the entire screen (use dbl-click to toggle)'),
-            CheckOption(self, 'keep-nan', 'keep invalid data values (NaN) resulting from overload'),
 
             FileNameOption(self, 'file', DEF_FNAME,
                 'output filename or filename template', 'actual output filename'),
