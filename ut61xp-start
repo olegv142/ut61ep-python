@@ -8,6 +8,7 @@ It manages configurations and launches data acquisition.
 import os
 import sys
 import math
+import json
 import logging
 import logging.handlers
 import tkinter as tk
@@ -16,7 +17,7 @@ import multiprocessing
 from multiprocessing import Process, Pipe
 from abc import ABC, abstractmethod
 from enum import Enum
-from ut61xp_get import _main
+from ut61xp_get import _main, _supported_devices
 
 try:
     from ctypes import windll
@@ -49,11 +50,11 @@ class Setting(ABC):
     def notify(self, event):
         """
         The following event notifications must/may be handled:
-          - on LauncherState.Created the instance must initialize itself with defaults and place its controls on the launcher window;
+          - on LauncherEvent.Created the instance must initialize itself with defaults and place its controls on the launcher window;
             the particular implementation may do it in constructor instead of event handler
-          - on LauncherState.Changed the instance must call launcher's get_config and update its settings accordingly
-          - on LauncherState.Started the instance may call launcher's get_started_options and update its settings accordingly
-          - on LauncherState.Terminating the instance may save its configuration
+          - on LauncherEvent.Changed the instance must call launcher's get_config and update its settings accordingly
+          - on LauncherEvent.Started the instance may call launcher's get_started_options and update its settings accordingly
+          - on LauncherEvent.Terminating the instance may save its configuration
         """
         pass
 
@@ -86,21 +87,8 @@ class OptionSeparator(DummyOption):
     def __init__(self, launcher, text):
         sep = ttk.Separator(launcher.settings_frame, orient="horizontal")
         label = ttk.Label(launcher.settings_frame, text=text, font=("Arial", 9, "italic"), foreground='grey')
-        launcher.pack_control(sep, 0, 1, sticky="ew", pady=3*VERT_PAD)
-        launcher.pack_control(label, 1, padx=2*HORIZ_PAD, pady=3*VERT_PAD)
-
-class ModelSelector(Setting):
-    def __init__(self, launcher):
-        self.launcher = launcher
-
-    def notify(self, event):
-        pass
-
-    def get_opts(self):
-        return ['-B', '-M', 'OWON', 'data', '-g']
-
-    def get_config(self):
-        return {}
+        launcher.pack_control(sep, 0, 1, sticky="ew", pady=4*VERT_PAD)
+        launcher.pack_control(label, 1, padx=2*HORIZ_PAD, pady=4*VERT_PAD)
 
 class CheckOption(Setting):
     """Boolean option with checkbox"""
@@ -279,6 +267,124 @@ class RealNumbersOption(ValueListOption):
     def __init__(self, launcher, option, text):
         super().__init__(launcher, option, text, validator=lambda v: not v or math.isfinite(float(v)))
 
+class ModelSelector(Setting):
+    models = [t.model_name + ' ' + ('BT' if t.isBT else 'USB') for t in _supported_devices]
+    cfg_path = '.config'
+
+    def __init__(self, launcher, text):
+        self.launcher = launcher
+        self.init_config()
+        self.start_cfg = None
+        self.start_model = None
+        self.path = None
+        label = ttk.Label(launcher.settings_frame, text=text)
+        launcher.pack_control(label, 0)
+        model_list = list(self.cfg['models'].keys())
+        self.selector = ttk.Combobox(launcher.settings_frame, values=model_list, state="readonly", width=40)
+        self.selector.current(model_list.index(self.cfg['model']))
+        self.selector.bind("<<ComboboxSelected>>", self.notify_selected)
+        launcher.pack_control(self.selector, 1)
+
+    def notify_selected(self, event=None):
+        model_spec = self.selector.get()
+        log.debug('on_model_selected: %s', model_spec)
+        self.launcher.set_config(self.cfg['models'][model_spec])
+
+    def init_config(self):
+        try:
+            cfg = self.load_config()
+            cfg_models = cfg['models']
+            if cfg['model'] not in cfg_models:
+                self.init_default_config()
+                return
+            for m in self.models:
+                if m not in cfg_models:
+                    cfg_models[m] = {}
+                elif type(cfg_models[m]) is not dict:
+                    self.init_default_config()
+                    return
+            self.cfg = cfg
+            log.debug('init_config: %s', self.cfg)
+        except (TypeError, KeyError) as e:
+            log.debug('init_config failed: %s' % e)
+            self.init_default_config()
+
+    def init_default_config(self):
+        self.cfg = {
+            'model' : self.models[0],
+            'models' : {
+                m : {} for m in self.models
+            }
+        }
+        log.debug('init_default_config: %s', self.cfg)
+
+    def load_config(self):
+        try:
+            with open(self.cfg_path) as f:
+                return json.loads(f.read())
+        except Exception as e:
+            log.debug('load_config failed: %s', e)
+            return None
+
+    def save_config(self, cfg):
+        try:
+            cfg_str = json.dumps(cfg)
+            with open(self.cfg_path + '.tmp', 'w') as f:
+                f.write(cfg_str)
+            try:
+                os.rename(self.cfg_path + '.tmp', self.cfg_path)
+            except FileExistsError:
+                # sadly windows can't atomically replace file
+                os.unlink(self.cfg_path)
+                os.rename(self.cfg_path + '.tmp', self.cfg_path)
+        except Exception as e:
+            log.debug('save_config failed: %s', e)
+
+    def notify(self, event):
+        if event == LauncherEvent.Created:
+            self.notify_selected()
+        elif event == LauncherEvent.Starting:
+            self.start_model = self.selector.get()
+            self.start_cfg = self.launcher.collect_config()
+        elif event == LauncherEvent.Started:
+            path = self.launcher.get_started_opts()['path']
+            if 'path' not in self.start_cfg:
+                model_path = self.start_model + ' ' + path
+                self.cfg['models'][self.start_model] = self.start_cfg
+                self.cfg['models'][model_path] = {
+                        **self.start_cfg, 'path' : path
+                    }
+                models = list(self.selector['values'])
+                if model_path not in models:
+                    models.append(model_path)
+                    self.selector['values'] = models
+                self.selector.current(models.index(model_path))
+            else:
+                assert path == self.start_cfg['path']
+                self.cfg['models'][self.start_model] = self.start_cfg
+            self.cfg['model'] = self.start_model
+            self.save_config(self.cfg)
+
+    def get_opts(self):
+        # we expect notify(LauncherEvent.Starting) is already called
+        assert self.start_cfg
+        assert self.start_model
+        sep_idx = self.start_model.index(' ')
+        model_name = self.start_model[:sep_idx]
+        opts = ['-M', model_name]
+        if is_bt := (self.start_model[sep_idx+1:sep_idx+3] == 'BT'):
+            opts.append('-B')
+        cfg_file = model_name + '_' + ('BT' if is_bt else 'USB')
+        if path := self.start_cfg.get('path', None):
+            opts += ['--path', path]
+        return opts + ['data', '-g', '--cfg-save', '.cfg/' + cfg_file]
+
+    def get_config(self):
+        if path := self.cfg['models'][self.selector.get()].get('path', None):
+            return {'path' : path}
+        else:
+            return {}
+
 class Launcher:
     """The launcher UI"""
     def __init__(self):
@@ -306,7 +412,7 @@ class Launcher:
 
     def create_settings(self):
         self.settings = [
-            ModelSelector(self),
+            ModelSelector(self, 'Multimeter model'),
 
             OptionSeparator(self, 'acquisition options:'),
 
@@ -345,10 +451,10 @@ class Launcher:
     def on_start_bt(self):
         if self.conn is not None:
             return
+        self.notify(LauncherEvent.Starting)
         opts = self.collect_opts()
         if opts is None:
             return
-        self.notify(LauncherEvent.Starting)
         self.conn, child_conn = Pipe()
         proc = Process(target=_main, args=(
                 child_conn, opts, log_queue
@@ -398,6 +504,9 @@ class Launcher:
             self.cfg_ = cfg
 
     def set_config_(self, cfg):
+        if self.cfg == cfg:
+            log.debug('set_config_: unchanged')
+            return
         self.cfg = cfg
         self.notify(LauncherEvent.Changed)
 
