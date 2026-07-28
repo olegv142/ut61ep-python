@@ -201,6 +201,20 @@ To read from OWON multimeter using 'BDM' protocol one can supply *-B -M OWON* op
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
 
+# Integration with your own code
+The following code continuously reads data from OWON Bluetooth multimeter.
+```
+from owon import OwonBtDevice
+
+if dev := OwonBtDevice.open():
+    with dev:
+        while dev.is_connected():
+            if data := dev.query_raw():
+                print(dev.get_value(data), dev.get_mode(data))
+            else:
+                break
+```
+
 # Working with GUI
 The GUI workflow is built around **ut61xp-start** script that provides convenient UI for setting **ut61xp-get** options and launching data acquisition in separate processes. The single instance of **ut61xp-start** UI can launch any number of data acquisition processes working in parallel, saving data to separate files and showing collected data in their own data plot windows. The following figure illustrates using data acquisition GUI reading data from 3 multimeters simultaneously on Raspberry Pi5.
 
