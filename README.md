@@ -31,7 +31,7 @@ The tool supports the number of Bluetooth multimeters using the same 'BDM' proto
 Other compatible OWON multimeters like B35T+ and OW18E should work with this tool as well.
 
 ## Installation
-
+### Working with sources
 ```
 git clone https://github.com/olegv142/ut61xpy.git
 ```
@@ -47,6 +47,7 @@ sudo apt install python3-hidapi python3-bleak python3-matplotlib
 ```
 On some systems the package *python3-hid* is available instead of *python3-hidapi*. Note that you don't have to install the particular package unless you are not going to use the corresponding features. In particular, you can use the **ut61xp-get** tool without *matplotlib* package if you are not going to plot data charts. You can work without *bleak* package if you have only USB multimeters and without *hid/hidapi* package if you have only Bluetooth multimeters.
 
+### Using portable binaries
 Working with sources is the preferred way of using this tool on Linux. On Windows one can just download latest [release](https://github.com/olegv142/ut61xpy/releases) of portable binaries, unpack them to readable folder and double click **ut61xp-start** acquisition launcher to start working immediately without any additional installation efforts. See [Working with GUI](#working-with-gui) section for more details.
 
 # Working with command line
