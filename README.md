@@ -233,11 +233,11 @@ There are several other tools that are actually wrappers around **ut61xp-get** t
 The **ut61xp-start** tool creates several files and directories next to executable to save data, logs and other execution artifacts. By default only data directory is visible. It contains sub-folders named by creation date with data files having time and multimeter model as parts of their names by default. The user may change the name output file if necessary. There are several other files and folders with names started with dot. One should use *ls* with *-a* switch to see them on Linux or enable 'Show hidden and system files' option in 'System/Advanced/File Explorer' settings on Windows. They are listed in the following table.
 | Path relative to executable location |  Description                                 |
 |--------------------------------------|----------------------------------------------|
-| data                                 | Folder for storing output data (by default)  |
+| data/                                | Folder for storing output data (by default)  |
 | .config                              | File storing models configuration as json dictionary. One can drop it if something goes wrong. It will be recreated automatically on next **ut61xp-start** tool invocation. |
 | .cfg/                                | Folder storing configuration files for recent acquisition runs with names constructed from multimeter model name and communication protocol like 'OWON_BT'. So one can invoke acquisition with the same settings from command line by executing **ut61xp-get data --cfg-load .cfg/<config name>** |
 | .logs/                               | Folder with **ut61xp-start** tool execution logs. One can examine them should something goes wrong or send to the author for analysis. |
-| .internal                            | Folder containing executable components such as a shared libraries and compiled Python code. |
+| .internal/                           | Folder containing executable components such as a shared libraries and compiled Python code. |
 
 ## Known issues
 
