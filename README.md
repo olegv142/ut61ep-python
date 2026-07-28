@@ -37,7 +37,7 @@ git clone https://github.com/olegv142/ut61xpy.git
 ```
 
 Alternatively you can download source code archive and unpack it. 
-The code uses *hid/hidapi* package for communicating with USB multimeters, *bleak* package for communicating with Bluetooth multimeters and *matplotlib* package for data chart plotting. The can be installed by various ways depending on you operating system. To install the with pip (Windows):
+The code uses *hid/hidapi* package for communicating with USB multimeters, *bleak* package for communicating with Bluetooth multimeters and *matplotlib* package for data chart plotting. They can be installed by various ways depending on you operating system. To install them with pip (Windows/Lunix):
 ```
 pip install hidapi bleak matplotlib
 ```
@@ -60,7 +60,7 @@ In case the file with the name provided with *-f* option already exists it will 
 
 ## Dual channel mode
 
-Dual channel mode is handy while reading data in DC+AC mode of UT61E+. To use this mode you will need to properly setup your device and specify filename for storing second channel by means of *-a/--alt-file* option. This may be convenient, but note that DC+AC mode has several peculiarities compared to other modes:
+Dual channel mode is handy while reading data in DC+AC mode of UT61E+. To use this feature you will need to choose proper mode on the multimeter mode dial and specify filename for storing second channel by means of *-a/--alt-file* option. This may be convenient, but note that DC+AC mode has several peculiarities compared to other modes:
  - it takes ~0.7 sec to read single value of the single channel
  - the DC voltage channel fluctuates much more than in other modes
  - to ensure alternating reception of DC and AC readings, it is recommended to use the default sampling interval, which is set to zero in this mode
@@ -92,7 +92,7 @@ With *-s/--stat* option the **ut61xp-get data** command will print various colle
  - the 3rd central moment relative to the standard deviation (*skewness*)
  - the 4th central moment relative to the standard deviation minus 3 (*kurtosis exess*)
 
-The last two metrics may be used to characterize deviations from the mean. The smaller they are the close the values distribution to the standard one with *Gaussian* noise.
+The last two metrics may be used to characterize deviations from the mean. The smaller they are the closer the value distribution to the standard one with *Gaussian* noise.
 
 ### Print statistics while plotting data
 
@@ -176,7 +176,7 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 ## Working with other supported devices
 
-By default, the **ut61xp-get** tool always expects the UT61X+ multimeter as the target device. To change this, one can use *-M/--model* option. Please note that if device works via Bluetooth, the *-B* option must be provided with *-M/--model* option.
+By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device by default. To change this, one can use *-M/--model* option. Please note that if device works via Bluetooth, the *-B* option must be provided with *-M/--model* option.
 
 ### UT60BT
 The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero. Similar dead band exists in A mode between -5mA and +5mA in both UT60BT and UT61X+.
@@ -196,14 +196,15 @@ The GUI workflow is built around **ut61xp-start** script that provides convenien
 ![ut61xp-start tool collecting data from 3 multimeters on RPi5](/misc/rpi.png)
 
 ## Data acquisition launcher
-The **ut61xp-start** script opens window with controls providing convenient way of setting data acquisition and plotting options and launching data acquisition in separate windows as if they will be opened by running **ut61xp-get** tool from command line. The launcher window consists of the following major parts:
+The **ut61xp-start** script opens window with controls providing convenient way of setting data acquisition and plotting options and launching data acquisition in separate windows as if they were opened by running **ut61xp-get** tool from command line. The launcher window consists of the following major parts:
  - the multimeter model selector
  - the data acquisition options (for ex. output file name)
  - the plot styling options (for ex. the plot title)
  - the acquisition start button
-Initially the model list contains only 'unbounded' models. Once the tool connects to the particular multimeter by autodetecting it, the 'bounded' model with particular USB path / BT address assigned is added to the list of models. So you can easily connect to the same multimeter later by choosing the particular bounded model. The full set of configured options is saved and restored whenever you select the particular model. Pressing Start button launches data acquisition process in separate window. This window has the same set of useful hot keys as described in [Plot window hotkeys](#plot-window-hotkeys) section. The data collected is being saved to the file with the path configured in the launcher window. By default the output file is located in 'data' folder next to the **ut61xp-start** tool in subfolder with current date as the name. Its name is made by concatenation of the start time and multimeter model name. The real path to the file is shown on **ut61xp-start** tool window right below the file path template. To stop data acquisition one can just close the acquisition window.
+ 
+Initially the model list contains only 'unbounded' models. Once the tool connects to the particular multimeter by autodetecting it, the 'bounded' model with particular USB path / BT address assigned is added to the list of models. So you can easily connect to the same multimeter later by choosing the particular bounded model. The full set of configured options is saved and restored whenever you select the particular model. Pressing Start button launches data acquisition process in separate window. This window has the same set of useful hot keys as described in [Plot window hotkeys](#plot-window-hotkeys) section. The data collected is being saved to the file with the path configured in the launcher window. By default the output file is located in 'data' folder next to the **ut61xp-start** tool in subfolder with current date as the name. Its name is made by concatenation of the start time and multimeter model name. The real path to the last created data file is shown on **ut61xp-start** tool window right below the file path template. To stop data acquisition one can just close the acquisition window.
 
-## Packaging
+## Making standalone executables
 On windows the build_exe.bat script builds standalone executables in dist/dmm-tools folder. They can be copied to any folder on the target system including the flash drive and used without installing anything. The same script may be used on Linux like
 ```
 bash build_exe.bat
@@ -221,7 +222,7 @@ There are several other tools that are actually wrappers around **ut61xp-get** t
 ## Known issues
 
 ### Window does not have dedicated icon on some Linux systems
-Various distributions have different matplotlib backends each with its own method of assigning icon to the window. Forcing the particular backend in the code is not an option since it introduces a lot more compatibility pain that just the absence of an icon on some distributions.
+Various distributions have different matplotlib backends, each with its own method of assigning icon to the window. Forcing the particular backend in the code is not an option since it introduces a lot more compatibility pain that just the absence of an icon on some distributions.
 
 ### Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
 The multimeter becomes available for reconnect after dropping of the previous connection. The problem here is that its the operating system that maintains connection. It may not drop connection if application that initiated it was terminated not gracefully, especially on Linux. So the multimeter thinks its still connected to already terminated application. The problem occurs if one close **ut61xp-start** window while some data acquisition windows are still open. In case all such windows are closed before closing **ut61xp-start** window the Bluetooth connections are terminated as expected.
