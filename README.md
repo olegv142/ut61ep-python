@@ -235,7 +235,7 @@ The **ut61xp-start** tool creates several files and directories next to executab
 |--------------------------------------|----------------------------------------------|
 | data/                                | Folder for storing output data (by default)  |
 | .config                              | File storing models configuration as json dictionary. One can drop it if something goes wrong. It will be recreated automatically on next **ut61xp-start** tool invocation. |
-| .cfg/                                | Folder storing configuration files for recent acquisition runs with names constructed from multimeter model name and communication protocol like 'OWON_BT'. So one can invoke acquisition with the same settings from command line by executing **ut61xp-get data --cfg-load .cfg/CONFIG_NAME** |
+| .cfg/                                | Folder storing configuration files for recent acquisition runs with names constructed from multimeter model name and communication protocol like 'OWON_BT'. So one can invoke acquisition with the same settings from command line by executing **ut61xp-get data -c .cfg/CONFIG_NAME** |
 | .logs/                               | Folder with **ut61xp-start** tool execution logs. One can examine them should something goes wrong or send to the author for analysis. |
 | .internal/                           | Folder containing executable components such as a shared libraries and compiled Python code. |
 
