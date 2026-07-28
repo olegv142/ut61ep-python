@@ -105,14 +105,22 @@ The **ut61xp-get stat input_file** command prints statistics of the data stored 
 
 ## Plot window hotkeys
 The following keys (partially discussed above) have special meaning when pressed in the data plot window:
-| key   | meaning                                                                                    |
-|-------|--------------------------------------------------------------------------------------------|
-| space | print current statistics to terminal so you can easily copy/paste them                     |
-| t     | show / hide statistics display area on the plot                                            |
-| w     | turn data window on / off (provided that it was initially configured by *-w/--wnd* option) |
-| z     | turn on / off 'with-zero' mode                                                             |
-| s     | opens file chooser dialog to save plot as an image                                         |
-| q     | close plot window                                                                          |
+| key                     | meaning                                                                                    |
+|-------------------------|--------------------------------------------------------------------------------------------|
+| space                   | print current statistics to terminal so you can easily copy/paste them                     |
+| t                       | show / hide statistics display area on the plot                                            |
+| w                       | turn data window on / off (provided that it was initially configured by *-w/--wnd* option) |
+| z                       | turn on / off 'with-zero' mode                                                             |
+| p                       | toggle pan / zoom mode                                                                     |
+| o                       | toggle zoom to rectangle mode                                                              |
+| left / right arrow      | iterate over list of recent views                                                          |
+| c, Backspace            | switch to the previous view                                                                |
+| r, h, Home              | reset view                                                                                 |
+| s, Ctrl+s               | opens file chooser dialog to save plot chart as an image                                   |
+| double click, f, Ctrl+f | toggle full screen mode                                                                    |
+| q, Ctrl+w               | close plot window                                                                          |
+
+Some of these hot keys are implemented by matplotlib library. Note that in panning / zooming mode the window will stop updating itself on every new data sample. Yet the data acquisition will run as usual. Saving figure as an image will pause data acquisition till saving completion, so use this feature with caution. Switching view does not terminate panning / zooming mode which may be confusing sometimes.
 
 ## Working with data histograms
 
@@ -205,21 +213,21 @@ The **ut61xp-start** script opens window with controls providing convenient way 
 Initially the model list contains only 'unbounded' models. Once the tool connects to the particular multimeter by autodetecting it, the 'bounded' model with particular USB path / BT address assigned is added to the list of models. So you can easily connect to the same multimeter later by choosing the particular bounded model. The full set of configured options is saved and restored whenever you select the particular model. Pressing Start button launches data acquisition process in separate window. This window has the same set of useful hot keys as described in [Plot window hotkeys](#plot-window-hotkeys) section. The data collected is being saved to the file with the path configured in the launcher window. By default the output file is located in 'data' folder next to the **ut61xp-start** tool in subfolder with current date as the name. Its name is made by concatenation of the start time and multimeter model name. The real path to the last created data file is shown on **ut61xp-start** tool window right below the file path template. To stop data acquisition one can just close the acquisition window.
 
 ## Making standalone executables
-On windows the build_exe.bat script builds standalone executables in dist/dmm-tools folder. They can be copied to any folder on the target system including the flash drive and used without installing anything. The only requirement for the folder where the executable files will be placed is the ability to write to it. Since the application is 'portable' it tends to store all its files next to the executable. The 'Program Files' folder on Windows is usually write-protected, so you should choose a different location to store executable files.
+On Windows the build_exe.bat script builds standalone executables in dist/dmm-tools folder. They can be copied to any folder on the target system including the flash drive and used without installing anything. The only requirement for the folder where the executable files will be placed is the ability to write to it. Since the application is 'portable' it tends to store all its files next to the executable. The 'Program Files' folder on Windows is usually write-protected, so you should choose a different location to store executable files.
 
 The same script may be used on Linux like
 ```
 bash build_exe.bat
 ```
-It will produce executables on Linux as well but the resulting size of that executables on Linux is drastically larger than on windows which makes this installation method practically meaningless.
+It will produce executables on Linux as well but the resulting size of that executables on Linux is drastically larger than on Windows which makes this installation method practically meaningless.
 
 ## Other UI tools
-There are several other tools that are actually wrappers around **ut61xp-get** tool. They make using particular functionality easy especially on windows as described in the following table.
+There are several other tools that are actually wrappers around **ut61xp-get** tool. They make using particular functionality easy especially on Windows as described in the following table.
 | Tools           |  What it does  |
 |-----------------|----------------|
-| **ut61xp-plot** | Plot one or more files given as command line arguments similar to **ut61xp-get plot** command. On windows one can drag and drop one or more files to this tool to plot them.       |
-| **ut61xp-hist** | Plot histogram for the file passed as command line arguments similar to **ut61xp-get hist** command. On windows one can drag and drop file to this tool to plot its histogram.     |
-| **ut61xp-stat** | Print statistics for the file passed as command line arguments similar to **ut61xp-get stat** command. On windows one can drag and drop file to this tool to print its statistics. |
+| **ut61xp-plot** | Plot one or more files given as command line arguments similar to **ut61xp-get plot** command. On Windows one can drag and drop one or more files to this tool to plot them.       |
+| **ut61xp-hist** | Plot histogram for the file passed as command line arguments similar to **ut61xp-get hist** command. On Windows one can drag and drop file to this tool to plot its histogram.     |
+| **ut61xp-stat** | Print statistics for the file passed as command line arguments similar to **ut61xp-get stat** command. On Windows one can drag and drop file to this tool to print its statistics. |
 
 ## Known issues
 
