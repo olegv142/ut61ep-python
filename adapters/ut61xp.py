@@ -146,10 +146,10 @@ class UTDevice(Device):
         """Returns measurement mode and units description string"""
         mode = UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0], '')
         f1, f2, f3 = data[UTDevice.DATA_LEN-3:]
-        if f1 & 1:
-            mode += ' Rel'
         if f1 & 2:
             mode += ' Hold'
+        if f1 & 1:
+            mode += ' Rel'
         if f1 & 4:
             mode += ' Min'
         if f1 & 8:

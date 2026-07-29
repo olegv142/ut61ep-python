@@ -143,12 +143,12 @@ class OwonBtDevice(BTMixin, Device):
             mode += ' Hold'
         if flags & 2:
             mode += ' Rel'
-        if flags & 8:
-            mode += ' LoBatt'
         if flags & 0x10:
             mode += ' Min'
         if flags & 0x20:
             mode += ' Max'
+        if flags & 8:
+            mode += ' LoBatt'
         return mode
 
     def close(self):
