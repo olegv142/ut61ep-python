@@ -202,9 +202,9 @@ To add new device you should implement its adapter class inherited from *Device*
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
 
 # Integration with your own code
-The following code continuously reads data from OWON Bluetooth multimeter.
+Add this project as the sub-module to your source tree. After that you can use the following code to continuously read data from OWON Bluetooth multimeter.
 ```
-from owon import OwonBtDevice
+from ut61xpy.adapters.owon import OwonBtDevice
 
 if dev := OwonBtDevice.open():
     with dev:

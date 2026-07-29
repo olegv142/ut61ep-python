@@ -2,7 +2,7 @@
 
 a1 = Analysis(
     ['ut61xp-get'],
-    pathex=[],
+    pathex=['adapters'],
     binaries=[],
     datas=[('meter.png', '.')],
     hiddenimports=[],
@@ -16,7 +16,7 @@ a1 = Analysis(
 
 a2 = Analysis(
     ['ut61xp-plot'],
-    pathex=[],
+    pathex=['adapters'],
     binaries=[],
     datas=[('meter.png', '.')],
     hiddenimports=[],
@@ -30,7 +30,7 @@ a2 = Analysis(
 
 a3 = Analysis(
     ['ut61xp-hist'],
-    pathex=[],
+    pathex=['adapters'],
     binaries=[],
     datas=[('meter.png', '.')],
     hiddenimports=[],
@@ -44,7 +44,7 @@ a3 = Analysis(
 
 a4 = Analysis(
     ['ut61xp-stat'],
-    pathex=[],
+    pathex=['adapters'],
     binaries=[],
     datas=[('meter.png', '.')],
     hiddenimports=[],
@@ -58,7 +58,7 @@ a4 = Analysis(
 
 a5 = Analysis(
     ['ut61xp-start'],
-    pathex=[],
+    pathex=['adapters'],
     binaries=[],
     datas=[('meter.png', '.')],
     hiddenimports=[],

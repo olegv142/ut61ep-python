@@ -2,6 +2,11 @@
 Device adapters abstract base classes
 """
 
+import os
+import sys
+
+if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
+
 from abc import ABC, abstractmethod
 import bt_engine
 import logging

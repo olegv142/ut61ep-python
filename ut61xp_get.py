@@ -10,8 +10,8 @@ import time
 import json
 import argparse
 import logging
-from ut61xp import UTDevice, HIDDevice, BTDevice, UT60BTDevice
-from owon import OwonBtDevice
+from adapters.ut61xp import UTDevice, HIDDevice, BTDevice, UT60BTDevice
+from adapters.owon import OwonBtDevice
 from data_stat import StatCollector, histogram
 from version import version_str
 from datetime import datetime

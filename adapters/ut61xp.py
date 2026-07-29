@@ -9,6 +9,11 @@ The code was reworked with the following goals in mind:
  - support for USB HID and Bluetooth communication channel
 """
 
+import os
+import sys
+
+if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
+
 import time
 import logging
 import asyncio
@@ -297,7 +302,6 @@ class UT60BTDevice(BTDevice):
 
 if __name__ == '__main__':
     # Open device and print raw readings as well as the corresponding floating point value
-    import sys
     try:
         if len(sys.argv) > 1:
             name = sys.argv[1]
