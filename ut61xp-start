@@ -402,7 +402,7 @@ class Launcher:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Data acquisition launcher')
-        self.root.iconphoto(True, tk.PhotoImage(file=module_dir + '/meter.png'))
+        self.root.iconphoto(True, tk.PhotoImage(file=module_dir + '/misc/meter.png'))
         self.cur_row = -1
         self.conn = None
         self.curr_evt = None
