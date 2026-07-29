@@ -1,10 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 a1 = Analysis(
-    ['ut61xp-get'],
-    pathex=['adapters'],
+    ['../ut61xp-get'],
+    pathex=['../adapters'],
     binaries=[],
-    datas=[('misc/meter.png', 'misc')],
+    datas=[('../misc/meter.png', 'misc')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -15,10 +15,10 @@ a1 = Analysis(
 )
 
 a2 = Analysis(
-    ['ut61xp-plot'],
-    pathex=['adapters'],
+    ['../ut61xp-plot'],
+    pathex=['../adapters'],
     binaries=[],
-    datas=[('misc/meter.png', 'misc')],
+    datas=[('../misc/meter.png', 'misc')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -29,10 +29,10 @@ a2 = Analysis(
 )
 
 a3 = Analysis(
-    ['ut61xp-hist'],
-    pathex=['adapters'],
+    ['../ut61xp-hist'],
+    pathex=['../adapters'],
     binaries=[],
-    datas=[('misc/meter.png', 'misc')],
+    datas=[('../misc/meter.png', 'misc')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -43,10 +43,10 @@ a3 = Analysis(
 )
 
 a4 = Analysis(
-    ['ut61xp-stat'],
-    pathex=['adapters'],
+    ['../ut61xp-stat'],
+    pathex=['../adapters'],
     binaries=[],
-    datas=[('misc/meter.png', 'misc')],
+    datas=[('../misc/meter.png', 'misc')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -57,10 +57,10 @@ a4 = Analysis(
 )
 
 a5 = Analysis(
-    ['ut61xp-start'],
-    pathex=['adapters'],
+    ['../ut61xp-start'],
+    pathex=['../adapters'],
     binaries=[],
-    datas=[('misc/meter.png', 'misc')],
+    datas=[('../misc/meter.png', 'misc')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -86,7 +86,7 @@ exe1 = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['misc/meter.ico'],
+    icon=['../misc/meter.ico'],
     contents_directory='.internal',
 )
 
@@ -106,7 +106,7 @@ exe2 = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['misc/meter.ico'],
+    icon=['../misc/meter.ico'],
     contents_directory='.internal',
 )
 
@@ -126,7 +126,7 @@ exe3 = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['misc/meter.ico'],
+    icon=['../misc/meter.ico'],
     contents_directory='.internal',
 )
 
@@ -146,7 +146,7 @@ exe4 = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['misc/meter.ico'],
+    icon=['../misc/meter.ico'],
     contents_directory='.internal',
 )
 
@@ -166,7 +166,7 @@ exe5 = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['misc/meter.ico'],
+    icon=['../misc/meter.ico'],
     contents_directory='.internal',
 )
 
