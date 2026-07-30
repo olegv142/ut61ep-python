@@ -1,5 +1,6 @@
 """
-ANENG digital multimeters communication adapter
+ANENG digital multimeter communication adapter
+Supports AN9002 model also sold as ZOTEK/BSIDE ZT-300AB
 """
 
 import os
@@ -15,7 +16,13 @@ from device import Device, BTMixin
 log = logging.getLogger('DEV')
 
 class AnengBtDevice(BTMixin, Device):
-    """OWON Bluetooth multimeter interface class"""
+    """
+    Bluetooth multimeter interface class for Aneng AN9002 also sold as ZOTEK/BSIDE ZT-300AB.
+    The Zotek/Aneng multimeters uses display segment based encoding for BT communications.
+    So there are as many protocol variants as there are displays in use. Therefore this
+    adapter class will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566.
+    Yet the AN9002 is the most interesting model considering the ergonomics and price / performance.
+    """
     model_name  = 'ANENG'
     device_name = 'Bluetooth DMM'
     BT_RX_CHAR  = 'FFF4'
