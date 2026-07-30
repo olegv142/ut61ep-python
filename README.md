@@ -33,7 +33,7 @@ Other compatible OWON multimeters like B35T+ and OW18E should work with this too
 ### ANENG / ZOTEK / BSIDE multimeters
 This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 6000 counts display with 10µV voltage measuring resolution, 0.1µA current measuring resolution and 1pF capacity resolution. The stand is terrible, the quality of the probes is questionable, but other than that its quite usable with good display and small power consumption (3.5mA with Bluetooth active). Despite such low power consumption it has the best Bluetooth communication range among all tested multimeters.
 
-The Zotek/Aneng multimeters uses display segment based encoding for BT communications. So there are as many protocol variants as there are displays in use. Therefore, this tool will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566. Yet the AN9002 is the most interesting model considering the ergonomics and price / performance. The price of this device is smaller that the cost of the single UNI-T Bluetooth adapter.
+The Zotek/Aneng multimeters use display segment based encoding for BT communications. So there are as many protocol variants as there are displays in use. Therefore, this tool will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566. Yet the AN9002 is the most interesting model considering the ergonomics and price / performance. The price of this device is smaller than the cost of the single UNI-T Bluetooth adapter.
 
 ## Installation
 ### Working with sources
