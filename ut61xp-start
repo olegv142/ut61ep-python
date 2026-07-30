@@ -13,6 +13,7 @@ import json
 import logging
 import logging.handlers
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import ttk
 import multiprocessing
 from multiprocessing import Process, Pipe
@@ -34,9 +35,12 @@ log_queue = None
 
 DEF_FNAME        = 'data/%Y-%m-%d/%H%M%S-${MODEL}.dat'
 DEF_ALT_FNAME    = 'data/%Y-%m-%d/%H%M%S-${MODEL}_.dat'
-TEXT_ENTRY_WIDTH = len(DEF_ALT_FNAME)
+TEXT_ENTRY_WIDTH = len(DEF_ALT_FNAME) + 1
 VERT_PAD         = 1
 HORIZ_PAD        = 8
+
+FONT_SIZE = 10
+SMALL_FONT_SIZE = 9
 
 class LauncherEvent(Enum):
     Created       = 0
@@ -89,7 +93,7 @@ class OptionSeparator(DummyOption):
     """Separate option list by horizontal line and label"""
     def __init__(self, launcher, text):
         sep = ttk.Separator(launcher.settings_frame, orient="horizontal")
-        label = ttk.Label(launcher.settings_frame, text=text, font=("Arial", 9, "italic"), foreground='grey')
+        label = ttk.Label(launcher.settings_frame, text=text, font=("Arial", SMALL_FONT_SIZE, "italic"), foreground='grey')
         launcher.pack_control(sep, 0, 1, sticky="ew", pady=4*VERT_PAD)
         launcher.pack_control(label, 1, padx=2*HORIZ_PAD, pady=4*VERT_PAD)
 
@@ -403,6 +407,8 @@ class Launcher:
         self.root = tk.Tk()
         self.root.title('Data acquisition launcher')
         self.root.iconphoto(True, tk.PhotoImage(file=module_dir + '/misc/meter.png'))
+        tkfont.nametofont('TkDefaultFont').configure(size=FONT_SIZE)
+        tkfont.nametofont('TkFixedFont').configure(size=FONT_SIZE)
         self.cur_row = -1
         self.conn = None
         self.curr_evt = None
