@@ -267,3 +267,6 @@ The **ut61xp-start** tool creates several files and directories next to executab
 
 ### Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
 The multimeter becomes available for reconnect after dropping of the previous connection. The problem here is that its the operating system that maintains connection. It may not drop connection if application that initiated it was terminated not gracefully, especially on Linux. So the multimeter thinks its still connected to already terminated application. The problem occurs if one close **ut61xp-start** window while some data acquisition windows are still open. In case all such windows are closed before closing **ut61xp-start** window the Bluetooth connections are terminated as expected.
+
+### Data was not saved to the output file after closing **ut61xp-start** application
+Closing **ut61xp-start** window while acquisition is still active terminates acquisition process without saving anything. Therefore, if you need the collected data, please close the data collection window first.
