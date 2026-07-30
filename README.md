@@ -1,4 +1,4 @@
-# The digital multimeter communication and data plotting tool supporting UNI-T UT61B/D/E+, UT60BT and several OWON Bluetooth multimeters
+# The digital multimeter communication and data plotting tool supporting UNI-T UT61B/D/E+, UT60BT and several OWON / ANENG / ZOTEK / BSIDE Bluetooth multimeters
 
 This repository provides simple alternative to vendor data collection programs. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system. 
 
@@ -29,6 +29,11 @@ The tool supports the number of Bluetooth multimeters using the same 'BDM' proto
 - The OW18B is a cheap, low resolution model with built in Bluetooth. However, it has better display and lower power consumption than B41T+.
 
 Other compatible OWON multimeters like B35T+ and OW18E should work with this tool as well.
+
+### ANENG / ZOTEK / BSIDE multimeters
+This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 6000 counts display with 10µV voltage measuring resolution, 0.1µA current measuring resolution and 1pF capacity resolution. The stand is terrible, the quality of the probes is questionable, but other than that its quite usable with good display and small power consumption (3.5mA with Bluetooth active). The price of this device is smaller that the cost of the single UNI-T Bluetooth adapter.
+
+The Zotek/Aneng multimeters uses display segment based encoding for BT communications. So there are as many protocol variants as there are displays in use. Therefore, this tool will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566. Yet the AN9002 is the most interesting model considering the ergonomics and price / performance.
 
 ## Installation
 ### Working with sources
