@@ -18,7 +18,7 @@ The code was reworked with the following goals in mind:
 
 ### UNI-T multimeters
 - The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
-The tool works via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel at the expense of the lower communication speed. The minimum data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter. The BT adapter shows surprisingly good communication range. Its even able to communicate through the layer of reinforced concrete.
+The tool works via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel at the expense of the lower communication speed. The minimum data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter.
 - The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
 - The UT60BT is consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even higher resolution than the UT61X+ in both millivolt and capacitance modes, with some caveats (see below).
 
@@ -31,9 +31,9 @@ The tool supports the number of Bluetooth multimeters using the same 'BDM' proto
 Other compatible OWON multimeters like B35T+ and OW18E should work with this tool as well.
 
 ### ANENG / ZOTEK / BSIDE multimeters
-This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 6000 counts display with 10µV voltage measuring resolution, 0.1µA current measuring resolution and 1pF capacity resolution. The stand is terrible, the quality of the probes is questionable, but other than that its quite usable with good display and small power consumption (3.5mA with Bluetooth active). The price of this device is smaller that the cost of the single UNI-T Bluetooth adapter.
+This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 6000 counts display with 10µV voltage measuring resolution, 0.1µA current measuring resolution and 1pF capacity resolution. The stand is terrible, the quality of the probes is questionable, but other than that its quite usable with good display and small power consumption (3.5mA with Bluetooth active). Despite such low power consumption it has the best Bluetooth communication range among all tested multimeters.
 
-The Zotek/Aneng multimeters uses display segment based encoding for BT communications. So there are as many protocol variants as there are displays in use. Therefore, this tool will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566. Yet the AN9002 is the most interesting model considering the ergonomics and price / performance.
+The Zotek/Aneng multimeters uses display segment based encoding for BT communications. So there are as many protocol variants as there are displays in use. Therefore, this tool will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566. Yet the AN9002 is the most interesting model considering the ergonomics and price / performance. The price of this device is smaller that the cost of the single UNI-T Bluetooth adapter.
 
 ## Installation
 ### Working with sources
