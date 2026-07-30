@@ -270,3 +270,6 @@ The multimeter becomes available for reconnect after dropping of the previous co
 
 ### Data was not saved to the output file after closing **ut61xp-start** application
 Closing **ut61xp-start** window while acquisition is still active terminates acquisition process without saving anything. Therefore, if you need the collected data, please close the acquisition plot window first.
+
+### Aneng (ZOTEK/BSIDE) multimeter is powering off automatically after some time while data collection is running
+The auto power off feature powers off device after 15 min of inactivity. The Aneng (ZOTEK/BSIDE) multimeters don't consider Bluetooth connection as 'activity'. To disable auto powering off you should press and hold the SEL button while powering on multimeter and selecting desired mode with mode dial. The SEL button should be held until you hear four beeps. The auto power off feature will be disabled until the next power on. With power off disabled the multimeter will still emit alarming beeps periodically but will not power off.
