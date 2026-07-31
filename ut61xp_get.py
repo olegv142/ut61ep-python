@@ -66,7 +66,7 @@ class Plotter:
         self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
         self.init_window_icon(self.fig.canvas)
         self.init_dbl_click_handler(self.fig.canvas)
-        self.init_hot_keys(self.fig.canvas)
+        self.init_hot_keys()
         if args.full_screen:
             self.fig.canvas.manager.full_screen_toggle()
 
@@ -92,7 +92,7 @@ class Plotter:
             last_click = ts
         canvas.mpl_connect('button_press_event', on_click)
 
-    def init_hot_keys(self, canvas):
+    def init_hot_keys(self):
         wnd = None
         def on_key_press(e):
             nonlocal wnd
@@ -115,7 +115,7 @@ class Plotter:
                             l.remove()
                 self.args.plot_stat = not self.args.plot_stat
 
-        canvas.mpl_connect('key_press_event', on_key_press)
+        self.fig.canvas.mpl_connect('key_press_event', on_key_press)
         log.info('press space to print data statistics, z to toggle zero axis display, w to toggle data window, t to toggle stat display, q to exit')
 
     def is_closed(self):
@@ -146,12 +146,13 @@ class Plotter:
             vmax = ymax + vrange * self.padding
         ax.set_ylim(vmin, vmax)
 
-    def show_stat(self, ax, stat):
+    @staticmethod
+    def show_stat_(ax, stat, location='lower left'):
         buff = io.StringIO()
         stat.print(buff)
         ax.legend(
             [buff.getvalue().strip()], 
-            loc=self.args.plot_stat_loc,
+            loc=location,
             handlelength=0,      # Removes the line symbol 
             handletextpad=0,     # Removes padding between the symbol and text
             facecolor='white',   # Background color of the text box
@@ -160,6 +161,9 @@ class Plotter:
             fancybox=True,
             prop={'family': 'monospace'} # Use monospace font
         )
+
+    def show_stat(self, ax, stat):
+        self.show_stat_(ax, stat, self.args.plot_stat_loc)
         if len(self.ax) > 1 and not self.expanded:
             h = self.fig.get_figheight()
             if h < self.dual_with_stat_min_h:
@@ -368,7 +372,7 @@ def do_data(args):
                 # Show progress
                 print('.' if val_good else '!', end='', file=sys.stderr, flush=True)
             # Update stat
-            stat[val_chan].account(val, t)
+            stat[val_chan].account(t, val)
             if plotter:
                 if plotter.is_closed():
                     return 0
@@ -431,7 +435,7 @@ def get_file_base_name(fname):
     name = os.path.basename(fname)
     return os.path.splitext(name)[0]
 
-def plot_data(Xs, Ys, Names, Infos, no_yticks=False, title_suffix=''):
+def plot_data(Xs, Ys, Names, Infos, no_yticks=False, no_stat=False, title_suffix=''):
     """Plot one or more datasets"""
     import matplotlib.pyplot as plt
     models = {}
@@ -453,6 +457,22 @@ def plot_data(Xs, Ys, Names, Infos, no_yticks=False, title_suffix=''):
         canvas.manager.set_window_title(', '.join(list(models.keys())) + title_suffix)
     Plotter.init_window_icon(canvas)
     Plotter.init_dbl_click_handler(canvas)
+    if not no_stat and len(Xs) == 1:
+        stat = StatCollector((Xs[0], Ys[0]))
+        def on_key_press(e):
+            if e.key == ' ':
+                print('\n--- data statistics:', file=sys.stderr)
+                stat.print(sys.stderr)
+            elif e.key == 't' or e.key == 'T':
+                if l := plt.gca().get_legend():
+                    l.remove()
+                else:
+                    Plotter.show_stat_(plt.gca(), stat)
+                canvas.draw_idle()
+        canvas.mpl_connect('key_press_event', on_key_press)
+        log.info('press space to print data statistics, t to toggle stat display, q to exit')
+    else:
+        log.info('press q to exit')
     plt.show()
 
 def do_plot(args):
@@ -479,7 +499,7 @@ def do_stat(args):
                 x, y = float(xy[0]), float(xy[1])
             except ValueError:
                 continue
-            stat.account(y, x)
+            stat.account(x, y)
     stat.print(sys.stdout)
 
 def do_hist(args):
@@ -501,7 +521,7 @@ def do_hist(args):
         outf.close()
     if args.graph:
         plot_data([H], [Cnt], [get_file_base_name(args.input_file)], [info],
-            no_yticks=True, title_suffix=' [histogram]')
+            no_yticks=True, no_stat=True, title_suffix=' [histogram]')
 
 def main(argv=None):
     logging.basicConfig(format='%(message)s', level=logging.INFO)

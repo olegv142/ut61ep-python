@@ -8,7 +8,7 @@ class StatCollector:
     """Measured values sequence stat collector"""
     median_wnd = 1025
 
-    def __init__(self):
+    def __init__(self, XY=None):
         self.total_samples = self.total_valid = 0
         self.total_sum = self.total_sum2 = self.total_sum3 = self.total_sum4 = 0
         self.total_min = float('inf')
@@ -18,15 +18,17 @@ class StatCollector:
         self.last_ts = None
         self.last_val = None
         self.integral = 0.
+        if XY:
+            for x, y in zip(XY[0], XY[1]):
+                self.account(x, y)
 
-    def account(self, val, t=None):
+    def account(self, t, val):
         self.total_samples += 1
-        now = t if t is not None else time.monotonic()
         if self.last_ts is not None:
-            elapsed = now - self.last_ts
+            elapsed = t - self.last_ts
         else:
             elapsed = 0
-        self.last_ts = now
+        self.last_ts = t
         if self.last_val is not None:
             self.integral += self.last_val * elapsed / 2
         if math.isnan(val):
