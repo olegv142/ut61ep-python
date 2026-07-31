@@ -253,6 +253,8 @@ There are several other tools that are actually wrappers around **ut61xp-get** t
 | **ut61xp-hist** | Plot histogram for the file passed as command line arguments similar to **ut61xp-get hist** command. On Windows one can drag and drop file to this tool to plot its histogram.     |
 | **ut61xp-stat** | Print statistics for the file passed as command line arguments similar to **ut61xp-get stat** command. On Windows one can drag and drop file to this tool to print its statistics. |
 
+For convenience you can associate .dat files with **ut61xp-plot** tool. To do it right click such file, choose 'Open with', then select 'Choose another app', then click 'Choose an app from your PC' at the bottom of the list, then select **ut61xp-plot** tool in the file chooser and finally click 'Always' button. Now the **ut61xp-plot** tool will plot .dat file every time you double click it.
+
 ## Special files and folders
 The **ut61xp-start** tool creates several files and directories next to executable to save data, logs and other execution artifacts. By default only data directory is visible. It contains sub-folders named by creation date with data files having time and multimeter model as parts of their names by default. The user may change the name of the output file in **ut61xp-start** window if necessary. There are several other files and folders with names started with dot. One should use *ls* with *-a* switch to see them on Linux or enable 'Show hidden and system files' option in 'System/Advanced/File Explorer' settings on Windows. They are listed in the following table.
 | Path relative to executable location |  Description                                 |
