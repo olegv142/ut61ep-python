@@ -79,7 +79,7 @@ The **ut61xp-get data** command will plot data read from device in separate wind
 
 ## Plotting already collected data
 
-The **ut61xp-get plot** command followed by the list of filenames plots the data sets reading them from the given files. It is just a convenient tool for viewing the collected data without any complex charting features. You can use plot navigation bar as usual and use double click to toggle full screen mode.
+The **ut61xp-get plot** command followed by the list of filenames plots the data sets reading them from the given files. It is just a convenient tool for viewing the collected data without any complex charting features. You can use plot navigation bar as usual and use double click to toggle full screen mode. While plotting single file you can press space to print statistics to console or press t to toggle showing statistics on the plot window. See [Printing data statistics](#printing-data-statistics) section for more details.
 
 ## Data units and scaling
 
