@@ -105,7 +105,7 @@ class Plotter:
                     log.info('\nwnd off')
                 elif wnd:
                     self.args.wnd = wnd
-                    log.info('\nwnd[%u] on' % wnd)
+                    log.info('\nwnd[%d] on' % wnd)
             elif e.key == 'z' or e.key == 'Z':
                 self.args.with_zero = not self.args.with_zero
             elif e.key == 't' or e.key == 'T':
@@ -177,12 +177,13 @@ class Plotter:
             self.vmax[chan] = max(self.vmax[chan], val)
             wnd = self.args.wnd
             xdata, ydata = self.x_data[chan], self.y_data[chan]
+            pan_zoom = axis.get_navigate_mode() is not None
+            if xdata and wnd and not pan_zoom:
+                while (len(xdata) > wnd) if wnd > 0 else (xdata[-1] - xdata[0] > -wnd):
+                    xdata.pop(0)
+                    ydata.pop(0)
             xdata.append(t)
             ydata.append(val)
-            pan_zoom = axis.get_navigate_mode() is not None
-            while wnd and not pan_zoom and len(xdata) > wnd:
-                xdata.pop(0)
-                ydata.pop(0)
             self.line[chan].set_data(xdata, ydata)
             if not pan_zoom:
                 if not chan:
@@ -588,7 +589,7 @@ def main_impl(argv=None):
             help='data delimiter on output (optional, space by default)')
     data_parser.add_argument('-g', '--graph', action='store_true',
             help='show data graph')
-    data_parser.add_argument('-w', '--wnd', type=int, required=False, metavar='SAMPLES',
+    data_parser.add_argument('-w', '--wnd', type=int, required=False, metavar='SAMPLES|-SECONDS',
             help='data graph window samples (optional, show all samples by default); press w to toggle')
     data_parser.add_argument('-z', '--with-zero', action='store_true',
             help='make sure the zero is within data graph vertical axis range; press z to toggle')
