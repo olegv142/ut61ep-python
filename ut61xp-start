@@ -458,7 +458,7 @@ class Launcher:
             CheckOption(self, 'with-zero', 'make sure the zero is within data graph vertical axis range (press z to toggle)'),
             CheckOption(self, 'plot-stat', 'show statistic while plotting data (press t to toggle)'),
 
-            IntegerNumberOption(self, 'wnd', 'data plot window as sample count or -seconds (press w to toggle)'),
+            IntegerNumberOption(self, 'wnd', 'plot data range as sample count or -seconds (press w to toggle)'),
 
             TextOption(self, 'title', 'data graph window title'),
             TextOption(self, 'plot-title', 'data plot title'),
