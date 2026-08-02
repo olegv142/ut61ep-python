@@ -197,10 +197,13 @@ By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target 
 ### UT60BT
 The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero. Similar dead band exists in A mode between -5mA and +5mA in both UT60BT and UT61X+.
 
-To read from UT60BT one can supply *-B -M UT60BT* options right after **ut61xp-get** in the command line.
+To read from UT60BT one should supply *-B -M UT60BT* options right after **ut61xp-get** in the command line.
 
 ### OWON multimeters
-To read from OWON multimeter using 'BDM' protocol one can supply *-B -M OWON* options right after **ut61xp-get** in the command line.
+To read from OWON multimeter using 'BDM' protocol one should supply *-B -M OWON* options right after **ut61xp-get** in the command line.
+
+### ANENG / ZOTEK / BSIDE multimeters
+To read data from Aneng AN9002 multimeter or identical ZOTEK/BSIDE ZT-300AB one should supply *-B -M ANENG* options right after **ut61xp-get** in the command line.
 
 ### Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
