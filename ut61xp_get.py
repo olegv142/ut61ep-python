@@ -190,7 +190,7 @@ class Plotter:
                     self.update_xlim(chan, xdata[0], xdata[-1])
                 self.update_ylim(chan, *((min(ydata), max(ydata)) if wnd else (self.vmin[chan], self.vmax[chan])))
             if not (self.args.plot_title, self.args.alt_title)[chan]:
-                mode = self.devT.get_mode(data)
+                mode = self.devT.get_mode(data, chan)
                 if axis.get_title() != mode:
                     axis.set_title(mode)
             if self.args.plot_stat:
@@ -293,8 +293,8 @@ def get_fname(dev, fname):
             pass
     return fname
 
-def write_data_info(out_file, dev, data):
-    print('#', dev.get_mode(data), '|', dev.model_name, file=out_file)
+def write_data_info(out_file, dev, data, chan):
+    print('#', dev.get_mode(data, chan), '|', dev.model_name, file=out_file)
 
 def do_data(args):
     """
@@ -316,7 +316,6 @@ def do_data(args):
     out_fmt = '%.3f%s %f'
     out_file = sys.stdout if not fname else open(fname, 'w')
     alt_file = None if not alt_fname else open(alt_fname, 'w')
-    out_empty, alt_empty = True, True
     stat = [StatCollector(), StatCollector()]
     if args.graph:
         plotter = Plotter(args, type(dev), stat)
@@ -326,6 +325,8 @@ def do_data(args):
         sleep_fn = time.sleep
     errs_max = 1 if not args.bt else 5
     errs_left = errs_max
+    if alt_file:
+        dev.set_channels(2)
     try:
         start = ts = time.time()
         while True:
@@ -346,24 +347,24 @@ def do_data(args):
                 continue
             errs_left = errs_max
             t = ts - start
-            val = dev.get_value(data)
-            val_chan = dev.get_channel(data)
-            val_good = not math.isnan(val)
-            # Output data
-            if val_good or args.keep_nan:
-                if val_chan == 0:
-                    if val_good: # apply value transformation
-                        val = (val - args.offset) * args.mult
-                    if out_empty:
-                        out_empty = False
+            channel_count = dev.get_channels(data)
+            for chan in range(channel_count):
+                val_chan = dev.get_channel(data) if channel_count == 1 else chan
+                val = dev.get_value(data, val_chan)
+                val_good = not math.isnan(val)
+                # Output data
+                if val_good or args.keep_nan:
+                    if val_chan == 0:
+                        if val_good: # apply value transformation
+                            val = (val - args.offset) * args.mult
                         if fname:
-                            write_data_info(out_file, dev, data)
-                    print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=out_file)
-                elif alt_file:
-                    if alt_empty:
-                        alt_empty = False
-                        write_data_info(alt_file, dev, data)
-                    print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=alt_file)
+                            if not out_file.tell():
+                                write_data_info(out_file, dev, data, val_chan)
+                        print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=out_file)
+                    elif alt_file:
+                        if not alt_file.tell():
+                            write_data_info(alt_file, dev, data, val_chan)
+                        print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=alt_file)
             if fname and args.progress:
                 # Show progress
                 print('.' if val_good else '!', end='', file=sys.stderr, flush=True)

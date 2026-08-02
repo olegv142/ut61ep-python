@@ -37,21 +37,26 @@ class Device(ABC):
         """Subclasses may redefine this method to indicate disconnection"""
         return True
 
+    def set_channels(self, cnt):
+        """
+        Set the number of channels we are going the read. Calling with cnt = 1 is not required
+        since reading single channel is the default case. Should be called before first query_raw call.
+        """
+        pass
+
     @abstractmethod
     def query_raw(self, tout, idle_sleep):
         """Reads raw data packet from device and returns it"""
         pass
 
-    @classmethod
-    @abstractmethod
-    def get_value(cls, data):
+    @staticmethod
+    def get_channels(data):
         """
-        Converts raw data to the floating point value. Here we don't
-        care about units since the caller should be aware of them.
-        It set mode dial manually after all. So in the mV mode the
-        result is expressed in mV rather than volts.
+        Get the number of channels contained in the raw data. In there there are more than 1 channel
+        its index should be passed explicitly to get_value and get_mode method. Otherwise
+        the channel number may be retrieved by get_channel method.
         """
-        pass
+        return 1
 
     @staticmethod
     def get_channel(data):
@@ -62,9 +67,20 @@ class Device(ABC):
         """
         return 0
 
+    @classmethod
+    @abstractmethod
+    def get_value(cls, data, channel=None):
+        """
+        Converts raw data to the floating point value. Here we don't
+        care about units since the caller should be aware of them.
+        It set mode dial manually after all. So in the mV mode the
+        result is expressed in mV rather than volts.
+        """
+        pass
+
     @staticmethod
     @abstractmethod
-    def get_mode(data):
+    def get_mode(data, channel=None):
         """Returns measurement mode and units description string"""
         pass
 

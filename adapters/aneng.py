@@ -103,7 +103,7 @@ class AnengBtDevice(BTMixin, Device):
         return data[3:]
 
     @classmethod
-    def get_value(cls, data):
+    def get_value(cls, data, channel=None):
         """
         Converts raw data to the floating point value.
         """
@@ -139,7 +139,7 @@ class AnengBtDevice(BTMixin, Device):
         return val
 
     @staticmethod
-    def get_mode(data):
+    def get_mode(data, channel=None):
         """
         Returns measurement mode and units description string.
         """

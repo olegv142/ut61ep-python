@@ -72,7 +72,7 @@ class UTDevice(Device):
         return 1
 
     @classmethod
-    def get_value(cls, data):
+    def get_value(cls, data, channel=None):
         """
         Converts raw data to the floating point value. Here we don't
         care about units since the caller should be aware of them.
@@ -142,7 +142,7 @@ class UTDevice(Device):
     ]
 
     @staticmethod
-    def get_mode(data):
+    def get_mode(data, channel=None):
         """Returns measurement mode and units description string"""
         mode = UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0], '')
         f1, f2, f3 = data[UTDevice.DATA_LEN-3:]
