@@ -13,6 +13,7 @@ import logging
 from adapters.ut61xp import UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from adapters.owon import OwonBtDevice
 from adapters.aneng import AnengBtDevice
+from adapters.scpi import SCPIDevice
 from data_stat import StatCollector, histogram
 from version import version_str
 from datetime import datetime
@@ -22,7 +23,7 @@ log = logging.getLogger('DEV')
 _parent_conn = None
 
 _supported_devices = (
-    HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice, AnengBtDevice
+    HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice, AnengBtDevice, SCPIDevice
 )
 
 class Plotter:
@@ -323,10 +324,9 @@ def do_data(args):
     else:
         plotter = None
         sleep_fn = time.sleep
-    errs_max = 1 if not args.bt else 5
+    errs_max = 2 if not args.bt else 5
     errs_left = errs_max
-    if alt_file:
-        dev.set_channels(2)
+    dev.set_channels(2 if alt_file else 1)
     try:
         start = ts = time.time()
         while True:
@@ -353,28 +353,29 @@ def do_data(args):
                 val = dev.get_value(data, val_chan)
                 val_good = not math.isnan(val)
                 # Output data
-                if val_good or args.keep_nan:
-                    if val_chan == 0:
-                        if val_good: # apply value transformation
-                            val = (val - args.offset) * args.mult
-                        if fname:
-                            if not out_file.tell():
-                                write_data_info(out_file, dev, data, val_chan)
-                        print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=out_file)
-                    elif alt_file:
-                        if not alt_file.tell():
-                            write_data_info(alt_file, dev, data, val_chan)
-                        print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=alt_file)
+                if not val_good and not args.keep_nan:
+                    continue
+                if val_chan == 0:
+                    if val_good: # apply value transformation
+                        val = (val - args.offset) * args.mult
+                    if fname:
+                        if not out_file.tell():
+                            write_data_info(out_file, dev, data, val_chan)
+                    print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=out_file)
+                elif alt_file:
+                    if not alt_file.tell():
+                        write_data_info(alt_file, dev, data, val_chan)
+                    print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=alt_file)
+                # Update stat
+                stat[val_chan].account(t, val)
+                if plotter:
+                    if plotter.is_closed():
+                        return 0
+                    # Update plot
+                    plotter.update(t, data, val, val_chan)
             if fname and args.progress:
                 # Show progress
                 print('.' if val_good else '!', end='', file=sys.stderr, flush=True)
-            # Update stat
-            stat[val_chan].account(t, val)
-            if plotter:
-                if plotter.is_closed():
-                    return 0
-                # Update plot
-                plotter.update(t, data, val, val_chan)
             # Introduce delay according to acquisition interval
             now = time.time()
             elapsed = now - ts
