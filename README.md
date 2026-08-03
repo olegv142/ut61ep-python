@@ -1,6 +1,6 @@
 # The cross-platform digital multimeter communication and data plotting tool supporting variety of popular UNI-T, OWON, ANENG, ZOTEK, BSIDE multimeters.
 
-This repository provides simple alternative to vendor data collection programs. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system.
+This repository provides simple alternative to vendor data collection programs. It works uniformly on Windows and Linux (not tested on MacOS). One can use it either from command line or GUI. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system. 
 
 The project is inspired by https://github.com/ljakob/unit_ut61eplus and https://github.com/aroum/unit_ut61eplus_python.
 The code was reworked with the following goals in mind:
