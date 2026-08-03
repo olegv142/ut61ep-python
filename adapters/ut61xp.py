@@ -178,7 +178,7 @@ class HIDDevice(HIDMixin, UTDevice):
         self.disconnected = False
 
     def is_connected(self):
-        return not self.disconnected
+        return self.dev and not self.disconnected
 
     @classmethod
     def open_path(cls, path):

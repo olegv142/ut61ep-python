@@ -39,8 +39,7 @@ class Device(ABC):
 
     def set_channels(self, cnt):
         """
-        Set the number of channels we are going the read. Calling with cnt = 1 is not required
-        since reading single channel is the default case. Should be called before first query_raw call.
+        Set the number of channels we are going the read. Should be called before first query_raw call.
         """
         pass
 
@@ -143,8 +142,8 @@ class HIDMixin(USBMixin):
             pid = cls.device_pid
         return [dev['path'].decode('ascii') for dev in hid.enumerate(vid, pid)]
 
-    @staticmethod
-    def _open_path(path):
+    @classmethod
+    def _open_path(cls, path):
         """Opens hid device given the path and returns it"""
         import_hid()
         if isinstance(path, str):
@@ -157,6 +156,32 @@ class HIDMixin(USBMixin):
             return None
         dev.set_nonblocking(True)
         return dev
+
+class CDCMixin(USBMixin):
+    """Methods specific for USB CDC devices"""
+    # The following properties may be redefined in subclasses
+    baud_rate = 115200
+    write_timeout = .1
+
+    @classmethod
+    def list_paths(cls, vid=None, pid=None):
+        """Returns the list of CDC device paths"""
+        from serial.tools.list_ports import comports
+        if vid is None:
+            vid = cls.device_vid
+        if pid is None:
+            pid = cls.device_pid
+        return [port.device for port in comports()]
+
+    @classmethod
+    def _open_path(cls, path):
+        """Opens CDC device given the path and returns it"""
+        import serial
+        try:
+            return serial.Serial(path, baudrate=cls.baud_rate, timeout=0, write_timeout=cls.write_timeout)
+        except:
+            log.error('failed to open device %s', path)
+            return None
 
 class BTMixin(ABC):
     """Methods specific for BT devices"""
