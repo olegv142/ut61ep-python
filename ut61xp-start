@@ -368,7 +368,7 @@ class ModelSelector(Setting):
             opts = self.launcher.get_started_opts()
             path = opts['path']
             if 'path' not in self.start_cfg:
-                tag = '#%08x' % zlib.crc32(path.encode('utf-8')) if not opts['bt'] else path
+                tag = '#%08x' % zlib.crc32(path.encode('utf-8')) if not opts['bt'] and len(path) > 16 else path
                 model_tag = self.start_model + ' ' + tag
                 self.cfg['models'][self.start_model] = self.start_cfg
                 self.cfg['models'][model_tag] = {
