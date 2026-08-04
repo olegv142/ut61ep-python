@@ -20,9 +20,9 @@ The code was reworked with the following goals in mind:
 - The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
 The tool works via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel at the expense of the lower communication speed. The minimum data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter.
 - The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
-- The UT60BT is consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even higher resolution than the UT61X+ in both millivolt and capacitance modes, with some caveats (see below).
+- The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero. Similar dead band exists in A mode between -5mA and +5mA in both UT60BT and UT61X+.
 
-### OWON multimeters
+### OWON Bluetooth multimeters
 The tool supports the number of Bluetooth multimeters using the same 'BDM' protocol. In particular its tested with the following devices:
 - The CM2100B clamp meter is inexpensive and quite versatile device capable of measuring AC or DC current without any electrical contact.
 - The B41T+ is a multimeter with 22,000 counts and built-in Bluetooth. However, it is relatively expensive and has a number of disadvantages, including poor display quality and high power consumption when Bluetooth is enabled.
@@ -30,6 +30,9 @@ The tool supports the number of Bluetooth multimeters using the same 'BDM' proto
 
 Other compatible OWON multimeters like B35T+ and OW18E should work with this tool as well.
 
+### OWON desktop multimeters
+OWON produces a line of desktop multimeters that use the SCPI communication protocol via USB connection. The tool is tested with XDM1241 model. This is 55000 count multimeter with 1µV resolution. Its fast on paper but may be painfully slow in practice especially in capacitance mode. The SCPI implementation on this device is rather primitive. For example its impossible to read data with the rate its actually measured. Other models like XDM1041 should work with this tool as well.
+ 
 ### ANENG / ZOTEK / BSIDE multimeters
 This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 6000 counts display with 10µV voltage measuring resolution, 0.1µA current measuring resolution and 1pF capacity resolution. The stand is terrible, the quality of the probes is questionable, but other than that its quite usable with good display and small power consumption (3.5mA with Bluetooth active). Despite such low power consumption it has the best Bluetooth communication range among all tested multimeters. The only thing noticed that may be considered as a drawback is relatively low input impedance in voltage measuring mode. Its around 1 MOhm while other DMM typically have an input impedance of around 10 MOhm.
 
@@ -192,18 +195,16 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 ## Working with other supported devices
 
-By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device by default. To change this, one can use *-M/--model* option. Please note that if device works via Bluetooth, the *-B* option must be provided with *-M/--model* option.
+By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device by default. To change this, one can use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table.
 
-### UT60BT
-The UT60BT is inexpensive consumer grade multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero. Similar dead band exists in A mode between -5mA and +5mA in both UT60BT and UT61X+.
-
-To read from UT60BT one should supply *-B -M UT60BT* options right after **ut61xp-get** in the command line.
-
-### OWON multimeters
-To read from OWON multimeter using 'BDM' protocol one should supply *-B -M OWON* options right after **ut61xp-get** in the command line.
-
-### ANENG / ZOTEK / BSIDE multimeters
-To read data from Aneng AN9002 multimeter or identical ZOTEK/BSIDE ZT-300AB one should supply *-B -M ANENG* options right after **ut61xp-get** in the command line.
+| Model family                               | Options               |
+|--------------------------------------------|-----------------------|
+| UT61B/D/E+                                 | -M UT61X+             |
+| UT61B/D/E+ with UT-D07B Bluetooth adapter  | -M UT61X+ -B          |
+| UT60BT                                     | -M UT60BT -B          |
+| OWON Bluetooth multimeter                  | -M OWON -B            |
+| ANENG / ZOTEK / BSIDE Bluetooth multimeter | -M ANENG -B           |
+| OWON desktop multimeter                    | -M SCPI               |
 
 ### Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
