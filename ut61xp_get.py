@@ -433,7 +433,7 @@ def get_file_base_name(fname):
     name = os.path.basename(fname)
     return os.path.splitext(name)[0]
 
-def plot_data(Xs, Ys, Names, Infos, no_yticks=False, no_stat=False, title_suffix=''):
+def plot_data(Xs, Ys, Names, Infos, yticks=None, no_stat=False, title_suffix=''):
     """Plot one or more datasets"""
     import matplotlib.pyplot as plt
     models = {}
@@ -448,8 +448,8 @@ def plot_data(Xs, Ys, Names, Infos, no_yticks=False, no_stat=False, title_suffix
         plt.title(Names[0])
     else:
         plt.legend()
-    if no_yticks:
-        plt.yticks([])
+    if yticks is not None:
+        plt.yticks(yticks)
     canvas = plt.gcf().canvas
     if models:
         canvas.manager.set_window_title(', '.join(list(models.keys())) + title_suffix)
@@ -519,7 +519,7 @@ def do_hist(args):
         outf.close()
     if args.graph:
         plot_data([H], [Cnt], [get_file_base_name(args.input_file)], [info],
-            no_yticks=True, no_stat=True, title_suffix=' [histogram]')
+            yticks=[0], no_stat=True, title_suffix=' [histogram]')
 
 def main(argv=None):
     logging.basicConfig(format='%(message)s', level=logging.INFO)
