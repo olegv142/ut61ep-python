@@ -93,9 +93,10 @@ def histogram(Y, N):
     if not Y:
         return [], []
     Y0, Y1 = min(Y), max(Y)
-    dY = (Y1 - Y0) / N
+    dY = (Y1 - Y0) / (N - 1)
     Cnt = [0] * N
+    Y_ = Y0 - dY / 2
     for y in Y:
-        Cnt[min(int((y - Y0) / dY), N - 1)] += 1
-    return [Y0 + dY / 2 + dY * i for i in range(N)], Cnt
+        Cnt[min(int((y - Y_) / dY), N - 1)] += 1
+    return [Y0 + dY * i for i in range(N)], Cnt
 
