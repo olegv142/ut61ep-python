@@ -100,3 +100,9 @@ def histogram(Y, N):
         Cnt[min(int((y - Y_) / dY), N - 1)] += 1
     return [Y0 + dY * i for i in range(N)], Cnt
 
+if __name__ == '__main__':
+    Y = range(200)
+    H, Cnt = histogram(Y, 5)
+    assert H[0] == Y[0]
+    assert H[-1] == Y[-1]
+    assert Cnt == [25, 50, 50, 50, 25]
