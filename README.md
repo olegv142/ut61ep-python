@@ -203,8 +203,8 @@ By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target 
 | UT61B/D/E+ with UT-D07B Bluetooth adapter  | -M UT61X+ -B          |
 | UT60BT                                     | -M UT60BT -B          |
 | OWON Bluetooth multimeter                  | -M OWON -B            |
+| OWON desktop multimeter with USB port      | -M SCPI               |
 | ANENG / ZOTEK / BSIDE Bluetooth multimeter | -M ANENG -B           |
-| OWON desktop multimeter                    | -M SCPI               |
 
 ### Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
