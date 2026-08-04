@@ -173,20 +173,12 @@ class HIDDevice(HIDMixin, UTDevice):
     device_pid = 0xe429
 
     def __init__(self, dev, path):
-        super().__init__(path)
+        UTDevice.__init__(self, path)
         self.dev = dev
         self.disconnected = False
 
     def is_connected(self):
         return self.dev and not self.disconnected
-
-    @classmethod
-    def open_path(cls, path):
-        """Opens device given the path"""
-        dev = super()._open_path(path)
-        if dev is None:
-            return None
-        return cls(dev, path)
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from HID device"""
@@ -225,7 +217,7 @@ class BTDevice(BTMixin, UTDevice):
     BT_RX_CHAR  = '49535343-1e4d-4bd9-ba61-23c647249616'
 
     def __init__(self, dev, addr):
-        super().__init__(addr)
+        UTDevice.__init__(self, addr)
         self.dev = dev
         self.last_data = None
 

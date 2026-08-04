@@ -102,6 +102,10 @@ class USBMixin(ABC):
     device_vid = None
     device_pid = None
 
+    @abstractmethod
+    def __init__(self, dev, path):
+        pass
+
     @classmethod
     @abstractmethod
     def list_paths(cls, vid=None, pid=None):
@@ -109,9 +113,17 @@ class USBMixin(ABC):
         pass
 
     @classmethod
-    @abstractmethod
     def open_path(cls, path):
-        """Opens device instance given the path and returns it"""
+        """Opens device given the path"""
+        dev = cls._open_path(path)
+        if dev is None:
+            return None
+        return cls(dev, path)
+
+    @classmethod
+    @abstractmethod
+    def _open_path(cls, path):
+        """Opens device given the path and returns it"""
         pass
 
     @classmethod

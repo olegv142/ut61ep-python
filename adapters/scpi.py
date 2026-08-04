@@ -25,7 +25,7 @@ class SCPIDevice(CDCMixin, Device):
     no_value = b'NONe'
 
     def __init__(self, dev, path):
-        super().__init__(path)
+        Device.__init__(self, path)
         self.dev = dev
         self.disconnected = False
         self.channels = 1
@@ -42,14 +42,6 @@ class SCPIDevice(CDCMixin, Device):
 
     def is_connected(self):
         return self.dev and not self.disconnected
-
-    @classmethod
-    def open_path(cls, path):
-        """Opens device given the path"""
-        dev = super()._open_path(path)
-        if dev is None:
-            return None
-        return cls(dev, path)
 
     def _call(self, cmd, tout=None, idle_sleep=time.sleep):
         wait = tout if tout is not None else self.def_read_tout

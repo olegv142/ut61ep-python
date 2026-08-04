@@ -23,7 +23,7 @@ class OwonBtDevice(BTMixin, Device):
     DEF_TOUT    = 4 # default timeout in seconds
 
     def __init__(self, dev, addr):
-        super().__init__(addr)
+        Device.__init__(self, addr)
         self.dev = dev
         self.last_data = None
 
