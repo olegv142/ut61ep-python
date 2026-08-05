@@ -77,7 +77,7 @@ class SCPIDmm(SCPIMixin, Device):
         self.modes = [f.decode('ascii') if f and f != SCPIDmm.no_value else self.def_mode for f in funcs]
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
-        """Queries raw data packet from HID device"""
+        """Queries raw data from device"""
         resp = self._call(b'MEAS?', tout, idle_sleep)
         if not resp:
             return None
@@ -104,3 +104,52 @@ class SCPIDmm(SCPIMixin, Device):
     def get_mode(data, channel=None):
         self, _ = data
         return self.modes[channel if channel is not None else 0]
+
+class SCPIPowerSource(SCPIMixin, Device):
+    """
+    SCPI programmable power supplies interface adapter. Tested with OWON SPE3051.
+    It always measures current in the main channel and voltage in the secondary one.
+    """
+    model_name  = 'SCPI-CV'
+    # CH340 USB-serial chip
+    device_vid = 0x1a86
+    device_pid = 0x7523
+
+    def __init__(self, dev, path):
+        SCPIMixin.__init__(self, dev, path)
+        self.channels = None
+
+    def set_channels(self, cnt):
+        """
+        Set the number of channels we are going the read. Should be called before first query_raw call.
+        """
+        assert cnt in (1, 2)
+        self.channels = cnt
+
+    def query_raw(self, tout=None, idle_sleep=time.sleep):
+        """Queries raw data from device"""
+        if self.channels < 2:
+            resp = self._call(b'MEAS:CURR?', tout, idle_sleep)
+            return (self, (resp,)) if resp else None
+        resp = self._call(b'MEAS:ALL?', tout, idle_sleep)
+        if not resp:
+            return None
+        return (self, tuple(reversed(resp.split(b',')[:2])))
+
+    @staticmethod
+    def get_channels(data):
+        self, vals = data
+        return min(self.channels, len(vals))
+
+    @classmethod
+    def get_value(cls, data, channel=None):
+        _, vals = data
+        try:
+            return float(vals[channel if channel is not None else 0])
+        except ValueError:
+            return float('nan')
+
+    @staticmethod
+    def get_mode(data, channel=None):
+        self, _ = data
+        return ('CURR', 'VOLT')[channel if channel is not None else 0]
