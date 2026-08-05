@@ -1,6 +1,6 @@
 """
-Adapter communicating with multimeter by SCPI commands.
-Tested with OWON XDM1241.
+Adapters communicating with device by SCPI commands.
+Tested with OWON multimeters and programmable power supplies.
 """
 
 import os
@@ -14,31 +14,14 @@ from device import CDCMixin, Device
 
 log = logging.getLogger('DEV')
 
-class SCPIDevice(CDCMixin, Device):
-    """OWON SCPI multimeter interface adapter"""
-    model_name  = 'SCPI'
-    # CH340 USB-serial chip
-    device_vid = 0x1a86
-    device_pid = 0x7523
-
+class SCPIMixin(CDCMixin):
+    """Base class for adapters using SCPI commands over CDC link"""
     def_read_tout = 1
-    no_value = b'NONe'
 
     def __init__(self, dev, path):
         Device.__init__(self, path)
         self.dev = dev
         self.disconnected = False
-        self.channels = 1
-        self.modes = None
-
-    def set_channels(self, cnt):
-        """
-        Set the number of channels we are going the read. Should be called before first query_raw call.
-        """
-        self.channels = cnt
-        assert cnt == 1 or cnt == 2
-        funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(cnt)]
-        self.modes = [f.decode('ascii') if f and f != SCPIDevice.no_value else '' for f in funcs]
 
     def is_connected(self):
         return self.dev and not self.disconnected
@@ -61,6 +44,36 @@ class SCPIDevice(CDCMixin, Device):
             self.disconnected = True
             log.debug(e)
             return None
+
+    def close(self):
+        """Closes device if its still open"""
+        if self.dev is None:
+            return
+        self.dev.close()
+        self.dev = None
+
+class SCPIDevice(SCPIMixin, Device):
+    """SCPI multimeter interface adapter. Tested with OWON XDM1241."""
+    model_name  = 'SCPI'
+    # CH340 USB-serial chip
+    device_vid = 0x1a86
+    device_pid = 0x7523
+
+    no_value = b'NONe'
+
+    def __init__(self, dev, path):
+        SCPIMixin.__init__(self, dev, path)
+        self.channels = 1
+        self.modes = None
+
+    def set_channels(self, cnt):
+        """
+        Set the number of channels we are going the read. Should be called before first query_raw call.
+        """
+        self.channels = cnt
+        assert cnt == 1 or cnt == 2
+        funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(cnt)]
+        self.modes = [f.decode('ascii') if f and f != SCPIDevice.no_value else '' for f in funcs]
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from HID device"""
@@ -90,10 +103,3 @@ class SCPIDevice(CDCMixin, Device):
     def get_mode(data, channel=None):
         self, _ = data
         return self.modes[channel if channel is not None else 0]
-
-    def close(self):
-        """Closes device if its still open"""
-        if self.dev is None:
-            return
-        self.dev.close()
-        self.dev = None
