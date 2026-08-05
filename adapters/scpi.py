@@ -60,6 +60,7 @@ class SCPIDevice(SCPIMixin, Device):
     device_pid = 0x7523
 
     no_value = b'NONe'
+    def_mode = 'DUTY%'
 
     def __init__(self, dev, path):
         SCPIMixin.__init__(self, dev, path)
@@ -73,7 +74,7 @@ class SCPIDevice(SCPIMixin, Device):
         self.channels = cnt
         assert cnt == 1 or cnt == 2
         funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(cnt)]
-        self.modes = [f.decode('ascii') if f and f != SCPIDevice.no_value else '' for f in funcs]
+        self.modes = [f.decode('ascii') if f and f != SCPIDevice.no_value else self.def_mode for f in funcs]
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from HID device"""
