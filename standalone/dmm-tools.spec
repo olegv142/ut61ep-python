@@ -10,7 +10,7 @@ a1 = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    noarchive=True,
     optimize=0,
 )
 
@@ -24,7 +24,7 @@ a2 = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    noarchive=True,
     optimize=0,
 )
 
@@ -38,7 +38,7 @@ a3 = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    noarchive=True,
     optimize=0,
 )
 
@@ -52,7 +52,7 @@ a4 = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    noarchive=True,
     optimize=0,
 )
 
@@ -66,7 +66,7 @@ a5 = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    noarchive=True,
     optimize=0,
 )
 
