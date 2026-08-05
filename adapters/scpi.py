@@ -52,7 +52,7 @@ class SCPIMixin(CDCMixin):
         self.dev.close()
         self.dev = None
 
-class SCPIDevice(SCPIMixin, Device):
+class SCPIDmm(SCPIMixin, Device):
     """SCPI multimeter interface adapter. Tested with OWON XDM1241."""
     model_name  = 'SCPI'
     # CH340 USB-serial chip
@@ -64,17 +64,17 @@ class SCPIDevice(SCPIMixin, Device):
 
     def __init__(self, dev, path):
         SCPIMixin.__init__(self, dev, path)
-        self.channels = 1
+        self.channels = None
         self.modes = None
 
     def set_channels(self, cnt):
         """
         Set the number of channels we are going the read. Should be called before first query_raw call.
         """
+        assert cnt in (1, 2)
         self.channels = cnt
-        assert cnt == 1 or cnt == 2
         funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(cnt)]
-        self.modes = [f.decode('ascii') if f and f != SCPIDevice.no_value else self.def_mode for f in funcs]
+        self.modes = [f.decode('ascii') if f and f != SCPIDmm.no_value else self.def_mode for f in funcs]
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from HID device"""

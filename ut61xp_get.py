@@ -13,7 +13,7 @@ import logging
 from adapters.ut61xp import UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from adapters.owon import OwonBtDevice
 from adapters.aneng import AnengBtDevice
-from adapters.scpi import SCPIDevice
+from adapters.scpi import SCPIDmm
 from data_stat import StatCollector, histogram
 from version import version_str
 from datetime import datetime
@@ -23,7 +23,7 @@ log = logging.getLogger('DEV')
 _parent_conn = None
 
 _supported_devices = (
-    HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice, AnengBtDevice, SCPIDevice
+    HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice, AnengBtDevice, SCPIDmm
 )
 
 class Plotter:
@@ -551,7 +551,7 @@ def main_impl(argv=None):
     parser.add_argument('-B', '--bt', action='store_true',
             help='use Bluetooth for communicating with device')
     parser.add_argument('-M', '--model', type=str, required=False, metavar='NAME', default=None,
-            help='BT device model (%s (default), %s)' % (UTDevice.model_name, UT60BTDevice.model_name))
+            help='device model (optional, default is %s)' % (UTDevice.model_name))
     parser.add_argument('--name', type=str, required=False, default=None,
             help='set Bluetooth adapter name (optional)')
     parser.add_argument('--exit-prompt', action='store_true',
