@@ -54,7 +54,7 @@ class SCPIMixin(CDCMixin):
 
 class SCPIDmm(SCPIMixin, Device):
     """SCPI multimeter interface adapter. Tested with OWON XDM1241."""
-    model_name  = 'SCPI'
+    model_name  = 'SCPI-DMM'
     # CH340 USB-serial chip
     device_vid = 0x1a86
     device_pid = 0x7523
