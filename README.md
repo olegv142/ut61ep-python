@@ -2,17 +2,16 @@
 
 This repository provides simple alternative to vendor data collection programs. It works uniformly on Windows and Linux (not tested on MacOS). One can use it either from command line or GUI. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system. 
 
-The project is inspired by https://github.com/ljakob/unit_ut61eplus and https://github.com/aroum/unit_ut61eplus_python.
-The code was reworked with the following goals in mind:
+The project was started as robust and simple tool for reading data from UNI-T UT61E+ multimeter. It was inspired by https://github.com/ljakob/unit_ut61eplus and https://github.com/aroum/unit_ut61eplus_python. Since then the number of other multimeter models were supported and the project was extended with the following goals in mind:
  - keep code as small and simple as possible
- - support for USB HID and Bluetooth communication channel
- - support dual channel (DC+AC mode of UT61E+) reading and plotting
- - ensure seamless working on Windows and Linux
+ - support for USB and Bluetooth communication channels
+ - support for dual channel reading and plotting (DC+AC mode of UT61E+ for ex.)
+ - seamless working on Windows and Linux
  - convenient working with several devices simultaneously
- - create simple CLI tool (**ut61xp-get**) for data collection and visualization
- - create GUI application (**ut61xp-start**) with the same capabilities as CLI tool
- - support for other multimeter vendors / models
- - make adding support for more model as simple as possible
+ - single CLI tool (**ut61xp-get**) for data collection and visualization
+ - simple GUI application (**ut61xp-start**) with the same capabilities as CLI tool
+ - ease of adding new multimeter models
+ - ease of reuse in other projects
 
 ## Supported devices
 
