@@ -32,7 +32,10 @@ Other compatible OWON multimeters like B35T+ and OW18E should work with this too
 
 ### OWON desktop multimeters
 OWON produces a line of desktop multimeters that use the SCPI communication protocol via USB connection. The tool is tested with XDM1241 model. This is a 55000 count multimeter with 1µV resolution. Its fast on paper but may be painfully slow in practice especially in capacitance mode. The SCPI command set implemented by this device is very basic. Other similar models like XDM1041 should work with this tool as well.
- 
+
+### OWON programmable laboratory power supplies
+OWON produces a line of programmable laboratory power supplies that use the SCPI communication protocol via USB connection. The tool provides the way to read output current value and optionally output voltage in alternative measuring channel. The tool is tested with SPE3051 device. It should be noted that the accuracy of the current values reported by such a device is quite low. It has dead band below 10mA where the current is always reported as zero. Higher current values are reported inaccurately with constant offset of +5mA.
+
 ### ANENG / ZOTEK / BSIDE multimeters
 This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 6000 counts display with 10µV voltage measuring resolution, 0.1µA current measuring resolution and 1pF capacity resolution. The stand is terrible, the quality of the probes is questionable, but other than that its quite usable with good display and small power consumption (3.5mA with Bluetooth active). Despite such low power consumption it has the best Bluetooth communication range among all tested multimeters. The only thing noticed that may be considered as a drawback is relatively low input impedance in voltage measuring mode. Its around 1 MOhm while other DMM typically have an input impedance of around 10 MOhm.
 
@@ -198,13 +201,14 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device. To change this, one should use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table.
 
 | Model family                               | Options               |
-|--------------------------------------------|-----------------------|
-| UT61B/D/E+                                 | -M UT61X+             |
-| UT61B/D/E+ with UT-D07B Bluetooth adapter  | -M UT61X+ -B          |
-| UT60BT                                     | -M UT60BT -B          |
-| OWON Bluetooth multimeter                  | -M OWON -B            |
-| OWON desktop multimeter with USB port      | -M SCPI               |
-| ANENG / ZOTEK / BSIDE Bluetooth multimeter | -M ANENG -B           |
+|----------------------------------------------|-----------------------|
+| UT61B/D/E+                                   | -M UT61X+             |
+| UT61B/D/E+ with UT-D07B Bluetooth adapter    | -M UT61X+ -B          |
+| UT60BT                                       | -M UT60BT -B          |
+| OWON Bluetooth multimeter                    | -M OWON -B            |
+| OWON desktop multimeter with USB port        | -M SCPI-DMM           |
+| OWON programmable power supply with USB port | -M SCPI-CV            |
+| ANENG / ZOTEK / BSIDE Bluetooth multimeter   | -M ANENG -B           |
 
 ### Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
