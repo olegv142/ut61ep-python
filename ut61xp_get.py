@@ -31,13 +31,13 @@ class Plotter:
     padding = .075
     dual_with_stat_min_h = 7
 
-    def __init__(self, args, devT, stat):
+    def __init__(self, args, dev, stat):
         import matplotlib.pyplot as plt
         plt.rcParams["figure.raise_window"] = False
         plt.ion()
         self.plt = plt
         self.args = args
-        self.devT = devT
+        self.dev = dev
         self.stat = stat
         self.expanded = False
         if args.alt_file:
@@ -64,7 +64,7 @@ class Plotter:
                 color=(args.line_color, args.alt_line_color)[i]
             )[0] for i in range(nchan)]
         self.vmin, self.vmax = [float('inf')] * nchan, [float('-inf')] * nchan
-        self.fig.canvas.manager.set_window_title(args.title if args.title else devT.model_name)
+        self.fig.canvas.manager.set_window_title(args.title if args.title else dev.get_model())
         self.init_window_icon(self.fig.canvas)
         self.init_dbl_click_handler(self.fig.canvas)
         self.init_hot_keys()
@@ -191,7 +191,7 @@ class Plotter:
                     self.update_xlim(chan, xdata[0], xdata[-1])
                 self.update_ylim(chan, *((min(ydata), max(ydata)) if wnd else (self.vmin[chan], self.vmax[chan])))
             if not (self.args.plot_title, self.args.alt_title)[chan]:
-                mode = self.devT.get_mode(data, chan)
+                mode = self.dev.get_mode(data, chan)
                 if axis.get_title() != mode:
                     axis.set_title(mode)
             if self.args.plot_stat:
@@ -295,7 +295,7 @@ def get_fname(dev, fname):
     return fname
 
 def write_data_info(out_file, dev, data, chan):
-    print('#', dev.get_mode(data, chan), '|', dev.model_name, file=out_file)
+    print('#', dev.get_mode(data, chan), '|', dev.get_model(), file=out_file)
 
 def do_data(args):
     """
@@ -319,7 +319,7 @@ def do_data(args):
     alt_file = None if not alt_fname else open(alt_fname, 'w')
     stat = [StatCollector(), StatCollector()]
     if args.graph:
-        plotter = Plotter(args, type(dev), stat)
+        plotter = Plotter(args, dev, stat)
         sleep_fn = plotter.plt.pause
     else:
         plotter = None

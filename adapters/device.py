@@ -33,6 +33,10 @@ class Device(ABC):
     def __init__(self, path):
         self.path = path
 
+    def get_model(self):
+        """The implementation may redefine this method to return actual model name"""
+        return self.model_name
+
     def is_connected(self):
         """Subclasses may redefine this method to indicate disconnection"""
         return True

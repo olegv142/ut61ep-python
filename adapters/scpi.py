@@ -14,7 +14,7 @@ from device import CDCMixin, Device
 
 log = logging.getLogger('DEV')
 
-class SCPIMixin(CDCMixin):
+class SCPIDevice(CDCMixin, Device):
     """Base class for adapters using SCPI commands over CDC link"""
     def_read_tout = 1
 
@@ -22,6 +22,18 @@ class SCPIMixin(CDCMixin):
         Device.__init__(self, path)
         self.dev = dev
         self.disconnected = False
+        self.model = None
+
+    def get_model(self):
+        """The implementation may redefine this method to return actual model name"""
+        if self.model:
+            return self.model
+        if resp := self._call(b'*IDN?'):
+            self.model = b' '.join(resp.split(b',')[:2]).decode('ascii')
+            return self.model
+        else:
+            self.disconnected = True
+            return self.model_name
 
     def is_connected(self):
         return self.dev and not self.disconnected
@@ -52,7 +64,7 @@ class SCPIMixin(CDCMixin):
         self.dev.close()
         self.dev = None
 
-class SCPIDmm(SCPIMixin, Device):
+class SCPIDmm(SCPIDevice):
     """SCPI multimeter interface adapter. Tested with OWON XDM1241."""
     model_name  = 'SCPI-DMM'
     # CH340 USB-serial chip
@@ -63,7 +75,7 @@ class SCPIDmm(SCPIMixin, Device):
     def_mode = 'DUTY%'
 
     def __init__(self, dev, path):
-        SCPIMixin.__init__(self, dev, path)
+        SCPIDevice.__init__(self, dev, path)
         self.channels = None
         self.modes = None
 
@@ -105,7 +117,7 @@ class SCPIDmm(SCPIMixin, Device):
         self, _ = data
         return self.modes[channel if channel is not None else 0]
 
-class SCPIPowerSource(SCPIMixin, Device):
+class SCPIPowerSource(SCPIDevice):
     """
     SCPI programmable power supplies interface adapter. Tested with OWON SPE3051.
     It always measures current in the main channel and voltage in the secondary one.
@@ -116,7 +128,7 @@ class SCPIPowerSource(SCPIMixin, Device):
     device_pid = 0x7523
 
     def __init__(self, dev, path):
-        SCPIMixin.__init__(self, dev, path)
+        SCPIDevice.__init__(self, dev, path)
         self.channels = None
 
     def set_channels(self, cnt):
