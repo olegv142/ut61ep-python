@@ -1,5 +1,7 @@
 pyinstaller dmm-tools.spec --noconfirm
 
+xcopy scripts dist\dmm-tools\scripts\
+
 for /f "delims=" %%i in ('python ../version.py') do set "Ver=%%i"
 
 cd dist
