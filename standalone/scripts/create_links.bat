@@ -1,6 +1,10 @@
 @echo off
 
-cd "%~dp0"
+::
+:: Creates links to binaries on Windows desktop
+::
+
+cd /d "%~dp0"
 
 pushd ..
 if not exist data mkdir data
