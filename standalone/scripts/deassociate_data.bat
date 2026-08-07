@@ -1,7 +1,7 @@
 @echo off
 
 ::
-:: Remove .dat files association
+:: Remove .data files association
 ::
 
 :: Check for administrative permissions
