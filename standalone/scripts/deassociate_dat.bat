@@ -12,7 +12,6 @@ if %errorLevel% neq 0 (
     exit /b
 )
 
-assoc .dat=
-ftype DMMData=
+assoc .data=
+ftype DMMTools.Data=
 
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.dat" /f

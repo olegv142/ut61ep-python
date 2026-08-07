@@ -1,7 +1,7 @@
 @echo off
 
 ::
-:: Associate .dat files with ut61xp-plot tool
+:: Associate .data files with ut61xp-plot tool
 ::
 
 :: Check for administrative permissions
@@ -17,7 +17,5 @@ cd ..
 
 for %%I in (ut61xp-plot.exe) do set "targetPath=%%~fI"
 
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.dat" /f
-
-assoc .dat=DMMData
-ftype DMMData="%targetPath%" "%%1"
+ftype DMMTools.Data="%targetPath%" "%%1"
+assoc .data=DMMTools.Data

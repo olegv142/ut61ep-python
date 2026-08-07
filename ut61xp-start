@@ -33,8 +33,8 @@ log = logging.getLogger('APP')
 module_dir = os.path.dirname(os.path.abspath(__file__))
 log_queue = None
 
-DEF_FNAME        = 'data/%Y-%m-%d/%H%M%S-${MODEL}.dat'
-DEF_ALT_FNAME    = 'data/%Y-%m-%d/%H%M%S-${MODEL}_.dat'
+DEF_FNAME        = 'data/%Y-%m-%d/%H%M%S-${MODEL}.data'
+DEF_ALT_FNAME    = 'data/%Y-%m-%d/%H%M%S-${MODEL}_.data'
 TEXT_ENTRY_WIDTH = len(DEF_ALT_FNAME) + 1
 VERT_PAD         = 1
 HORIZ_PAD        = 8
