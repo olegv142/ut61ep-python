@@ -424,8 +424,8 @@ class Launcher:
         self.settings_frame = tk.Frame(self.root)
         self.settings_frame.pack(side=tk.TOP)
 
-        btn = ttk.Button(self.root, text='Start', command=self.on_start_bt)
-        btn.pack(side=tk.TOP, pady=15)
+        self.start_btn = ttk.Button(self.root, text='Start', command=self.on_start_bt)
+        self.start_btn.pack(side=tk.TOP, pady=15)
 
         self.status_label = tk.Label(self.root,
                 bd=1, relief=tk.SUNKEN, anchor=tk.W, padx=HORIZ_PAD
@@ -500,12 +500,17 @@ class Launcher:
         self.show_status(msg, color='darkred')
 
     def update_status(self, event):
-        if event in (LauncherEvent.Created, LauncherEvent.Started):
+        if event == LauncherEvent.Created:
             self.show_status('ready')
         elif event == LauncherEvent.Starting:
             self.show_status('starting...', color='grey')
+            self.start_btn.state(['disabled'])
+        elif event == LauncherEvent.Started:
+            self.show_status('ready')
+            self.start_btn.state(['!disabled'])
         elif event == LauncherEvent.StartFailed:
             self.show_status('start failed', color='darkred')
+            self.start_btn.state(['!disabled'])
 
     def notify(self, event):
         log.debug('notify: %s', event)
