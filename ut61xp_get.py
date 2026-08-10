@@ -217,12 +217,12 @@ def device_type(args):
     T = _device_type(args.bt)
     assert T is not None
     log.warning('model %s is not supported in %s mode, using default %s',
-            args.model, 'BT' if args.bt else 'HID', T.model_name
+            args.model, 'BT' if args.bt else 'USB', T.model_name
         )
     return T
 
 def open_device(args):
-    """Open HID or BT device"""
+    """Open USB or BT device"""
     T = device_type(args)
     if args.path:
         dev = T.open_addr(args.path) if T.isBT else T.open_path(args.path)
