@@ -605,6 +605,7 @@ def main():
     if '--preload' in sys.argv[1:]:
         import bleak
         import matplotlib
+        import matplotlib.pyplot
         from adapters.device import import_hid
         import_hid()
     if '--quit' in sys.argv[1:]:
