@@ -603,7 +603,10 @@ def main():
     multiprocessing.freeze_support()
     multiprocessing.set_start_method('spawn', force=True)
     if '--preload' in sys.argv[1:]:
+        import bleak
         import matplotlib
+        from adapters.device import import_hid
+        import_hid()
     if '--quit' in sys.argv[1:]:
         return 0
     current_dir = module_dir
