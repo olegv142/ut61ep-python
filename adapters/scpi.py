@@ -136,11 +136,11 @@ class SCPIPowerSource(SCPIDevice):
         """Queries raw data from device"""
         if self.channels < 2:
             resp = self._call(b'MEAS:CURR?', tout, idle_sleep)
-            return (self, (resp,)) if resp else None
+            return (resp,) if resp else None
         resp = self._call(b'MEAS:ALL?', tout, idle_sleep)
         if not resp:
             return None
-        return (self, tuple(reversed(resp.split(b',')[:2])))
+        return tuple(reversed(resp.split(b',')[:2]))
 
     def get_channels(self, data):
         return min(self.channels, len(data))
