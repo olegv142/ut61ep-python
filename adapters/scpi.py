@@ -5,11 +5,11 @@ Tested with OWON multimeters and programmable power supplies.
 
 import os
 import sys
+import time
+import logging
 
 if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
-import time
-import logging
 from device import CDCMixin, Device
 
 log = logging.getLogger('DEV')
@@ -105,17 +105,17 @@ class SCPIDmm(SCPIDevice):
         return min(self.channels, len(vals))
 
     @classmethod
-    def get_value(cls, data, channel=None):
+    def get_value(cls, data, channel=0):
         _, vals = data
         try:
-            return float(vals[channel if channel is not None else 0])
+            return float(vals[channel])
         except ValueError:
             return float('nan')
 
     @staticmethod
-    def get_mode(data, channel=None):
+    def get_mode(data, channel=0):
         self, _ = data
-        return self.modes[channel if channel is not None else 0]
+        return self.modes[channel]
 
 class SCPIPowerSource(SCPIDevice):
     """
@@ -154,14 +154,14 @@ class SCPIPowerSource(SCPIDevice):
         return min(self.channels, len(vals))
 
     @classmethod
-    def get_value(cls, data, channel=None):
+    def get_value(cls, data, channel=0):
         _, vals = data
         try:
-            return float(vals[channel if channel is not None else 0])
+            return float(vals[channel])
         except ValueError:
             return float('nan')
 
     @staticmethod
-    def get_mode(data, channel=None):
+    def get_mode(data, channel=0):
         self, _ = data
-        return ('CURR', 'VOLT')[channel if channel is not None else 0]
+        return ('CURR', 'VOLT')[channel]
