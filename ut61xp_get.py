@@ -14,6 +14,7 @@ from adapters.ut61xp import UTDevice, HIDDevice, BTDevice, UT60BTDevice
 from adapters.owon import OwonBtDevice
 from adapters.aneng import AnengBtDevice
 from adapters.scpi import SCPIDmm, SCPIPowerSource
+from adapters.fnirsi import FNB48PUsb, FNB58Usb
 from data_stat import StatCollector, histogram
 from version import version_str
 from datetime import datetime
@@ -23,7 +24,10 @@ log = logging.getLogger('DEV')
 _parent_conn = None
 
 _supported_devices = (
-    HIDDevice, BTDevice, UT60BTDevice, OwonBtDevice, AnengBtDevice, SCPIDmm, SCPIPowerSource
+    HIDDevice, BTDevice, UT60BTDevice,
+    OwonBtDevice, AnengBtDevice,
+    SCPIDmm, SCPIPowerSource,
+    FNB48PUsb, FNB58Usb
 )
 
 class Plotter:
