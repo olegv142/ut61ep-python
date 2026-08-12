@@ -4,12 +4,12 @@ Device adapters abstract base classes
 
 import os
 import sys
+import logging
+from abc import ABC, abstractmethod
 
 if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
-from abc import ABC, abstractmethod
 import bt_engine
-import logging
 
 log = logging.getLogger('DEV')
 
@@ -187,7 +187,7 @@ class CDCMixin(USBMixin):
             vid = cls.device_vid
         if pid is None:
             pid = cls.device_pid
-        return [port.device for port in comports()]
+        return [port.device for port in comports() if port.vid == vid and port.pid == pid]
 
     @classmethod
     def _open_path(cls, path):
