@@ -21,6 +21,7 @@ class OwonBtDevice(BTMixin, Device):
     BT_RX_CHAR  = 'FFF4'
     DATA_LEN    = 6 # data response packet length
     DEF_TOUT    = 4 # default timeout in seconds
+    IDLE_DELAY  = .1
 
     def __init__(self, dev, addr):
         Device.__init__(self, addr)
@@ -58,8 +59,8 @@ class OwonBtDevice(BTMixin, Device):
         wait = tout if tout is not None else OwonBtDevice.DEF_TOUT
         self.last_data = None
         while self.last_data is None and wait >= 0:
-            idle_sleep(.1)
-            wait -= .1
+            idle_sleep(self.IDLE_DELAY)
+            wait -= self.IDLE_DELAY
         if not self.last_data:
             return None
         return self.last_data

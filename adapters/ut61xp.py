@@ -168,6 +168,7 @@ class HIDDevice(HIDMixin, UTDevice):
     """USB HID adapter (D-09A) interface class"""
     device_vid = 0x1a86
     device_pid = 0xe429
+    IDLE_DELAY = .1
 
     def __init__(self, dev, path):
         UTDevice.__init__(self, path)
@@ -183,11 +184,11 @@ class HIDDevice(HIDMixin, UTDevice):
         try:
             self.dev.write([0, len(self.TRIGGER_CMD)] + self.TRIGGER_CMD)
             while True:
-                idle_sleep(.1)
+                idle_sleep(self.IDLE_DELAY)
                 buf = self.dev.read(64)
                 if buf:
                     break
-                wait -= .1
+                wait -= self.IDLE_DELAY
                 if wait <= 0:
                     return None
         except Exception as e:
@@ -212,6 +213,7 @@ class BTDevice(BTMixin, UTDevice):
     device_name = 'UT-D07B'
     BT_TX_CHAR  = '49535343-8841-43f4-a8d4-ecbe34729bb3'
     BT_RX_CHAR  = '49535343-1e4d-4bd9-ba61-23c647249616'
+    IDLE_DELAY  = .1
 
     def __init__(self, dev, addr):
         UTDevice.__init__(self, addr)
@@ -252,8 +254,8 @@ class BTDevice(BTMixin, UTDevice):
         if not bt_engine.async_exec(a_trigger()):
             return None
         while self.last_data is None and wait >= 0:
-            idle_sleep(.1)
-            wait -= .1
+            idle_sleep(self.IDLE_DELAY)
+            wait -= self.IDLE_DELAY
         if not self.last_data:
             return None
         return self._validate_raw_data(self.last_data)

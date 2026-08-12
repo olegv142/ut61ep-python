@@ -1,5 +1,6 @@
 """
 FNIRSI USB testers communication adapter
+The protocol details are taken from https://github.com/yeckel/OpenFNB58 project
 """
 
 import os
@@ -104,7 +105,7 @@ class FNB58Usb(HIDDevice):
     model_name = 'FNB58'
 
 if __name__ == '__main__':
-    dev = FNB48PUsb.open() if '-48' in sys.argv[1:] else FNB58Usb.open()
+    dev = FNB48PUsb.open() if '--48' in sys.argv[1:] else FNB58Usb.open()
     if dev:
         print(dev)
         with dev:

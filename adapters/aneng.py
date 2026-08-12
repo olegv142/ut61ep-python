@@ -30,6 +30,7 @@ class AnengBtDevice(BTMixin, Device):
     DEF_TOUT    = 4  # default timeout in seconds
     DATA_PREFIX = [0x5a, 0xa5, 0x3]
     XOR_KEY     = [0x41, 0x21, 0x73, 0x55, 0xa2, 0xc1, 0x32, 0x71, 0x66, 0xaa, 0x3b]
+    IDLE_DELAY  = .1
     #
     # There is a direct mapping between BT packet bits and DMM display segments
     # as described in https://github.com/ludwich66/Bluetooth-DMM/wiki
@@ -93,8 +94,8 @@ class AnengBtDevice(BTMixin, Device):
         wait = tout if tout is not None else AnengBtDevice.DEF_TOUT
         self.last_data = None
         while self.last_data is None and wait >= 0:
-            idle_sleep(.1)
-            wait -= .1
+            idle_sleep(self.IDLE_DELAY)
+            wait -= self.IDLE_DELAY
         if not self.last_data:
             return None
         data = [self.last_data[i] ^ AnengBtDevice.XOR_KEY[i] for i in range(AnengBtDevice.DATA_LEN)]
