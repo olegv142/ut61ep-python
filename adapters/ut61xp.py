@@ -11,12 +11,12 @@ The code was reworked with the following goals in mind:
 
 import os
 import sys
-
-if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
-
 import time
 import logging
 import asyncio
+
+if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
+
 import bt_engine
 from device import Device, HIDMixin, BTMixin
 
