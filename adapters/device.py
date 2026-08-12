@@ -52,8 +52,7 @@ class Device(ABC):
         """Reads raw data packet from device and returns it"""
         pass
 
-    @staticmethod
-    def get_channels(data):
+    def get_channels(self, data):
         """
         Get the number of channels contained in the raw data. In there there are more than 1 channel
         its index should be passed explicitly to get_value and get_mode method. Otherwise
@@ -61,8 +60,7 @@ class Device(ABC):
         """
         return 1
 
-    @staticmethod
-    def get_channel(data):
+    def get_channel(self, data):
         """
         The UT61E+ can measure DC and AC voltage alternately in DC voltage dial position.
         This function returns 1 in such mode (25) if the data belongs to the alternative
@@ -70,9 +68,8 @@ class Device(ABC):
         """
         return 0
 
-    @classmethod
     @abstractmethod
-    def get_value(cls, data, channel=None):
+    def get_value(self, data, channel=None):
         """
         Converts raw data to the floating point value. Here we don't
         care about units since the caller should be aware of them.
@@ -81,9 +78,8 @@ class Device(ABC):
         """
         pass
 
-    @staticmethod
     @abstractmethod
-    def get_mode(data, channel=None):
+    def get_mode(self, data, channel=None):
         """Returns measurement mode and units description string"""
         pass
 

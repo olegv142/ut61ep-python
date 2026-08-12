@@ -97,24 +97,18 @@ class SCPIDmm(SCPIDevice):
         if len(vals) < self.channels:
             if val2 := self._call(b'MEAS2?', tout, idle_sleep):
                 vals.append(val2)
-        return (self, vals)
+        return vals
 
-    @staticmethod
-    def get_channels(data):
-        self, vals = data
-        return min(self.channels, len(vals))
+    def get_channels(self, data):
+        return min(self.channels, len(data))
 
-    @classmethod
-    def get_value(cls, data, channel=0):
-        _, vals = data
+    def get_value(self, data, channel=0):
         try:
-            return float(vals[channel])
+            return float(data[channel])
         except ValueError:
             return float('nan')
 
-    @staticmethod
-    def get_mode(data, channel=0):
-        self, _ = data
+    def get_mode(self, data, channel=0):
         return self.modes[channel]
 
 class SCPIPowerSource(SCPIDevice):
@@ -148,20 +142,14 @@ class SCPIPowerSource(SCPIDevice):
             return None
         return (self, tuple(reversed(resp.split(b',')[:2])))
 
-    @staticmethod
-    def get_channels(data):
-        self, vals = data
-        return min(self.channels, len(vals))
+    def get_channels(self, data):
+        return min(self.channels, len(data))
 
-    @classmethod
-    def get_value(cls, data, channel=0):
-        _, vals = data
+    def get_value(self, data, channel=0):
         try:
-            return float(vals[channel])
+            return float(data[channel])
         except ValueError:
             return float('nan')
 
-    @staticmethod
-    def get_mode(data, channel=0):
-        self, _ = data
+    def get_mode(self, data, channel=0):
         return ('CURR', 'VOLT')[channel]

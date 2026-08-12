@@ -102,8 +102,7 @@ class AnengBtDevice(BTMixin, Device):
             log.debug('bad prefix: %s', data)
         return data[3:]
 
-    @classmethod
-    def get_value(cls, data, channel=None):
+    def get_value(self, data, channel=None):
         """
         Converts raw data to the floating point value.
         """
@@ -138,8 +137,7 @@ class AnengBtDevice(BTMixin, Device):
             val *= 1e6 # mF
         return val
 
-    @staticmethod
-    def get_mode(data, channel=None):
+    def get_mode(self, data, channel=None):
         """
         Returns measurement mode and units description string.
         """

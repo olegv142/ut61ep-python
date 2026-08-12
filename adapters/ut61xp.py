@@ -71,8 +71,7 @@ class UTDevice(Device):
         """
         return 1
 
-    @classmethod
-    def get_value(cls, data, channel=None):
+    def get_value(self, data, channel=None):
         """
         Converts raw data to the floating point value. Here we don't
         care about units since the caller should be aware of them.
@@ -96,20 +95,19 @@ class UTDevice(Device):
         # point corresponding to the range 0.
         # Its indexed by the mode. If the mode is not in the map
         # then we don't care about range multiplier at all.
-        val *= cls.get_scale(mode)
-        off = cls.get_range_offset(mode)
+        val *= self.get_scale(mode)
+        off = self.get_range_offset(mode)
         if off is not None:
             val *= 10 ** (3*((range + off) // 3))
         return val
 
-    @staticmethod
-    def get_channel(data):
+    def get_channel(self, data):
         """
         The UT61E+ can measure DC and AC voltage alternately in DC voltage dial position.
         This function returns 1 in such mode (25) if the data belongs to the alternative
         measuring channel, so it represents AC voltage. Otherwise it returns 0.
         """
-        return 1 if (data[0] == 25) and (data[UTDevice.DATA_LEN-1] & 8) else 0
+        return 1 if (data[0] == 25) and (data[self.DATA_LEN-1] & 8) else 0
 
     _mode_map = [
         {
@@ -141,11 +139,10 @@ class UTDevice(Device):
         }
     ]
 
-    @staticmethod
-    def get_mode(data, channel=None):
+    def get_mode(self, data, channel=None):
         """Returns measurement mode and units description string"""
-        mode = UTDevice._mode_map[UTDevice.get_channel(data)].get(data[0], '')
-        f1, f2, f3 = data[UTDevice.DATA_LEN-3:]
+        mode = self._mode_map[self.get_channel(data)].get(data[0], '')
+        f1, f2, f3 = data[self.DATA_LEN-3:]
         if f1 & 2:
             mode += ' Hold'
         if f1 & 1:
@@ -182,9 +179,9 @@ class HIDDevice(HIDMixin, UTDevice):
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from HID device"""
-        wait = tout if tout is not None else UTDevice.DEF_TOUT
+        wait = tout if tout is not None else self.DEF_TOUT
         try:
-            self.dev.write([0, len(UTDevice.TRIGGER_CMD)] + UTDevice.TRIGGER_CMD)
+            self.dev.write([0, len(self.TRIGGER_CMD)] + self.TRIGGER_CMD)
             while True:
                 idle_sleep(.1)
                 buf = self.dev.read(64)
@@ -226,7 +223,7 @@ class BTDevice(BTMixin, UTDevice):
 
     def _notify_cb(self, char, val):
         """BT adapter data changed notification callback"""
-        if len(val) == 3 + UTDevice.DATA_LEN + 2:
+        if len(val) == 3 + self.DATA_LEN + 2:
             self.last_data = val
 
     @classmethod
@@ -247,10 +244,10 @@ class BTDevice(BTMixin, UTDevice):
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data packet from BT device"""
-        wait = tout if tout is not None else UTDevice.DEF_TOUT
+        wait = tout if tout is not None else self.DEF_TOUT
         self.last_data = None
         async def a_trigger():
-            await self.dev.write_gatt_char(BTDevice.BT_TX_CHAR, bytearray(UTDevice.TRIGGER_CMD), response=False)
+            await self.dev.write_gatt_char(BTDevice.BT_TX_CHAR, bytearray(self.TRIGGER_CMD), response=False)
             return True
         if not bt_engine.async_exec(a_trigger()):
             return None
@@ -308,8 +305,8 @@ if __name__ == '__main__':
                     data = dev.query_raw()
                     if data:
                         if last_data is None: print()
-                        print(data[0], ''.join([chr(d) for d in data[1:9]]), list(data[UTDevice.DATA_LEN-3:UTDevice.DATA_LEN]),
-                            '[%d] =' % UTDevice.get_channel(data), dev.get_value(data), dev.get_mode(data))
+                        print(data[0], ''.join([chr(d) for d in data[1:9]]), list(data[dev.DATA_LEN-3:dev.DATA_LEN]),
+                            '[%d] =' % dev.get_channel(data), dev.get_value(data), dev.get_mode(data))
                     else:
                         print('.', end='', flush=True)
                     last_data = data

@@ -64,8 +64,7 @@ class OwonBtDevice(BTMixin, Device):
             return None
         return self.last_data
 
-    @classmethod
-    def get_value(cls, data, channel=None):
+    def get_value(self, data, channel=None):
         """
         Converts raw data to the floating point value. Here we don't
         care about units since the caller should be aware of them.
@@ -125,19 +124,18 @@ class OwonBtDevice(BTMixin, Device):
         0xb1 : (0xa1, 6),  # MHz  -> Hz
     }
 
-    @staticmethod
-    def get_mode(data, channel=None):
+    def get_mode(self, data, channel=None):
         """
         Returns measurement mode and units description string.
         """
-        mt = OwonBtDevice.mode_tag(data)
+        mt = self.mode_tag(data)
         # Different vendors use different approaches to reporting measurement mode. The UNI-T reports
         # mode set by user. OWON reports units chosen by auto-range (say millivolts) within the mode
         # set by user (say voltage). So the units may be voluntary switched right in the middle of the
         # data collection which is quite undesirable. Therefore we first map current units to some
         # 'base units' by _scale_map and then retrieve the corresponding label from _mode_map.
-        mt, _ = OwonBtDevice._scale_map.get(mt, (mt, 0))
-        mode  = OwonBtDevice._mode_map.get(mt, '')
+        mt, _ = self._scale_map.get(mt, (mt, 0))
+        mode  = self._mode_map.get(mt, '')
         flags = data[2]
         if flags & 1:
             mode += ' Hold'
