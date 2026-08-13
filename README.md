@@ -227,6 +227,7 @@ from ut61xpy.adapters.owon import OwonBtDevice
 
 if dev := OwonBtDevice.open():
     with dev:
+        dev.init()
         while dev.is_connected():
             if data := dev.query_raw():
                 print(dev.get_value(data), dev.get_mode(data))
