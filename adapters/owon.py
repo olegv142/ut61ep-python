@@ -33,7 +33,7 @@ class OwonBtDevice(BTMixin, Device):
 
     def _notify_cb(self, char, val):
         """BT adapter data changed notification callback"""
-        if len(val) == OwonBtDevice.DATA_LEN:
+        if len(val) == self.DATA_LEN:
             self.last_data = val
 
     @classmethod
@@ -45,7 +45,7 @@ class OwonBtDevice(BTMixin, Device):
         async def a_connect():
             await clnt.connect()
             if clnt.is_connected:
-                await clnt.start_notify(OwonBtDevice.BT_RX_CHAR, inst._notify_cb)
+                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
             log.error('failed to connect to device %s', addr)
@@ -56,7 +56,7 @@ class OwonBtDevice(BTMixin, Device):
         """Queries raw data packet from BT device"""
         if not self.dev.is_connected:
             return None
-        wait = tout if tout is not None else OwonBtDevice.DEF_TOUT
+        wait = tout if tout is not None else self.DEF_TOUT
         self.last_data = None
         while self.last_data is None and wait >= 0:
             idle_sleep(self.IDLE_DELAY)
@@ -72,8 +72,8 @@ class OwonBtDevice(BTMixin, Device):
         It set mode dial manually after all. So in the mV mode the
         result is expressed in mV rather than volts.
         """
-        mt = OwonBtDevice.mode_tag(data)
-        _, scale = OwonBtDevice._scale_map.get(mt, (mt, 0))
+        mt = self.mode_tag(data)
+        _, scale = self._scale_map.get(mt, (mt, 0))
         shift = data[0] & 7
         if shift == 7:
             return float('nan')

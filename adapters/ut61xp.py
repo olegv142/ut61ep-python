@@ -26,7 +26,6 @@ class UTDevice(Device):
     """
     Base class for supported UNI-T devices
     """
-    model_name = 'UT61X+'
     # The following is the data packet that consists of the single '^' symbol
     # prefixed by magic, length and followed by checksum
     # It should be sent to the device to trigger data response
@@ -164,7 +163,7 @@ class UTDevice(Device):
         # f3 & 8 means AC channel in DC+AC mode
         return mode
 
-class HIDDevice(HIDMixin, UTDevice):
+class UTUsbDevice(HIDMixin, UTDevice):
     """USB HID adapter (D-09A) interface class"""
     device_vid = 0x1a86
     device_pid = 0xe429
@@ -208,9 +207,8 @@ class HIDDevice(HIDMixin, UTDevice):
         self.dev.close()
         self.dev = None
 
-class BTDevice(BTMixin, UTDevice):
+class UTBtDevice(BTMixin, UTDevice):
     """Bluetooth adapter (UT-D07B) interface class"""
-    device_name = 'UT-D07B'
     BT_TX_CHAR  = '49535343-8841-43f4-a8d4-ecbe34729bb3'
     BT_RX_CHAR  = '49535343-1e4d-4bd9-ba61-23c647249616'
     IDLE_DELAY  = .1
@@ -237,7 +235,7 @@ class BTDevice(BTMixin, UTDevice):
         async def a_connect():
             await clnt.connect()
             if clnt.is_connected:
-                await clnt.start_notify(BTDevice.BT_RX_CHAR, inst._notify_cb)
+                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
             log.error('failed to connect to device %s', addr)
@@ -249,7 +247,7 @@ class BTDevice(BTMixin, UTDevice):
         wait = tout if tout is not None else self.DEF_TOUT
         self.last_data = None
         async def a_trigger():
-            await self.dev.write_gatt_char(BTDevice.BT_TX_CHAR, bytearray(self.TRIGGER_CMD), response=False)
+            await self.dev.write_gatt_char(self.BT_TX_CHAR, bytearray(self.TRIGGER_CMD), response=False)
             return True
         if not bt_engine.async_exec(a_trigger()):
             return None
@@ -267,7 +265,14 @@ class BTDevice(BTMixin, UTDevice):
         bt_engine.async_exec(self.dev.disconnect())
         self.dev = None
 
-class UT60BTDevice(BTDevice):
+class UT61XpUsbDevice(UTUsbDevice):
+    model_name = 'UT61X+'
+
+class UT61XpBtDevice(UTBtDevice):
+    model_name = 'UT61X+'
+    device_name = 'UT-D07B'
+
+class UT60BTDevice(UTBtDevice):
     """
     UT60BT specific stuff.
     It uses the same protocol with minor particularities related to ranges.
@@ -296,10 +301,10 @@ if __name__ == '__main__':
     try:
         if len(sys.argv) > 1:
             name = sys.argv[1]
-            dev_type = UT60BTDevice if name == UT60BTDevice.device_name else BTDevice
+            dev_type = UT60BTDevice if name == UT60BTDevice.device_name else UT61XpBtDevice
             dev = dev_type.open(name)
         else:
-            dev = HIDDevice.open()
+            dev = UT61XpUsbDevice.open()
         if dev:
             with dev:
                 last_data = None

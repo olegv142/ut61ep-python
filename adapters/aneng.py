@@ -68,7 +68,7 @@ class AnengBtDevice(BTMixin, Device):
 
     def _notify_cb(self, char, val):
         """BT adapter data changed notification callback"""
-        if len(val) == AnengBtDevice.DATA_LEN:
+        if len(val) == self.DATA_LEN:
             self.last_data = val
 
     @classmethod
@@ -80,7 +80,7 @@ class AnengBtDevice(BTMixin, Device):
         async def a_connect():
             await clnt.connect()
             if clnt.is_connected:
-                await clnt.start_notify(AnengBtDevice.BT_RX_CHAR, inst._notify_cb)
+                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
             log.error('failed to connect to device %s', addr)
@@ -91,15 +91,15 @@ class AnengBtDevice(BTMixin, Device):
         """Queries raw data packet from BT device"""
         if not self.dev.is_connected:
             return None
-        wait = tout if tout is not None else AnengBtDevice.DEF_TOUT
+        wait = tout if tout is not None else self.DEF_TOUT
         self.last_data = None
         while self.last_data is None and wait >= 0:
             idle_sleep(self.IDLE_DELAY)
             wait -= self.IDLE_DELAY
         if not self.last_data:
             return None
-        data = [self.last_data[i] ^ AnengBtDevice.XOR_KEY[i] for i in range(AnengBtDevice.DATA_LEN)]
-        if data[:3] != AnengBtDevice.DATA_PREFIX:
+        data = [self.last_data[i] ^ self.XOR_KEY[i] for i in range(self.DATA_LEN)]
+        if data[:3] != self.DATA_PREFIX:
             log.debug('bad prefix: %s', data)
         return data[3:]
 
@@ -113,14 +113,14 @@ class AnengBtDevice(BTMixin, Device):
             (data[2] & 0xf0) | (data[3] & 0xf),
             (data[3] & 0xf0) | (data[4] & 0xf)
         ]
-        dp = AnengBtDevice._dp
+        dp = self._dp
         dp_mask = 0xff ^ dp
         val_str = '-' if digit_codes[0] & dp else ''
         digit_codes[0] &= dp_mask
         for c in digit_codes:
             if c & dp:
                 val_str += '.'
-            val_str += AnengBtDevice.DIGIT_MAP.get(c & dp_mask, '?')
+            val_str += self.DIGIT_MAP.get(c & dp_mask, '?')
         try:
             val = float(val_str)
         except ValueError:
