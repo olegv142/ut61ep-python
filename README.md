@@ -1,8 +1,8 @@
-# The cross-platform digital multimeter communication and data plotting tool supporting variety of popular UNI-T, OWON, ANENG, ZOTEK, BSIDE multimeters.
+# The cross-platform digital multimeter communication and data plotting tool supporting variety of popular UNI-T, OWON, ANENG, ZOTEK, BSIDE multimeters and FNIRSI USB testers.
 
 This repository provides simple alternative to vendor data collection programs. It works uniformly on Windows and Linux (not tested on MacOS). One can use it either from command line or GUI. Since the code is written in python it may be easily incorporated onto your complex measuring or automation system. 
 
-The project was started as robust and simple tool for reading data from UNI-T UT61E+ multimeter. It was inspired by https://github.com/ljakob/unit_ut61eplus and https://github.com/aroum/unit_ut61eplus_python. Since then the number of other multimeter models were supported and the project was extended with the following goals in mind:
+The project was started as robust and simple tool for reading data from UNI-T UT61E+ multimeter. It was inspired by https://github.com/ljakob/unit_ut61eplus and https://github.com/aroum/unit_ut61eplus_python. Since then the number of other multimeter and USB tester models were supported and the project was extended with the following goals in mind:
  - keep code as small and simple as possible
  - support for USB and Bluetooth communication channels
  - support for dual channel reading and plotting (DC+AC mode of UT61E+ for ex.)
@@ -39,6 +39,9 @@ OWON produces a line of programmable laboratory power supplies that use the SCPI
 This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 6000 counts display with 10µV voltage measuring resolution, 0.1µA current measuring resolution and 1pF capacity resolution. The stand is terrible, the quality of the probes is questionable, but other than that its quite usable with good display and small power consumption (3.5mA with Bluetooth active). Despite such low power consumption it has the best Bluetooth communication range among all tested multimeters. The only thing noticed that may be considered as a drawback is relatively low input impedance in voltage measuring mode. Its around 1 MOhm while other DMM typically have an input impedance of around 10 MOhm.
 
 The Zotek/Aneng multimeters use display segment based encoding for BT communications. So there are as many protocol variants as there are displays in use. Therefore, this tool will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566. Yet the AN9002 is the most interesting model considering the ergonomics and price / performance. The price of this device is smaller than the cost of the single UNI-T Bluetooth adapter.
+
+### FNIRSI USB testers
+The tool supports reading USB bus current and optionally voltage in alternative measuring channel. Currently supported devices are FNB48P and FNB58. The data can be read either via USB or Bluetooth connection (if supported by device). While Bluetooth is convenient the USB connection provides significantly better resolution and reliability.
 
 ## Installation
 ### Working with sources
@@ -199,15 +202,19 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device. To change this, one should use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table.
 
-| Model family                               | Options               |
-|----------------------------------------------|-----------------------|
-| UT61B/D/E+                                   | -M UT61X+             |
-| UT61B/D/E+ with UT-D07B Bluetooth adapter    | -M UT61X+ -B          |
-| UT60BT                                       | -M UT60BT -B          |
-| OWON Bluetooth multimeter                    | -M OWON -B            |
-| OWON desktop multimeter with USB port        | -M SCPI-DMM           |
-| OWON programmable power supply with USB port | -M SCPI-CV            |
-| ANENG / ZOTEK / BSIDE Bluetooth multimeter   | -M ANENG -B           |
+| Model family                                 | Command line options  | Model tag in **ut61xp-start** |
+|----------------------------------------------|-----------------------|-------------------------------|
+| UT61B/D/E+                                   | -M UT61X+             | UT61X+ USB                    |
+| UT61B/D/E+ with UT-D07B Bluetooth adapter    | -M UT61X+ -B          | UT61X+ BT                     |
+| UT60BT                                       | -M UT60BT -B          | UT60BT BT                     |
+| OWON Bluetooth multimeter                    | -M OWON -B            | OWON BT                       |
+| ANENG / ZOTEK / BSIDE Bluetooth multimeter   | -M ANENG -B           | ANENG BT                      |
+| OWON desktop multimeter with USB port        | -M SCPI-DMM           | SCPI-DMM USB                  |
+| OWON programmable power supply with USB port | -M SCPI-CV            | SCPI-CV USB                   |
+| FNIRSI FNB48P USB tester via USB connection  | -M FNB48P             | FNB48P USB                    |
+| FNIRSI FNB48P USB tester via Bluetooth       | -M FNB48P -B          | FNB48P BT                     |
+| FNIRSI FNB58 USB tester via USB connection   | -M FNB58              | FNB58 USB                     |
+| FNIRSI FNB58 USB tester via Bluetooth        | -M FNB58 -B           | FNB58 BT                      |
 
 ### Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
