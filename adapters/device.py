@@ -43,7 +43,8 @@ class Device(ABC):
 
     def init(self, nchannels):
         """
-        Initialize device setting the number of channels we are going the read. Should be called before first query_raw call.
+        Initialize device setting the number of channels we are going the read.
+        Should be called before first query_raw call.
         """
         pass
 
