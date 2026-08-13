@@ -36,14 +36,24 @@ def async_exec(co, wait=True):
         log.debug(e)
         return None
 
+def name_matches(devname, name):
+    if not devname:
+        return False
+    if not name:
+        return True
+    if name[-1] != '*':
+        return devname == name
+    prefix = name[:-1]
+    return devname[:len(prefix)] == prefix
+
 def list_addrs(name):
     """Returns the list of addresses of BT devices with given name"""
     from bleak import BleakScanner
-    addr_list = []
     async def a_list():
-        devices = await BleakScanner.discover()
+        return await BleakScanner.discover()
+    addr_list = []
+    if devices := async_exec(a_list()):
         for d in devices:
-            if d.name == name:
+            if name_matches(d.name, name):
                 addr_list.append(d.address)
-    async_exec(a_list())
     return addr_list
