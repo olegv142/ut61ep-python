@@ -79,13 +79,14 @@ class SCPIDmm(SCPIDevice):
         self.channels = None
         self.modes = None
 
-    def set_channels(self, cnt):
+    def init(self, nchannels):
         """
-        Set the number of channels we are going the read. Should be called before first query_raw call.
+        Initialize device setting the number of channels we are going the read.
+        Should be called before first query_raw call.
         """
-        assert cnt in (1, 2)
-        self.channels = cnt
-        funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(cnt)]
+        assert nchannels in (1, 2)
+        self.channels = nchannels
+        funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(nchannels)]
         self.modes = [f.decode('ascii') if f and f != SCPIDmm.no_value else self.def_mode for f in funcs]
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
@@ -125,12 +126,13 @@ class SCPIPowerSource(SCPIDevice):
         SCPIDevice.__init__(self, dev, path)
         self.channels = None
 
-    def set_channels(self, cnt):
+    def init(self, nchannels):
         """
-        Set the number of channels we are going the read. Should be called before first query_raw call.
+        Initialize device setting the number of channels we are going the read.
+        Should be called before first query_raw call.
         """
-        assert cnt in (1, 2)
-        self.channels = cnt
+        assert nchannels in (1, 2)
+        self.channels = nchannels
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data from device"""

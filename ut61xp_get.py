@@ -330,7 +330,7 @@ def do_data(args):
         sleep_fn = time.sleep
     errs_max = 2 if not args.bt else 5
     errs_left = errs_max
-    dev.set_channels(2 if alt_file else 1)
+    dev.init(2 if alt_file else 1)
     try:
         start = ts = time.time()
         while True:

@@ -39,11 +39,12 @@ class HIDDevice(HIDMixin, Device):
     def send_cmd(self, cmd):
         self.dev.write([0] + cmd)
 
-    def set_channels(self, cnt):
+    def init(self, nchannels):
         """
-        Set the number of channels we are going the read. Should be called before first query_raw call.
+        Initialize device setting the number of channels we are going the read.
+        Should be called before first query_raw call.
         """
-        self.channels = cnt
+        self.channels = nchannels
         try:
             self.send_cmd(self.CMD_INIT)
             time.sleep(self.CMD_INTERVAL)
@@ -109,7 +110,7 @@ if __name__ == '__main__':
     if dev:
         print(dev)
         with dev:
-            dev.set_channels(1)
+            dev.init(1)
             while dev.is_connected():
                 data = dev.query_raw()
                 print(dev.get_value(data, 0), dev.get_mode(data, 0), dev.get_value(data, 1), dev.get_mode(data, 1))
