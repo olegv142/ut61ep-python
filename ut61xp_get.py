@@ -282,14 +282,14 @@ def print_stat(args, stats):
         print('\n--- alternative channel:', file=sys.stderr)
         stats[1].print(sys.stderr)
 
-def get_fname(dev, fname):
+def get_fname(dev, fname, dt):
     """Makes filename from parameter string and makes sure folder part exists"""
     if not fname:
         return None
     if '$' in fname:
         fname = fname.replace('${MODEL}', dev.model_name)
     if '%' in fname:
-        fname = datetime.now().strftime(fname)
+        fname = dt.strftime(fname)
     dirname = os.path.dirname(fname)
     if dirname:
         try:
@@ -311,7 +311,8 @@ def do_data(args):
     if dev is None:
         return -1
 
-    fname, alt_fname = get_fname(dev, args.file), get_fname(dev, args.alt_file)
+    dt = datetime.now()
+    fname, alt_fname = get_fname(dev, args.file, dt), get_fname(dev, args.alt_file, dt)
     if fname != args.file:
         log.info('saving data to %s', fname)
     if alt_fname != args.alt_file:
