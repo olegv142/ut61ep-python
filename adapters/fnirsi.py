@@ -11,12 +11,13 @@ import struct
 
 if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
-from device import Device, HIDMixin
+import bt_engine
+from device import Device, HIDMixin, BTMixin
 
 log = logging.getLogger('DEV')
 
 class HIDDevice(HIDMixin, Device):
-    """USB HID adapter for FNB48P, FNB58 USB testers"""
+    """USB HID adapter for FNIRSI USB testers"""
     device_vid = 0x2e3c
 
     CMD_INIT  = [0xaa, 0x81] + [0] * 61 + [0x8e]
@@ -78,12 +79,12 @@ class HIDDevice(HIDMixin, Device):
         return bytes(buf[2:])
 
     @staticmethod
-    def get_samples_(data, group):
-        return [struct.unpack_from('<I', data, 15*i + 4*group)[0] / 100000 for i in range(4)]
+    def get_samples_(data, off):
+        return [struct.unpack_from('<I', data, 15*i + off)[0] / 100000 for i in range(4)]
 
     def get_value(self, data, channel=0):
         """Converts raw data to the floating point value"""
-        samples = self.get_samples_(data, (1, 0)[channel])
+        samples = self.get_samples_(data, (4, 0)[channel])
         return sum(samples) / len(samples)
 
     def get_mode(self, data, channel=0):
@@ -97,7 +98,7 @@ class HIDDevice(HIDMixin, Device):
         self.dev.close()
         self.dev = None
 
-class FNB48PUsb(HIDDevice):
+class FNB48pUsb(HIDDevice):
     device_pid = 0x0049
     model_name = 'FNB48P'
 
@@ -105,8 +106,115 @@ class FNB58Usb(HIDDevice):
     device_pid = 0x5558
     model_name = 'FNB58'
 
+
+class UT61XpBtDevice(BTMixin, Device):
+    """BLE adapter for FNIRSI USB testers"""
+    BT_RX_CHAR = 'FFE4'
+    BT_TX_CHAR = 'FFE9'
+    CMD_INIT   = [0xaa, 0x81, 0, 0xf4]
+    CMD_START  = [0xaa, 0x82, 0, 0xa7]
+    IDLE_DELAY = .1
+    DEF_TOUT   = 4  # default timeout in seconds
+
+    def __init__(self, dev, addr):
+        Device.__init__(self, addr)
+        self.dev = dev
+        self.channels = None
+        self.last_data = None
+
+    def is_connected(self):
+        return self.dev.is_connected
+
+    def init(self, nchannels):
+        """
+        Initialize device setting the number of channels we are going the read.
+        Should be called before first query_raw call.
+        """
+        self.channels = nchannels
+        async def a_init():
+            await self.dev.write_gatt_char(self.BT_TX_CHAR, bytearray(self.CMD_INIT),  response=True)
+            await self.dev.write_gatt_char(self.BT_TX_CHAR, bytearray(self.CMD_START), response=True)
+        bt_engine.async_exec(a_init())
+
+    def get_channels(self, data):
+        """Get the number of channels contained in the raw data"""
+        return self.channels
+
+    def _notify_cb(self, char, val):
+        """BT adapter data changed notification callback"""
+        n, i = len(val), 0
+        while True:
+            if i == n:
+                return
+            if i + 2 >= n or val[i] != 0xaa:
+                log.debug('bad packet: %s', val)
+                return
+            tag, sz = val[i+1], val[i+2]
+            if i + sz + 4 > n:
+                log.debug('bad packet: %s', val)
+                return
+            elif tag == 7 and sz >= 4:
+                self.last_data = val[i + 3: i + 3 + sz]
+            i += sz + 4
+
+    @classmethod
+    def open_addr(cls, addr):
+        """Opens BT device given its mac address"""
+        from bleak import BleakClient
+        clnt = BleakClient(addr)
+        inst = cls(clnt, addr)
+        async def a_connect():
+            await clnt.connect()
+            if clnt.is_connected:
+                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
+        bt_engine.async_exec(a_connect())
+        if not clnt.is_connected:
+            log.error('failed to connect to device %s', addr)
+            return None
+        return inst
+
+    def query_raw(self, tout=None, idle_sleep=time.sleep):
+        """Queries raw data packet from BT device"""
+        if not self.dev.is_connected:
+            return None
+        wait = tout if tout is not None else self.DEF_TOUT
+        self.last_data = None
+        while self.last_data is None and wait >= 0:
+            idle_sleep(self.IDLE_DELAY)
+            wait -= self.IDLE_DELAY
+        if not self.last_data:
+            return None
+        return self.last_data
+
+    def get_value(self, data, channel=0):        
+        """Converts raw data to the floating point value"""
+        return struct.unpack_from('<H', data, (2, 0)[channel])[0] / 1000
+
+    def get_mode(self, data, channel=0):
+        """Returns measurement mode and units description string"""
+        return ('A', 'V')[channel]
+
+    def close(self):
+        """Closes device if its still open"""
+        if self.dev is None:
+            return
+        bt_engine.async_exec(self.dev.disconnect())
+        self.dev = None
+
+class FNB48pBt(UT61XpBtDevice):
+    model_name = 'FNB48P'
+    device_name = 'FNB48*'
+
+class FNB58Bt(UT61XpBtDevice):
+    model_name = 'FNB58'
+    device_name = 'FNB58*'
+
+
 if __name__ == '__main__':
-    dev = FNB48PUsb.open() if '--48' in sys.argv[1:] else FNB58Usb.open()
+    if '--bt' in sys.argv[1:]:
+        dev = FNB48pBt.open() if '--48' in sys.argv[1:] else FNB58Bt.open()
+    else:
+        dev = FNB48pUsb.open() if '--48' in sys.argv[1:] else FNB58Usb.open()
     if dev:
         print(dev)
         with dev:
