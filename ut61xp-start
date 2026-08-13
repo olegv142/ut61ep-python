@@ -600,6 +600,7 @@ def mkdir_safe(path):
         pass
 
 def main():
+    global log_queue
     multiprocessing.freeze_support()
     multiprocessing.set_start_method('spawn', force=True)
     if '--preload' in sys.argv[1:]:
