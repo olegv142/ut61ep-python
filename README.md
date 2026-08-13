@@ -9,7 +9,7 @@ The project was started as robust and simple tool for reading data from UNI-T UT
  - seamless working on Windows and Linux
  - convenient working with several devices simultaneously
  - single CLI tool (**ut61xp-get**) for data collection and visualization
- - simple GUI application (**ut61xp-start**) with the same capabilities as CLI tool
+ - simple GUI frontend application (**ut61xp-start**) with the same capabilities as CLI tool
  - ease of adding new multimeter models
  - ease of reuse in other projects
 
@@ -200,7 +200,7 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 ## Working with other supported devices
 
-By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device. To change this, one should use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table.
+By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device. To change this, one should use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table. The last column of the table shows corresponding model family tag used in **ut61xp-start** GUI frontend application, see [Working with GUI](#working-with-gui).
 
 | Model family                                 | Command line options  | Model tag in **ut61xp-start** UI |
 |----------------------------------------------|-----------------------|-------------------------------|
