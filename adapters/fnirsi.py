@@ -40,7 +40,7 @@ class HIDDevice(HIDMixin, Device):
     def send_cmd(self, cmd):
         self.dev.write([0] + cmd)
 
-    def init(self, nchannels):
+    def init(self, nchannels=1):
         """
         Initialize device setting the number of channels we are going the read.
         Should be called before first query_raw call.
@@ -125,7 +125,7 @@ class UT61XpBtDevice(BTMixin, Device):
     def is_connected(self):
         return self.dev.is_connected
 
-    def init(self, nchannels):
+    def init(self, nchannels=1):
         """
         Initialize device setting the number of channels we are going the read.
         Should be called before first query_raw call.

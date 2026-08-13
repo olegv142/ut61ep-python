@@ -41,10 +41,10 @@ class Device(ABC):
         """Subclasses may redefine this method to indicate disconnection"""
         return True
 
-    def init(self, nchannels):
+    def init(self, nchannels=1):
         """
-        Initialize device setting the number of channels we are going the read.
-        Should be called before first query_raw call.
+        Initialize device setting the number of channels we are going to read.
+        Should be called before the first query_raw call.
         """
         pass
 

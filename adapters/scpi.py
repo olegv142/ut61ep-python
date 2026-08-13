@@ -79,7 +79,7 @@ class SCPIDmm(SCPIDevice):
         self.channels = None
         self.modes = None
 
-    def init(self, nchannels):
+    def init(self, nchannels=1):
         """
         Initialize device setting the number of channels we are going the read.
         Should be called before first query_raw call.
@@ -126,7 +126,7 @@ class SCPIPowerSource(SCPIDevice):
         SCPIDevice.__init__(self, dev, path)
         self.channels = None
 
-    def init(self, nchannels):
+    def init(self, nchannels=1):
         """
         Initialize device setting the number of channels we are going the read.
         Should be called before first query_raw call.
