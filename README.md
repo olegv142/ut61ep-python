@@ -50,13 +50,13 @@ git clone https://github.com/olegv142/ut61xpy.git
 ```
 
 Alternatively you can download source code archive and unpack it. 
-The code uses *hid/hidapi* package for communicating with USB multimeters, *bleak* package for communicating with Bluetooth multimeters and *matplotlib* package for data chart plotting. They can be installed by various ways depending on you operating system. To install them with pip (Windows/Lunix):
+The code uses *hid/hidapi* package for communicating with USB HID multimeters, *pyserial* package for communicating with USB multimeters using serial protocol, *bleak* package for communicating with Bluetooth multimeters and *matplotlib* package for data chart plotting. They can be installed by various ways depending on you operating system. To install them with pip (Windows/Lunix):
 ```
-pip install hidapi bleak matplotlib
+pip install hidapi pyserial bleak matplotlib
 ```
 On Linux you probably have to create virtual environment first or install packages using package manager like the following:
 ```
-sudo apt install python3-hidapi python3-bleak python3-matplotlib
+sudo apt install python3-hidapi python3-serial python3-bleak python3-matplotlib
 ```
 On some systems the package *python3-hid* is available instead of *python3-hidapi*. Note that you don't have to install the particular package unless you are not going to use the corresponding features. In particular, you can use the **ut61xp-get** tool without *matplotlib* package if you are not going to plot data charts. You can work without *bleak* package if you have only USB multimeters and without *hid/hidapi* package if you have only Bluetooth multimeters.
 
