@@ -140,7 +140,7 @@ class UT61XpBtDevice(BTMixin, Device):
         """Get the number of channels contained in the raw data"""
         return self.channels
 
-    def _notify_cb(self, char, val):
+    def notify_cb_(self, char, val):
         """BT adapter data changed notification callback"""
         n, i = len(val), 0
         while True:
@@ -166,7 +166,7 @@ class UT61XpBtDevice(BTMixin, Device):
         async def a_connect():
             await clnt.connect()
             if clnt.is_connected:
-                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
+                await clnt.start_notify(cls.BT_RX_CHAR, inst.notify_cb_)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
             log.error('failed to connect to device %s', addr)

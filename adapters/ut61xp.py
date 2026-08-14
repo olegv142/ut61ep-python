@@ -220,7 +220,7 @@ class UTBtDevice(BTMixin, UTDevice):
     def is_connected(self):
         return self.dev.is_connected
 
-    def _notify_cb(self, char, val):
+    def notify_cb_(self, char, val):
         """BT adapter data changed notification callback"""
         if len(val) == 3 + self.DATA_LEN + 2:
             self.last_data = val
@@ -234,7 +234,7 @@ class UTBtDevice(BTMixin, UTDevice):
         async def a_connect():
             await clnt.connect()
             if clnt.is_connected:
-                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
+                await clnt.start_notify(cls.BT_RX_CHAR, inst.notify_cb_)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
             log.error('failed to connect to device %s', addr)
