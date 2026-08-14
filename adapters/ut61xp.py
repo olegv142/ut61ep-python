@@ -13,7 +13,6 @@ import os
 import sys
 import time
 import logging
-import asyncio
 
 if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
