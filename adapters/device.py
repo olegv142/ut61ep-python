@@ -16,12 +16,15 @@ log = logging.getLogger('DEV')
 hid = None
 
 def import_hid():
+    """
+    Imports hid module taking into account that it may be called hidapi on some platforms
+    """
     global hid
     if hid is not None:
         return
     try:
         import hid as hid
-    except:
+    except ModuleNotFoundError:
         import hidapi as hid
 
 class Device(ABC):
