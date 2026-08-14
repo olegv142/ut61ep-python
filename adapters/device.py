@@ -46,12 +46,10 @@ class Device(ABC):
         Initialize device setting the number of channels we are going to read.
         Should be called before the first query_raw call.
         """
-        pass
 
     @abstractmethod
     def query_raw(self, tout, idle_sleep):
         """Reads raw data packet from device and returns it"""
-        pass
 
     def get_channels(self, data):
         """
@@ -77,16 +75,14 @@ class Device(ABC):
         It set mode dial manually after all. So in the mV mode the
         result is expressed in mV rather than volts.
         """
-        pass
 
     @abstractmethod
     def get_mode(self, data, channel=None):
         """Returns measurement mode and units description string"""
-        pass
 
     @abstractmethod
     def close(self):
-        pass
+        """Closes device"""
 
     def __enter__(self):
         """Context manager protocol support"""
@@ -105,13 +101,12 @@ class USBMixin(ABC):
 
     @abstractmethod
     def __init__(self, dev, path):
-        pass
+        """Constructor, called by open_path"""
 
     @classmethod
     @abstractmethod
     def list_paths(cls, vid=None, pid=None):
         """Returns the list of USB device paths"""
-        pass
 
     @classmethod
     def open_path(cls, path):
@@ -125,7 +120,6 @@ class USBMixin(ABC):
     @abstractmethod
     def _open_path(cls, path):
         """Opens device given the path and returns it"""
-        pass
 
     @classmethod
     def open(cls, vid=None, pid=None):
@@ -213,7 +207,6 @@ class BTMixin(ABC):
     @abstractmethod
     def open_addr(cls, addr):
         """Opens BT device instance given its mac address and returns it"""
-        pass
 
     @classmethod
     def open(cls, name=None):
