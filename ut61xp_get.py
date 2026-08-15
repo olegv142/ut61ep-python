@@ -1,5 +1,5 @@
 """
-The UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool
+The UNI-T UT61X+/UT60BT and other multimeters data acquisition and plotting tool
 """
 
 import os
@@ -534,7 +534,7 @@ def main(argv=None):
 def main_impl(argv=None):
     formatter = lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
     parser = argparse.ArgumentParser(
-            description='UNI-T UT61X+/UT60BT and OWON multimeters data acquisition and plotting tool v.' + version_str,
+            description='UNI-T UT61X+/UT60BT and other multimeters data acquisition and plotting tool v.' + version_str,
             usage='%(prog)s [options] COMMAND [command options]',
             formatter_class=formatter
         )
