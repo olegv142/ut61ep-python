@@ -161,7 +161,7 @@ class HIDMixin(USBMixin):
         dev = hid.device()
         try:
             dev.open_path(path)
-        except:
+        except Exception:
             log.error('failed to open device %s', path)
             return None
         dev.set_nonblocking(True)
@@ -189,7 +189,7 @@ class CDCMixin(USBMixin):
         import serial
         try:
             return serial.Serial(path, baudrate=cls.baud_rate, timeout=0, write_timeout=cls.write_timeout)
-        except:
+        except Exception:
             log.error('failed to open device %s', path)
             return None
 
