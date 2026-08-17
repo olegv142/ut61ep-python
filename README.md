@@ -253,10 +253,14 @@ Note that there are no options that don't have default values. So one can just c
 On Windows the *standalone/build_sfx.bat* script builds standalone executables in *standalone/dist/dmm-tools* folder. It then creates a self extracting archive *standalone/dist/dmm-tools-{VERSION}.exe* provided that you have 7-Zip installed. This archive can be extracted to any folder on the target system including the flash drive. The only requirement for the folder where the executable files will be placed is the ability to write to it. Since the application is 'portable' it tends to store all its files next to the executable. The *Program Files* folder on Windows is usually write-protected, so you should choose a different location to store executable files.
 
 The *dmm-tools/scripts* folder contains several *.bat* files that can make setting up your windows environment easier:
- - *create_links.bat* creates links to executables and data folder on your windows desktop
- - *delete_links.bat* removes links from your windows desktop
- - *associate_data.bat* associates output files with .data extension with data plotting executable
- - *deassociate_data.bat* removes output files association with data plotting executable
+
+| Script                 | What it does                                                               |
+|------------------------|----------------------------------------------------------------------------|
+| *create_links.bat*     | creates links to executables and data folder on your windows desktop       |
+| *delete_links.bat*     | removes links from your windows desktop                                    |
+| *associate_data.bat*   | associates output files with .data extension with data plotting executable |
+| *deassociate_data.bat* | removes output files association with data plotting executable             |
+| *clear_config.bat*     | drop saved configurations reverting all settings to default values         |
 
 On Linux one can build executables by the following command
 ```
