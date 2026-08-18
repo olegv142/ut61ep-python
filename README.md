@@ -76,10 +76,7 @@ In case the file with the name provided with *-f* option already exists it will 
 
 ## Dual channel mode
 
-Dual channel mode is handy while reading data in DC+AC mode of UT61E+. To use this feature you will need to choose proper mode on the multimeter mode dial and specify filename for storing second channel by means of *-a/--alt-file* option. This may be convenient, but note that DC+AC mode has several peculiarities compared to other modes:
- - it takes ~0.7 sec to read single value of the single channel
- - the DC voltage channel fluctuates much more than in other modes
- - to ensure alternating reception of DC and AC readings, it is recommended to use the default sampling interval, which is set to zero in this mode
+Dual channel mode is handy while reading data in DC+AC mode of UT61E+. To use this feature you will need to choose proper mode on the multimeter mode dial and specify filename for storing second channel by means of *-a/--alt-file* option. Other multimeter models may support dual channel reading for AC voltage and frequency in particular. Programmable power sources and USB testers may report the load current and voltage. 
 
 ## Graph plotting
 
