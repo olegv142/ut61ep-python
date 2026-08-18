@@ -213,25 +213,6 @@ By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target 
 | FNIRSI FNB58 USB tester via USB connection   | -M FNB58              | FNB58 USB                     |
 | FNIRSI FNB58 USB tester via Bluetooth        | -M FNB58 -B           | FNB58 BT                      |
 
-### Adding your own device
-To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
-In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
-
-# Integration with your own code
-Add this project as the sub-module to your source tree. After that you can use the following code to continuously read data from OWON Bluetooth multimeter.
-```
-from ut61xpy.adapters.owon import OwonBtDevice
-
-if dev := OwonBtDevice.open():
-    with dev:
-        dev.init()
-        while dev.is_connected():
-            if data := dev.query_raw():
-                print(dev.get_value(data), dev.get_mode(data))
-            else:
-                break
-```
-
 # Working with GUI
 The GUI workflow is built around **ut61xp-start** script that provides convenient UI for setting **ut61xp-get** options and launching data acquisition in separate processes. The single instance of **ut61xp-start** UI can launch any number of data acquisition processes working in parallel, saving data to separate files and showing collected data in their own data plot windows. The following figure illustrates using data acquisition GUI reading data from 3 multimeters simultaneously on Raspberry Pi5.
 
@@ -285,16 +266,35 @@ The **ut61xp-start** tool creates several files and directories next to executab
 | .logs/                               | Folder with **ut61xp-start** tool execution logs. One can examine them should something goes wrong or send to the author for analysis. |
 | .internal/                           | Folder containing executable components such as a shared libraries and compiled Python code. |
 
-## Known issues
+# Known issues
 
-### Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
+## Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
 The multimeter becomes available for reconnect after dropping of the previous connection. The problem here is that its the operating system that maintains connection. It may not drop connection if application that initiated it was terminated not gracefully, especially on Linux. So the multimeter thinks its still connected to already terminated application. The problem occurs if one close **ut61xp-start** window while some data acquisition windows are still open. In case all such windows are closed before closing **ut61xp-start** window the Bluetooth connections are terminated as expected.
 
-### Data was not saved to the output file after closing **ut61xp-start** application
+## Data was not saved to the output file after closing **ut61xp-start** application
 Closing **ut61xp-start** window while acquisition is still active terminates acquisition process without saving anything. Therefore, if you need the collected data, please close the acquisition plot window first.
 
-### Aneng (ZOTEK/BSIDE) multimeter is powering off automatically after some time while data collection is running
+## Aneng (ZOTEK/BSIDE) multimeter is powering off automatically after some time while data collection is running
 The auto power off feature powers off device after 15 min of inactivity. The Aneng (ZOTEK/BSIDE) multimeters don't consider Bluetooth connection as 'activity'. To disable auto powering off you should press and hold the SEL button while powering on multimeter and selecting desired mode with mode dial. The SEL button should be held until you hear four beeps. The auto power off feature will be disabled until the next power on. With power off disabled the multimeter will still emit alarming beeps periodically but will not power off.
 
-### The *Windows protected your PC* warning always appears on attempt to run self extracting distribution archive
+## The *Windows protected your PC* warning always appears on attempt to run self extracting distribution archive
 This happens because Windows flags all unsigned executables downloaded from the web as untrusted. There are two ways to overcome it. You can click *More info* and press *Run anyway* button. Otherwise you can clean this flag in advance by right clicking the executable and checking *Unblock* on the *General tab* of the file *Properties*. The release notes contain a link to VirusTotal analysis of the self extracting archive so you can make sure its safe to run. You can even launch validation again if you wish.
+
+# Adding your own device
+To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
+In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
+
+# Integration with your own code
+Add this project as the sub-module to your source tree. After that you can use the following code to continuously read data from OWON Bluetooth multimeter.
+```
+from ut61xpy.adapters.owon import OwonBtDevice
+
+if dev := OwonBtDevice.open():
+    with dev:
+        dev.init()
+        while dev.is_connected():
+            if data := dev.query_raw():
+                print(dev.get_value(data), dev.get_mode(data))
+            else:
+                break
+```
