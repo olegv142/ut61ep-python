@@ -281,7 +281,7 @@ The auto power off feature powers off device after 15 min of inactivity. The Ane
 This happens because Windows flags all unsigned executables downloaded from the web as untrusted. There are two ways to overcome it. You can click *More info* and press *Run anyway* button. Otherwise you can clean this flag in advance by right clicking the executable and checking *Unblock* on the *General tab* of the file *Properties*. The release notes contain a link to VirusTotal analysis of the self extracting archive so you can make sure its safe to run. You can even launch validation again if you wish.
 
 # Adding your own device
-To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *HIDMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
+To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *USBMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
 
 # Integration with your own code
