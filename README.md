@@ -197,9 +197,9 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 ## Working with other supported devices
 
-By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device. To change this, one should use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table. The last column of the table shows corresponding model family tag used in **ut61xp-start** GUI frontend application, see [Working with GUI](#working-with-gui).
+By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device. To change this, one should use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table. The last column of the table shows corresponding model label used in **ut61xp-start** GUI frontend application, see [Working with GUI](#working-with-gui).
 
-| Model family                                 | Command line options  | Model tag in **ut61xp-start** UI |
+| Model family                                 | Command line options  | Model label in **ut61xp-start** UI |
 |----------------------------------------------|-----------------------|-------------------------------|
 | UT61B/D/E+                                   | -M UT61X+             | UT61X+ USB                    |
 | UT61B/D/E+ with UT-D07B Bluetooth adapter    | -M UT61X+ -B          | UT61X+ BT                     |
