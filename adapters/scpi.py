@@ -38,20 +38,26 @@ class SCPIDevice(CDCMixin, Device):
     def is_connected(self):
         return self.dev and not self.disconnected
 
-    def _call(self, cmd, tout=None, idle_sleep=time.sleep):
+    def _send(self, cmd):
+        self.dev.write(cmd + b'\r')
+
+    def _receive(self, tout=None, idle_sleep=time.sleep):
         wait = tout if tout is not None else self.def_read_tout
         wait_step = 0.01
         resp = bytes()
+        while True:
+            idle_sleep(wait_step)
+            resp += self.dev.read(64)
+            if resp and resp[-1:] == b'\n' or resp[-1:] == b'\r':
+                return resp.strip().strip(b'"')
+            wait -= wait_step
+            if wait <= 0:
+                return None
+
+    def _call(self, cmd, tout=None, idle_sleep=time.sleep):
         try:
-            self.dev.write(cmd + b'\r')
-            while True:
-                idle_sleep(wait_step)
-                resp += self.dev.read(64)
-                if resp and resp[-1:] == b'\n' or resp[-1:] == b'\r':
-                    return resp.strip().strip(b'"')
-                wait -= wait_step
-                if wait <= 0:
-                    return None
+            self._send(cmd)
+            return self._receive(tout, idle_sleep)
         except Exception as e:
             self.disconnected = True
             log.debug(e)
