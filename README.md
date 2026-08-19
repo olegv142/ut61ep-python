@@ -238,7 +238,7 @@ The *dmm-tools/scripts* folder contains several *.bat* files that can make setti
 | *delete_links.bat*     | removes links from your windows desktop                                    |
 | *associate_data.bat*   | associates output files with .data extension with data plotting executable |
 | *deassociate_data.bat* | removes output files association with data plotting executable             |
-| *clear_config.bat*     | drop saved configurations reverting all settings to default values         |
+| *clear_config.bat*     | drops saved configurations reverting all settings to default values        |
 
 On Linux one can build executables by the following command
 ```
@@ -250,9 +250,9 @@ Note that the resulting size of these executables on Linux is drastically larger
 There are several other tools that are actually wrappers around **ut61xp-get** tool. They make using particular functionality easy especially on Windows as described in the following table.
 | Tools           |  What it does  |
 |-----------------|----------------|
-| **ut61xp-plot** | Plot one or more files given as command line arguments similar to **ut61xp-get plot** command. On Windows one can drag and drop one or more files to this tool to plot them.       |
-| **ut61xp-hist** | Plot histogram for the file passed as command line arguments similar to **ut61xp-get hist** command. On Windows one can drag and drop file to this tool to plot its histogram.     |
-| **ut61xp-stat** | Print statistics for the file passed as command line arguments similar to **ut61xp-get stat** command. On Windows one can drag and drop file to this tool to print its statistics. |
+| **ut61xp-plot** | Plots one or more files given as command line arguments similar to **ut61xp-get plot** command. On Windows one can drag and drop one or more files to this tool to plot them.       |
+| **ut61xp-hist** | Plots histogram for the file passed as command line arguments similar to **ut61xp-get hist** command. On Windows one can drag and drop file to this tool to plot its histogram.     |
+| **ut61xp-stat** | Prints statistics for the file passed as command line arguments similar to **ut61xp-get stat** command. On Windows one can drag and drop file to this tool to print its statistics. |
 
 For convenience you can associate .dat files with **ut61xp-plot** tool. To do it right click such file, choose 'Open with', then select 'Choose another app', then click 'Choose an app from your PC' at the bottom of the list, then select **ut61xp-plot** tool in the file chooser and finally click 'Always' button. Now the **ut61xp-plot** tool will plot .dat file every time you double click it.
 
