@@ -153,7 +153,7 @@ class Plotter:
         ax.set_ylim(vmin, vmax)
 
     @staticmethod
-    def show_stat_(ax, stat, location='lower left'):
+    def _show_stat(ax, stat, location='lower left'):
         buff = io.StringIO()
         stat.print(buff)
         ax.legend(
@@ -169,7 +169,7 @@ class Plotter:
         )
 
     def show_stat(self, ax, stat):
-        self.show_stat_(ax, stat, self.args.plot_stat_loc)
+        self._show_stat(ax, stat, self.args.plot_stat_loc)
         if len(self.ax) > 1 and not self.expanded:
             h = self.fig.get_figheight()
             if h < self.dual_with_stat_min_h:
@@ -471,7 +471,7 @@ def plot_data(Xs, Ys, Names, Infos, yticks=None, no_stat=False, title_suffix='')
                 if l := plt.gca().get_legend():
                     l.remove()
                 else:
-                    Plotter.show_stat_(plt.gca(), stat)
+                    Plotter._show_stat(plt.gca(), stat)
                 canvas.draw_idle()
         canvas.mpl_connect('key_press_event', on_key_press)
         log.info('press space to print data statistics, t to toggle stat display, q to exit')

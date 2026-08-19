@@ -114,14 +114,14 @@ class USBMixin(ABC):
     @classmethod
     def open_path(cls, path):
         """Opens device given the path"""
-        dev = cls.open_path_(path)
+        dev = cls._open_path(path)
         if dev is None:
             return None
         return cls(dev, path)
 
     @classmethod
     @abstractmethod
-    def open_path_(cls, path):
+    def _open_path(cls, path):
         """Opens device given the path and returns it"""
 
     @classmethod
@@ -153,7 +153,7 @@ class HIDMixin(USBMixin):
         return [dev['path'].decode('ascii') for dev in hid.enumerate(vid, pid)]
 
     @classmethod
-    def open_path_(cls, path):
+    def _open_path(cls, path):
         """Opens hid device given the path and returns it"""
         import_hid()
         if isinstance(path, str):
@@ -184,7 +184,7 @@ class CDCMixin(USBMixin):
         return [port.device for port in comports() if port.vid == vid and port.pid == pid]
 
     @classmethod
-    def open_path_(cls, path):
+    def _open_path(cls, path):
         """Opens CDC device given the path and returns it"""
         import serial
         try:

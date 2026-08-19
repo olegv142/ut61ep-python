@@ -79,12 +79,12 @@ class HIDDevice(HIDMixin, Device):
         return bytes(buf[2:])
 
     @staticmethod
-    def get_samples_(data, off):
+    def _get_samples(data, off):
         return [struct.unpack_from('<I', data, 15*i + off)[0] / 100000 for i in range(4)]
 
     def get_value(self, data, channel=0):
         """Converts raw data to the floating point value"""
-        samples = self.get_samples_(data, (4, 0)[channel])
+        samples = self._get_samples(data, (4, 0)[channel])
         return sum(samples) / len(samples)
 
     def get_mode(self, data, channel=0):
@@ -140,7 +140,7 @@ class UT61XpBtDevice(BTMixin, Device):
         """Get the number of channels contained in the raw data"""
         return self.channels
 
-    def notify_cb_(self, char, val):
+    def _notify_cb(self, char, val):
         """BT adapter data changed notification callback"""
         n, i = len(val), 0
         while True:
@@ -166,7 +166,7 @@ class UT61XpBtDevice(BTMixin, Device):
         async def a_connect():
             await clnt.connect()
             if clnt.is_connected:
-                await clnt.start_notify(cls.BT_RX_CHAR, inst.notify_cb_)
+                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
             log.error('failed to connect to device %s', addr)

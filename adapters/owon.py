@@ -31,7 +31,7 @@ class OwonBtDevice(BTMixin, Device):
     def is_connected(self):
         return self.dev.is_connected
 
-    def notify_cb_(self, char, val):
+    def _notify_cb(self, char, val):
         """BT adapter data changed notification callback"""
         if len(val) == self.DATA_LEN:
             self.last_data = val
@@ -45,7 +45,7 @@ class OwonBtDevice(BTMixin, Device):
         async def a_connect():
             await clnt.connect()
             if clnt.is_connected:
-                await clnt.start_notify(cls.BT_RX_CHAR, inst.notify_cb_)
+                await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
             log.error('failed to connect to device %s', addr)
