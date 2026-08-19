@@ -127,6 +127,9 @@ class SCPIPowerSource(SCPIDevice):
     # CH340 USB-serial chip
     device_vid = 0x1a86
     device_pid = 0x7523
+    # Channel names for convenience
+    current_channel = 0
+    voltage_channel = 1
 
     def __init__(self, dev, path):
         SCPIDevice.__init__(self, dev, path)

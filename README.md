@@ -298,3 +298,21 @@ if dev := OwonBtDevice.open():
             else:
                 break
 ```
+
+The following code will configure OWON power source, turn on its output, wait 2 seconds, print current and voltage and switch output off.
+```
+import time
+from ut61xpy.adapters.scpi import SCPIPowerSource
+
+if dev := SCPIPowerSource.open():
+    with dev:
+        dev.init(2)
+        dev._send(b'VOLTage 10')
+        dev._send(b'CURRent:LIMit 1')
+        dev._send(b'OUTPut 1')
+        time.sleep(2)
+        if data := dev.query_raw():
+            print(dev.get_mode(data, dev.current_channel), ':', dev.get_value(data, dev.current_channel))
+            print(dev.get_mode(data, dev.voltage_channel), ':', dev.get_value(data, dev.voltage_channel))
+        dev._send(b'OUTPut 0')
+```
