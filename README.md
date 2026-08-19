@@ -92,7 +92,7 @@ The data reported by multimeter typically contains information about measurement
 
 ## Using configurations
 
-The configuration is the file storing the full set of command line options in the form of json dictionary. Use *--cfg-save* option with **ut61xp-get data** command to create such file filled with options specified in the current command line and *-c/--cfg-load* option to load such file back. They may be handy to save typing and even more importantly to make data acquisition from several devices easier. Several examples of using them while reading data from several devices simultaneously will be given below.
+The configuration is the file storing the full set of command line options in the form of json dictionary. Use *--cfg-save* option with **ut61xp-get data** command to create such file filled with options specified in the current command line and *-c/--cfg-load* option to load such file back. They may be handy to save typing and even more importantly to make data acquisition from several devices easier. Several examples of using them while [working with several devices simultaneously](#working-with-several-devices-simultaneously) will be given below.
 
 ## Printing data statistics
 
