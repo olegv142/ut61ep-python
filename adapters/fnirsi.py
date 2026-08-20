@@ -16,7 +16,7 @@ from device import Device, HIDMixin, BTMixin
 
 log = logging.getLogger('DEV')
 
-class HIDDevice(HIDMixin, Device):
+class FnirsiUSBDevice(HIDMixin, Device):
     """USB HID adapter for FNIRSI USB testers"""
     device_vid = 0x2e3c
 
@@ -98,16 +98,16 @@ class HIDDevice(HIDMixin, Device):
         self.dev.close()
         self.dev = None
 
-class FNB48pUsb(HIDDevice):
+class FNB48pUsb(FnirsiUSBDevice):
     device_pid = 0x0049
     model_name = 'FNB48P'
 
-class FNB58Usb(HIDDevice):
+class FNB58Usb(FnirsiUSBDevice):
     device_pid = 0x5558
     model_name = 'FNB58'
 
 
-class UT61XpBtDevice(BTMixin, Device):
+class FnirsiBtDevice(BTMixin, Device):
     """BLE adapter for FNIRSI USB testers"""
     BT_RX_CHAR = 'FFE4'
     BT_TX_CHAR = 'FFE9'
@@ -201,11 +201,11 @@ class UT61XpBtDevice(BTMixin, Device):
         bt_engine.async_exec(self.dev.disconnect())
         self.dev = None
 
-class FNB48pBt(UT61XpBtDevice):
+class FNB48pBt(FnirsiBtDevice):
     model_name = 'FNB48P'
     device_name = 'FNB48*'
 
-class FNB58Bt(UT61XpBtDevice):
+class FNB58Bt(FnirsiBtDevice):
     model_name = 'FNB58'
     device_name = 'FNB58*'
 
