@@ -133,10 +133,10 @@ class USBMixin(ABC):
             pid = cls.DEVICE_PID
         paths = cls.list_paths(vid, pid)
         if not paths:
-            log.error('not found')
+            log.error('%s USB device not found', cls.MODEL_NAME)
             return None
         if len(paths) > 1:
-            log.error('%d devices found', len(paths))
+            log.error('%d %s USB devices found', len(paths), cls.MODEL_NAME)
             return None
         return cls.open_path(paths[0])
 
@@ -218,9 +218,9 @@ class BTMixin(ABC):
             name = cls.DEVICE_NAME
         addrs = cls.list_addrs(name)
         if not addrs:
-            log.error('not found')
+            log.error('%s BT device not found', cls.MODEL_NAME)
             return None
         if len(addrs) > 1:
-            log.error('%d devices found', len(addrs))
+            log.error('%d %s BT devices found', len(addrs), cls.MODEL_NAME)
             return None
         return cls.open_addr(addrs[0])
