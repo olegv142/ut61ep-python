@@ -140,6 +140,9 @@ class USBMixin(ABC):
             return None
         return cls.open_path(paths[0])
 
+    def __str__(self):
+        return '[' + self.MODEL_NAME + ' USB]'
+
 class HIDMixin(USBMixin):
     """Methods specific for USB HID devices"""
     @classmethod
@@ -162,7 +165,7 @@ class HIDMixin(USBMixin):
         try:
             dev.open_path(path)
         except Exception:
-            log.error('failed to open device %s', path)
+            log.error('failed to open %s USB HID device %s', cls.MODEL_NAME, path)
             return None
         dev.set_nonblocking(True)
         return dev
@@ -190,7 +193,7 @@ class CDCMixin(USBMixin):
         try:
             return serial.Serial(path, baudrate=cls.BAUD_RATE, timeout=0, write_timeout=cls.WRITE_TIMEOUT)
         except Exception:
-            log.error('failed to open device %s', path)
+            log.error('failed to open %s USB CDC device %s', cls.MODEL_NAME, path)
             return None
 
 class BTMixin(ABC):
@@ -224,3 +227,6 @@ class BTMixin(ABC):
             log.error('%d %s BT devices found', len(addrs), cls.MODEL_NAME)
             return None
         return cls.open_addr(addrs[0])
+
+    def __str__(self):
+        return '[' + self.MODEL_NAME + ' BT]'

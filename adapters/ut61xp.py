@@ -32,24 +32,23 @@ class UTDevice(Device):
     DATA_LEN    = 14 # data response packet length
     DEF_TOUT    = 4  # default timeout in seconds
 
-    @staticmethod
-    def _validate_raw_data(data):
+    def _validate_raw_data(self, data):
         """
         Validates data packet. Returns either valid packet with
         header and checksum stripped or None.
         """
         if data[0] != 0xab or data[1] != 0xcd:
-            log.error('bad magic (%#x, %#x)', data[0], data[1])
+            log.error('%s bad data magic (%#x, %#x)', self, data[0], data[1])
             return None
         if len(data) != 3 + UTDevice.DATA_LEN + 2:
-            log.error('bad data length: %d', len(data))
+            log.error('%s bad data length: %d', self, len(data))
             return None
         if data[2] != len(data) - 3:
-            log.error('bad length: %d, expects %d', data[2], len(data) - 3)
+            log.error('%s bad data length: %d, expects %d', self, data[2], len(data) - 3)
             return None
         cs = data[-2] * 256 + data[-1]
         if cs != sum(data[:-2]):
-            log.error('bad checksum')
+            log.error('%s bad data checksum', self)
             return None
         return data[3:-2]
 
@@ -195,7 +194,7 @@ class UTUsbDevice(HIDMixin, UTDevice):
             return None
         data_len = buf[0]
         if data_len <= 2 or data_len > 63:
-            log.error('bad length: %d', data_len)
+            log.error('%s bad HID message length: %d', self, data_len)
             return None
         return self._validate_raw_data(buf[1:1+data_len])
 
@@ -237,7 +236,7 @@ class UTBtDevice(BTMixin, UTDevice):
                 await clnt.start_notify(cls.BT_RX_CHAR, inst._notify_cb)
         bt_engine.async_exec(a_connect())
         if not clnt.is_connected:
-            log.error('failed to connect to device %s', addr)
+            log.error('failed to connect to %s BT device %s', cls.MODEL_NAME, addr)
             return None
         return inst
 
