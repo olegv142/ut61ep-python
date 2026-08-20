@@ -335,7 +335,7 @@ if dev := SCPIPowerSource.open():
 ```
 Note that there are also VOLTage:LIMit and CURRent:LIMit parameters. If any of them is exceeded the OWON power source switches off its output showing warning on the screen. The error is cleared by switching output off either by OUTPut command or by button on the front panel. Therefore, if you need just current limiting, then take care to always have VOLTage:LIMit > VOLTage and CURRent:LIMit > CURRent.
 
-Similarly you can read voltage and current from FNIRSI USB tester with the following code:
+Similarly, you can read voltage and current from FNIRSI USB tester with the following code:
 ```
 from ut61xpy.adapters.fnirsi import FNB58Usb
 
