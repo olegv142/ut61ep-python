@@ -285,7 +285,9 @@ To add new device you should implement its adapter class inherited from *Device*
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
 
 # Integration with your own code
-Add this project as the sub-module to your source tree. After that you can use the following code to continuously read data from OWON Bluetooth multimeter.
+Just add this project as the sub-module to your source tree and import the necessary device adapter from it.
+
+The following code will read data from OWON Bluetooth multimeter continuously. It will discover the multimeter automatically provided that you have single one nearby.
 ```
 from ut61xpy.adapters.owon import OwonBtDevice
 
@@ -299,6 +301,21 @@ if dev := OwonBtDevice.open():
                 break
 ```
 
+If you know the Bluetooth device mac address you can open it faster without scanning. It will also work if you have several multimeters. The following code will read Aaneng AN9002 or compatible ZOTEK/BSIDE ZT-300AB with particular address.
+```
+from ut61xpy.adapters.aneng import AnengBtDevice
+
+if dev := AnengBtDevice.open_addr('C4:A9:B8:3A:5B:A2'):
+    with dev:
+        dev.init()
+        while dev.is_connected():
+            if data := dev.query_raw():
+                print(dev.get_value(data), dev.get_mode(data))
+            else:
+                break
+```
+
+While working with OWON programmable power source, you can not only read voltage and current, but also configure the power source output.
 The following code will configure OWON power source, turn on its output, wait 2 seconds, print current and voltage and switch output off.
 ```
 import time
