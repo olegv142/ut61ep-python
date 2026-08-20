@@ -284,7 +284,7 @@ class ModelSelector(Setting):
     The model selector setting object. In addition to providing model selector UI it also
     manages configuration for all models.
     """
-    models = [t.model_name + ' ' + ('BT' if t.isBT else 'USB') for t in _supported_devices]
+    models = [t.MODEL_NAME + ' ' + ('BT' if t.IsBT else 'USB') for t in _supported_devices]
     cfg_path = '.config'
 
     def __init__(self, launcher, text):

@@ -16,7 +16,7 @@ log = logging.getLogger('DEV')
 
 class SCPIDevice(CDCMixin, Device):
     """Base class for adapters using SCPI commands over CDC link"""
-    def_read_tout = 1
+    DEF_READ_TOUT = 1
 
     def __init__(self, dev, path):
         Device.__init__(self, path)
@@ -33,7 +33,7 @@ class SCPIDevice(CDCMixin, Device):
             return self.model
         else:
             self.disconnected = True
-            return self.model_name
+            return self.MODEL_NAME
 
     def is_connected(self):
         return self.dev and not self.disconnected
@@ -42,7 +42,7 @@ class SCPIDevice(CDCMixin, Device):
         self.dev.write(cmd + b'\r')
 
     def _receive(self, tout=None, idle_sleep=time.sleep):
-        wait = tout if tout is not None else self.def_read_tout
+        wait = tout if tout is not None else self.DEF_READ_TOUT
         wait_step = 0.01
         resp = bytes()
         while True:
@@ -72,13 +72,13 @@ class SCPIDevice(CDCMixin, Device):
 
 class SCPIDmm(SCPIDevice):
     """SCPI multimeter interface adapter. Tested with OWON XDM1241."""
-    model_name  = 'SCPI-DMM'
+    MODEL_NAME  = 'SCPI-DMM'
     # CH340 USB-serial chip
-    device_vid = 0x1a86
-    device_pid = 0x7523
+    DEVICE_VID = 0x1a86
+    DEVICE_PID = 0x7523
 
-    no_value = b'NONe'
-    def_mode = 'DUTY%'
+    NO_VALUE = b'NONe'
+    DEF_MODE = 'DUTY%'
 
     def __init__(self, dev, path):
         SCPIDevice.__init__(self, dev, path)
@@ -93,7 +93,7 @@ class SCPIDmm(SCPIDevice):
         assert nchannels in (1, 2)
         self.channels = nchannels
         funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(nchannels)]
-        self.modes = [f.decode('ascii') if f and f != SCPIDmm.no_value else self.def_mode for f in funcs]
+        self.modes = [f.decode('ascii') if f and f != self.NO_VALUE else self.DEF_MODE for f in funcs]
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data from device"""
@@ -123,10 +123,10 @@ class SCPIPowerSource(SCPIDevice):
     SCPI programmable power supplies interface adapter. Tested with OWON SPE3051.
     It always measures current in the main channel and voltage in the secondary one.
     """
-    model_name  = 'SCPI-CV'
+    MODEL_NAME  = 'SCPI-CV'
     # CH340 USB-serial chip
-    device_vid = 0x1a86
-    device_pid = 0x7523
+    DEVICE_VID = 0x1a86
+    DEVICE_PID = 0x7523
     # Channel names for convenience
     CURR_CHAN = 0
     VOLT_CHAN = 1

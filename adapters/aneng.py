@@ -23,8 +23,8 @@ class AnengBtDevice(BTMixin, Device):
     adapter class will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566.
     Yet the AN9002 is the most interesting model considering the ergonomics and price / performance.
     """
-    model_name  = 'ANENG'
-    device_name = 'Bluetooth DMM'
+    MODEL_NAME  = 'ANENG'
+    DEVICE_NAME = 'Bluetooth DMM'
     BT_RX_CHAR  = 'FFF4'
     DATA_LEN    = 11 # data response packet length
     DEF_TOUT    = 4  # default timeout in seconds

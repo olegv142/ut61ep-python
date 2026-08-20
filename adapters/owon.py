@@ -16,8 +16,8 @@ log = logging.getLogger('DEV')
 
 class OwonBtDevice(BTMixin, Device):
     """OWON Bluetooth multimeter interface class"""
-    model_name  = 'OWON'
-    device_name = 'BDM'
+    MODEL_NAME  = 'OWON'
+    DEVICE_NAME = 'BDM'
     BT_RX_CHAR  = 'FFF4'
     DATA_LEN    = 6 # data response packet length
     DEF_TOUT    = 4 # default timeout in seconds

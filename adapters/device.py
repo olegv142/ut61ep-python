@@ -31,14 +31,14 @@ class Device(ABC):
     """Base class for all device adapters"""
 
     # The following property should be redefined in subclasses
-    model_name = None
+    MODEL_NAME = None
 
     def __init__(self, path):
         self.path = path
 
     def get_model(self):
         """The implementation may redefine this method to return actual model name"""
-        return self.model_name
+        return self.MODEL_NAME
 
     def is_connected(self):
         """Subclasses may redefine this method to indicate disconnection"""
@@ -97,10 +97,10 @@ class Device(ABC):
 
 class USBMixin(ABC):
     """Methods specific for USB devices"""
-    isBT = False
+    IsBT = False
     # The following properties should be redefined in subclasses
-    device_vid = None
-    device_pid = None
+    DEVICE_VID = None
+    DEVICE_PID = None
 
     @abstractmethod
     def __init__(self, dev, path):
@@ -128,9 +128,9 @@ class USBMixin(ABC):
     def open(cls, vid=None, pid=None):
         """Opens device instance given its VID, PID and returns it"""
         if vid is None:
-            vid = cls.device_vid
+            vid = cls.DEVICE_VID
         if pid is None:
-            pid = cls.device_pid
+            pid = cls.DEVICE_PID
         paths = cls.list_paths(vid, pid)
         if not paths:
             log.error('not found')
@@ -147,9 +147,9 @@ class HIDMixin(USBMixin):
         """Returns the list of HID device paths"""
         import_hid()
         if vid is None:
-            vid = cls.device_vid
+            vid = cls.DEVICE_VID
         if pid is None:
-            pid = cls.device_pid
+            pid = cls.DEVICE_PID
         return [dev['path'].decode('ascii') for dev in hid.enumerate(vid, pid)]
 
     @classmethod
@@ -170,17 +170,17 @@ class HIDMixin(USBMixin):
 class CDCMixin(USBMixin):
     """Methods specific for USB CDC devices"""
     # The following properties may be redefined in subclasses
-    baud_rate = 115200
-    write_timeout = .1
+    BAUD_RATE = 115200
+    WRITE_TIMEOUT = .1
 
     @classmethod
     def list_paths(cls, vid=None, pid=None):
         """Returns the list of CDC device paths"""
         from serial.tools.list_ports import comports
         if vid is None:
-            vid = cls.device_vid
+            vid = cls.DEVICE_VID
         if pid is None:
-            pid = cls.device_pid
+            pid = cls.DEVICE_PID
         return [port.device for port in comports() if port.vid == vid and port.pid == pid]
 
     @classmethod
@@ -188,22 +188,22 @@ class CDCMixin(USBMixin):
         """Opens CDC device given the path and returns it"""
         import serial
         try:
-            return serial.Serial(path, baudrate=cls.baud_rate, timeout=0, write_timeout=cls.write_timeout)
+            return serial.Serial(path, baudrate=cls.BAUD_RATE, timeout=0, write_timeout=cls.WRITE_TIMEOUT)
         except Exception:
             log.error('failed to open device %s', path)
             return None
 
 class BTMixin(ABC):
     """Methods specific for BT devices"""
-    isBT = True
+    IsBT = True
     # The following property should be redefined in subclasses
-    device_name = None
+    DEVICE_NAME = None
 
     @classmethod
     def list_addrs(cls, name=None):
         """Returns the list of BT device addresses"""
         if name is None:
-            name = cls.device_name
+            name = cls.DEVICE_NAME
         return bt_engine.list_addrs(name)
 
     @classmethod
@@ -215,7 +215,7 @@ class BTMixin(ABC):
     def open(cls, name=None):
         """Opens BT device instance given its name and returns it"""
         if name is None:
-            name = cls.device_name
+            name = cls.DEVICE_NAME
         addrs = cls.list_addrs(name)
         if not addrs:
             log.error('not found')

@@ -18,7 +18,7 @@ log = logging.getLogger('DEV')
 
 class FnirsiUsbDevice(HIDMixin, Device):
     """USB HID adapter for FNIRSI USB testers"""
-    device_vid = 0x2e3c
+    DEVICE_VID = 0x2e3c
 
     CMD_INIT  = [0xaa, 0x81] + [0] * 61 + [0x8e]
     CMD_START = [0xaa, 0x82] + [0] * 61 + [0x96]
@@ -103,12 +103,12 @@ class FnirsiUsbDevice(HIDMixin, Device):
         self.dev = None
 
 class FNB48pUsb(FnirsiUsbDevice):
-    device_pid = 0x0049
-    model_name = 'FNB48P'
+    DEVICE_PID = 0x0049
+    MODEL_NAME = 'FNB48P'
 
 class FNB58Usb(FnirsiUsbDevice):
-    device_pid = 0x5558
-    model_name = 'FNB58'
+    DEVICE_PID = 0x5558
+    MODEL_NAME = 'FNB58'
 
 
 class FnirsiBtDevice(BTMixin, Device):
@@ -210,12 +210,12 @@ class FnirsiBtDevice(BTMixin, Device):
         self.dev = None
 
 class FNB48pBt(FnirsiBtDevice):
-    model_name = 'FNB48P'
-    device_name = 'FNB48*'
+    MODEL_NAME = 'FNB48P'
+    DEVICE_NAME = 'FNB48*'
 
 class FNB58Bt(FnirsiBtDevice):
-    model_name = 'FNB58'
-    device_name = 'FNB58*'
+    MODEL_NAME = 'FNB58'
+    DEVICE_NAME = 'FNB58*'
 
 
 if __name__ == '__main__':

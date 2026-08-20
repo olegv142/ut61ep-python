@@ -164,8 +164,8 @@ class UTDevice(Device):
 
 class UTUsbDevice(HIDMixin, UTDevice):
     """USB HID adapter (D-09A) interface class"""
-    device_vid = 0x1a86
-    device_pid = 0xe429
+    DEVICE_VID = 0x1a86
+    DEVICE_PID = 0xe429
     IDLE_DELAY = .1
 
     def __init__(self, dev, path):
@@ -265,18 +265,18 @@ class UTBtDevice(BTMixin, UTDevice):
         self.dev = None
 
 class UT61XpUsbDevice(UTUsbDevice):
-    model_name = 'UT61X+'
+    MODEL_NAME = 'UT61X+'
 
 class UT61XpBtDevice(UTBtDevice):
-    model_name = 'UT61X+'
-    device_name = 'UT-D07B'
+    MODEL_NAME = 'UT61X+'
+    DEVICE_NAME = 'UT-D07B'
 
 class UT60BTDevice(UTBtDevice):
     """
     UT60BT specific stuff.
     It uses the same protocol with minor particularities related to ranges.
     """
-    model_name = device_name = 'UT60BT'
+    MODEL_NAME = DEVICE_NAME = 'UT60BT'
 
     @staticmethod
     def get_range_offset(mode):
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     try:
         if len(sys.argv) > 1:
             name = sys.argv[1]
-            dev_type = UT60BTDevice if name == UT60BTDevice.device_name else UT61XpBtDevice
+            dev_type = UT60BTDevice if name == UT60BTDevice.DEVICE_NAME else UT61XpBtDevice
             dev = dev_type.open(name)
         else:
             dev = UT61XpUsbDevice.open()

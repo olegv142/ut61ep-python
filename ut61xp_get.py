@@ -206,10 +206,10 @@ class Plotter:
 
 def _device_type(is_bt, model=None):
     for T in _supported_devices:
-        if is_bt == T.isBT:
+        if is_bt == T.IsBT:
             if model is None:
                 return T
-            elif model == T.model_name:
+            elif model == T.MODEL_NAME:
                 return T
     return None
 
@@ -222,7 +222,7 @@ def device_type(args):
     T = _device_type(args.bt)
     assert T is not None
     log.warning('model %s is not supported in %s mode, using default %s',
-            args.model, 'BT' if args.bt else 'USB', T.model_name
+            args.model, 'BT' if args.bt else 'USB', T.MODEL_NAME
         )
     return T
 
@@ -230,16 +230,16 @@ def open_device(args):
     """Open USB or BT device"""
     T = device_type(args)
     if args.path:
-        dev = T.open_addr(args.path) if T.isBT else T.open_path(args.path)
+        dev = T.open_addr(args.path) if T.IsBT else T.open_path(args.path)
     else:
-        dev = T.open(args.name) if T.isBT else T.open(args.VID, args.PID)
+        dev = T.open(args.name) if T.IsBT else T.open(args.VID, args.PID)
     if dev:
-        log.info('%s %s at %s', 'open' if args.path else 'found', dev.model_name, dev.path)
+        log.info('%s %s at %s', 'open' if args.path else 'found', dev.MODEL_NAME, dev.path)
     return dev
 
 def do_list(args):
     T = device_type(args)
-    if not T.isBT:
+    if not T.IsBT:
         for path in T.list_paths(args.VID, args.PID):
             print(path)
     else:
@@ -288,7 +288,7 @@ def get_fname(dev, fname, dt):
     if not fname:
         return None
     if '$' in fname:
-        fname = fname.replace('${MODEL}', dev.model_name)
+        fname = fname.replace('${MODEL}', dev.MODEL_NAME)
     if '%' in fname:
         fname = dt.strftime(fname)
     dirname = os.path.dirname(fname)
@@ -557,7 +557,7 @@ def main_impl(argv=None):
     parser.add_argument('-B', '--bt', action='store_true',
             help='use Bluetooth for communicating with device')
     parser.add_argument('-M', '--model', type=str, required=False, metavar='NAME', default=None,
-            help='device model (optional, default is %s)' % (UTDevice.model_name))
+            help='device model (optional, default is %s)' % (UTDevice.MODEL_NAME))
     parser.add_argument('--name', type=str, required=False, default=None,
             help='set Bluetooth adapter name (optional)')
     parser.add_argument('--exit-prompt', action='store_true',
