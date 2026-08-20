@@ -234,7 +234,7 @@ def open_device(args):
     else:
         dev = T.open(args.name) if T.IsBT else T.open(args.VID, args.PID)
     if dev:
-        log.info('%s %s at %s', 'open' if args.path else 'found', dev.MODEL_NAME, dev.path)
+        log.info('%s %s at %s', dev, 'open' if args.path else 'found', dev.path)
     return dev
 
 def do_list(args):
@@ -255,7 +255,7 @@ def do_once(args):
     try:
         data = dev.query_raw(args.tout)
         if not data:
-            log.error('\nno data')
+            log.error('\n%s returns no data', dev)
             return -1
         print(dev.get_value(data))
         return 0
@@ -340,7 +340,7 @@ def do_data(args):
             data = dev.query_raw(args.tout, sleep_fn)
             if not data:
                 if not dev.is_connected():
-                    log.error('\ndisconnected')
+                    log.error('\n%s disconnected', dev)
                     return -1
                 if fname and args.progress:
                     print('~', end='', file=sys.stderr, flush=True)
@@ -348,7 +348,7 @@ def do_data(args):
                     return 0
                 errs_left -= 1
                 if errs_left <= 0:
-                    log.error('\nno data')
+                    log.error('\n%s returns no data', dev)
                     return -1
                 continue
             errs_left = errs_max
