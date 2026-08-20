@@ -352,3 +352,29 @@ if dev := FNB58Usb.open():
                 break
 ```
 To communicate with FNB58 via Bluetooth one can just replace FNB58Usb -> FNB58Bt.
+
+The next code example illustrates reading data from several devices simultaneously.
+```
+from ut61xpy.adapters.aneng import AnengBtDevice
+from ut61xpy.adapters.owon  import OwonBtDevice
+
+adev = AnengBtDevice.open()
+odev = OwonBtDevice.open()
+if adev and odev:
+    adev.init()
+    odev.init()
+    while adev.is_connected() and odev.is_connected():
+        adata = adev.query_raw()
+        odata = odev.query_raw()
+        if adata and odata:
+            print('%f %s\t| %f %s' % (
+                adev.get_value(adata), adev.get_mode(adata),
+                odev.get_value(odata), odev.get_mode(odata)
+            ))
+        else:
+            break
+if adev:
+    adev.close()
+if odev:
+    odev.close()
+```
