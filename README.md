@@ -358,23 +358,22 @@ The next code example illustrates reading data from several devices simultaneous
 from ut61xpy.adapters.aneng import AnengBtDevice
 from ut61xpy.adapters.owon  import OwonBtDevice
 
-adev = AnengBtDevice.open()
-odev = OwonBtDevice.open()
-if adev and odev:
-    adev.init()
-    odev.init()
-    while adev.is_connected() and odev.is_connected():
-        adata = adev.query_raw()
-        odata = odev.query_raw()
-        if adata and odata:
+devs = (AnengBtDevice.open(), OwonBtDevice.open())
+
+if all(devs):
+    for d in devs:
+        d.init()
+    while all(d.is_connected() for d in devs):
+        data = [d.query_raw() for d in devs]
+        if all(data):
             print('%f %s\t| %f %s' % (
-                adev.get_value(adata), adev.get_mode(adata),
-                odev.get_value(odata), odev.get_mode(odata)
+                devs[0].get_value(data[0]), devs[0].get_mode(data[0]),
+                devs[1].get_value(data[1]), devs[1].get_mode(data[1])
             ))
         else:
             break
-if adev:
-    adev.close()
-if odev:
-    odev.close()
+
+for d in devs:
+    if d:
+        d.close()
 ```
