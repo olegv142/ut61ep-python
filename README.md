@@ -17,7 +17,7 @@ The project was started as robust and simple tool for reading data from UNI-T UT
 
 ### UNI-T multimeters
 - The UNI-T UT61E+ is high precision low cost digital multimeter with optically isolated USB interface which makes it perfect choice for hobbyist and professionals on tight budget.
-The tool works via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel at the expense of the lower communication speed. The minimum data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter.
+The tool works via USB HID adapter D-09A commonly supplied with UT61X+ multimeter. Alternatively one can use UT-D07B Bluetooth adapter which provides the wireless communication channel. However its relatively expensive and very slow. The minimum achievable data readout interval is around 180 msec for USB adapter and around 800 msec for Bluetooth adapter. The latter works especially bad in dual AC+DC mode.
 - The UT61B/D+ models are lower cost 6000 count versions sharing the same excellent DC voltage measuring accuracy of 10µV and having some additional features like thermocouple measuring (UT61D+).
 - The UT60BT is inexpensive consumer grade 10000 counts multimeter with built-in BT adapter using the same protocol as UT61X+ devices. It has even better resolution than UT61X+ of 1pF in capacitance mode and 1µV in millivolt mode. Unfortunately, this latter advantage is offset by an annoying hack. To hide fluctuations in readings, the device uses a dead band from -10 µV to +10 µV, where the voltage is always read as zero. Similar dead band exists in A mode between -5mA and +5mA in both UT60BT and UT61X+.
 
