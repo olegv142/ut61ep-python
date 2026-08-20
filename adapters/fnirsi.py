@@ -16,7 +16,7 @@ from device import Device, HIDMixin, BTMixin
 
 log = logging.getLogger('DEV')
 
-class FnirsiUSBDevice(HIDMixin, Device):
+class FnirsiUsbDevice(HIDMixin, Device):
     """USB HID adapter for FNIRSI USB testers"""
     device_vid = 0x2e3c
 
@@ -27,6 +27,10 @@ class FnirsiUSBDevice(HIDMixin, Device):
     CMD_INTERVAL = 0.05
     IDLE_DELAY   = 0.05
     DEF_TOUT     = 4  # default timeout in seconds
+
+    # Channel names for convenience
+    current_channel = 0
+    voltage_channel = 1
 
     def __init__(self, dev, path):
         Device.__init__(self, path)
@@ -98,11 +102,11 @@ class FnirsiUSBDevice(HIDMixin, Device):
         self.dev.close()
         self.dev = None
 
-class FNB48pUsb(FnirsiUSBDevice):
+class FNB48pUsb(FnirsiUsbDevice):
     device_pid = 0x0049
     model_name = 'FNB48P'
 
-class FNB58Usb(FnirsiUSBDevice):
+class FNB58Usb(FnirsiUsbDevice):
     device_pid = 0x5558
     model_name = 'FNB58'
 
@@ -115,6 +119,10 @@ class FnirsiBtDevice(BTMixin, Device):
     CMD_START  = [0xaa, 0x82, 0, 0xa7]
     IDLE_DELAY = .1
     DEF_TOUT   = 4  # default timeout in seconds
+
+    # Channel names for convenience
+    current_channel = 0
+    voltage_channel = 1
 
     def __init__(self, dev, addr):
         Device.__init__(self, addr)

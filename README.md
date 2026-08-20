@@ -301,7 +301,7 @@ if dev := OwonBtDevice.open():
                 break
 ```
 
-If you know the Bluetooth device mac address you can open it faster without scanning. It will also work if you have several multimeters. The following code will read Aaneng AN9002 or compatible ZOTEK/BSIDE ZT-300AB with particular address.
+If you know the Bluetooth device mac address, you can open it faster without scanning. It will also work if you have several multimeters. The following code will read Aaneng AN9002 or compatible ZOTEK/BSIDE ZT-300AB with particular address.
 ```
 from ut61xpy.adapters.aneng import AnengBtDevice
 
@@ -334,3 +334,21 @@ if dev := SCPIPowerSource.open():
         dev._send(b'OUTPut 0')
 ```
 Note that there are also VOLTage:LIMit and CURRent:LIMit parameters. If any of them is exceeded the OWON power source switches off its output showing warning on the screen. The error is cleared by switching output off either by OUTPut command or by button on the front panel. Therefore, if you need just current limiting, then take care to always have VOLTage:LIMit > VOLTage and CURRent:LIMit > CURRent.
+
+Similarly you can read voltage and current from FNIRSI USB tester with the following code:
+```
+from ut61xpy.adapters.fnirsi import FNB58Usb
+
+if dev := FNB58Usb.open():
+    with dev:
+        dev.init(2)
+        while dev.is_connected():
+            if data := dev.query_raw():
+                print('%.4f%s\t%.4f%s' % (
+                    dev.get_value(data, dev.voltage_channel), dev.get_mode(data, dev.voltage_channel),
+                    dev.get_value(data, dev.current_channel), dev.get_mode(data, dev.current_channel)
+                ))
+            else:
+                break
+```
+To communicate with FNB58 via Bluetooth one can just replace FNB58Usb -> FNB58Bt.
