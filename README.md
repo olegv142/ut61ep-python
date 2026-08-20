@@ -329,8 +329,8 @@ if dev := SCPIPowerSource.open():
         dev._send(b'OUTPut 1')
         time.sleep(2)
         if data := dev.query_raw():
-            print(dev.get_mode(data, dev.current_channel), ':', dev.get_value(data, dev.current_channel))
-            print(dev.get_mode(data, dev.voltage_channel), ':', dev.get_value(data, dev.voltage_channel))
+            print(dev.get_mode(data, dev.CURR_CHAN), ':', dev.get_value(data, dev.CURR_CHAN))
+            print(dev.get_mode(data, dev.VOLT_CHAN), ':', dev.get_value(data, dev.VOLT_CHAN))
         dev._send(b'OUTPut 0')
 ```
 Note that there are also VOLTage:LIMit and CURRent:LIMit parameters. If any of them is exceeded the OWON power source switches off its output showing warning on the screen. The error is cleared by switching output off either by OUTPut command or by button on the front panel. Therefore, if you need just current limiting, then take care to always have VOLTage:LIMit > VOLTage and CURRent:LIMit > CURRent.
@@ -345,8 +345,8 @@ if dev := FNB58Usb.open():
         while dev.is_connected():
             if data := dev.query_raw():
                 print('%.4f%s\t%.4f%s' % (
-                    dev.get_value(data, dev.voltage_channel), dev.get_mode(data, dev.voltage_channel),
-                    dev.get_value(data, dev.current_channel), dev.get_mode(data, dev.current_channel)
+                    dev.get_value(data, dev.VOLT_CHAN), dev.get_mode(data, dev.VOLT_CHAN),
+                    dev.get_value(data, dev.CURR_CHAN), dev.get_mode(data, dev.CURR_CHAN)
                 ))
             else:
                 break

@@ -29,8 +29,8 @@ class FnirsiUsbDevice(HIDMixin, Device):
     DEF_TOUT     = 4  # default timeout in seconds
 
     # Channel names for convenience
-    current_channel = 0
-    voltage_channel = 1
+    CURR_CHAN = 0
+    VOLT_CHAN = 1
 
     def __init__(self, dev, path):
         Device.__init__(self, path)
@@ -121,8 +121,8 @@ class FnirsiBtDevice(BTMixin, Device):
     DEF_TOUT   = 4  # default timeout in seconds
 
     # Channel names for convenience
-    current_channel = 0
-    voltage_channel = 1
+    CURR_CHAN = 0
+    VOLT_CHAN = 1
 
     def __init__(self, dev, addr):
         Device.__init__(self, addr)
