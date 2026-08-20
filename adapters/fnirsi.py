@@ -186,13 +186,13 @@ class FnirsiBtDevice(BTMixin, Device):
         if not self.dev.is_connected:
             return None
         wait = tout if tout is not None else self.DEF_TOUT
-        self.last_data = None
         while self.last_data is None and wait >= 0:
             idle_sleep(self.IDLE_DELAY)
             wait -= self.IDLE_DELAY
         if not self.last_data:
             return None
-        return self.last_data
+        data, self.last_data = self.last_data, None
+        return data
 
     def get_value(self, data, channel=0):        
         """Converts raw data to the floating point value"""

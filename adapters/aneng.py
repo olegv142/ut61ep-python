@@ -92,13 +92,13 @@ class AnengBtDevice(BTMixin, Device):
         if not self.dev.is_connected:
             return None
         wait = tout if tout is not None else self.DEF_TOUT
-        self.last_data = None
         while self.last_data is None and wait >= 0:
             idle_sleep(self.IDLE_DELAY)
             wait -= self.IDLE_DELAY
         if not self.last_data:
             return None
-        data = [self.last_data[i] ^ self.XOR_KEY[i] for i in range(self.DATA_LEN)]
+        data, self.last_data = self.last_data, None
+        data = [data[i] ^ self.XOR_KEY[i] for i in range(self.DATA_LEN)]
         if data[:3] != self.DATA_PREFIX:
             log.debug('bad prefix: %s', data)
         return data[3:]
