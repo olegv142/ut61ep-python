@@ -81,7 +81,7 @@ class UTDevice(Device):
         except ValueError:
             return float('nan')
         # Apply range multiplier
-        mode, range = data[0], data[1] - ord('0')
+        mode, rng = data[0], data[1] - ord('0')
         # There are 3 positions of the decimal place on display.
         # Every time the range value is incremented the decimal place
         # either moves to the right or jumps back to the leftmost
@@ -95,7 +95,7 @@ class UTDevice(Device):
         val *= self.get_scale(mode)
         off = self.get_range_offset(mode)
         if off is not None:
-            val *= 10 ** (3*((range + off) // 3))
+            val *= 10 ** (3*((rng + off) // 3))
         return val
 
     def get_channel(self, data):
