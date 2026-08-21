@@ -199,19 +199,20 @@ Working with Bluetooth adapter conceptually is not different from using USB. Jus
 
 By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target device. To change this, one should use *-M/--model* option. In case device works via Bluetooth, the *-B* option must be provided with *-M/--model* option. Both options should be specified right after **ut61xp-get** in the command line. The required options for the particular model family are listed in the following table. The last column of the table shows corresponding model label used in **ut61xp-start** GUI frontend application, see [Working with GUI](#working-with-gui).
 
-| Model family                                 | Command line options  | Model label in **ut61xp-start** UI |
-|----------------------------------------------|-----------------------|-------------------------------|
-| UT61B/D/E+                                   | -M UT61X+             | UT61X+ USB                    |
-| UT61B/D/E+ with UT-D07B Bluetooth adapter    | -M UT61X+ -B          | UT61X+ BT                     |
-| UT60BT                                       | -M UT60BT -B          | UT60BT BT                     |
-| OWON Bluetooth multimeter                    | -M OWON -B            | OWON BT                       |
-| ANENG / ZOTEK / BSIDE Bluetooth multimeter   | -M ANENG -B           | ANENG BT                      |
-| OWON desktop multimeter with USB port        | -M SCPI-DMM           | SCPI-DMM USB                  |
-| OWON programmable power supply with USB port | -M SCPI-CV            | SCPI-CV USB                   |
-| FNIRSI FNB48P USB tester via USB connection  | -M FNB48P             | FNB48P USB                    |
-| FNIRSI FNB48P USB tester via Bluetooth       | -M FNB48P -B          | FNB48P BT                     |
-| FNIRSI FNB58 USB tester via USB connection   | -M FNB58              | FNB58 USB                     |
-| FNIRSI FNB58 USB tester via Bluetooth        | -M FNB58 -B           | FNB58 BT                      |
+| Vendor  | Model family                                 | Command line options  | Model label in **ut61xp-start** UI |
+|---------|----------------------------------------------|-----------------------|------------------------------------|
+| UNI-T   | UT61B/D/E+                                   | -M UT61X+             | UT61X+ USB                         |
+|         | UT61B/D/E+ with UT-D07B Bluetooth adapter    | -M UT61X+ -B          | UT61X+ BT                          |
+|         | UT60BT                                       | -M UT60BT -B          | UT60BT BT                          |
+| OWON    | Bluetooth multimeters                        | -M OWON -B            | OWON BT                            |
+|         | Desktop multimeters with USB port            | -M SCPI-DMM           | SCPI-DMM USB                       |
+|         | Programmable power supply with USB port      | -M SCPI-CV            | SCPI-CV USB                        |
+| ANENG   | AN9002 bluetooth multimeter                  | -M ANENG -B           | ANENG BT                           |
+| ZOTEK/BSIDE | ZT-300AB bluetooth multimeter            |                       |                                    |
+| FNIRSI  | FNB48P USB tester via USB connection         | -M FNB48P             | FNB48P USB                         |
+|         | FNB48P USB tester via Bluetooth              | -M FNB48P -B          | FNB48P BT                          |
+|         | FNB58 USB tester via USB connection          | -M FNB58              | FNB58 USB                          |
+|         | FNB58 USB tester via Bluetooth               | -M FNB58 -B           | FNB58 BT                           |
 
 # Working with GUI
 The GUI workflow is built around **ut61xp-start** script that provides convenient UI for setting **ut61xp-get** options and launching data acquisition in separate processes. The single instance of **ut61xp-start** UI can launch any number of data acquisition processes working in parallel, saving data to separate files and showing collected data in their own data plot windows. The following figure illustrates using data acquisition GUI reading data from 3 multimeters simultaneously on Raspberry Pi5.
