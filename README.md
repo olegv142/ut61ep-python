@@ -207,8 +207,8 @@ By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target 
 | OWON    | Bluetooth multimeters                        | -M OWON -B            | OWON BT                            |
 |         | Desktop multimeters with USB port            | -M SCPI-DMM           | SCPI-DMM USB                       |
 |         | Programmable power supply with USB port      | -M SCPI-CV            | SCPI-CV USB                        |
-| ANENG   | AN9002 bluetooth multimeter                  | -M ANENG -B           | ANENG BT                           |
-| ZOTEK/BSIDE | ZT-300AB bluetooth multimeter            | -M ANENG -B           | ANENG BT                           |
+| ANENG   | AN9002 Bluetooth multimeter                  | -M ANENG -B           | ANENG BT                           |
+| ZOTEK/BSIDE | ZT-300AB Bluetooth multimeter            | -M ANENG -B           | ANENG BT                           |
 | FNIRSI  | FNB48P USB tester via USB connection         | -M FNB48P             | FNB48P USB                         |
 |         | FNB48P USB tester via Bluetooth              | -M FNB48P -B          | FNB48P BT                          |
 |         | FNB58 USB tester via USB connection          | -M FNB58              | FNB58 USB                          |
