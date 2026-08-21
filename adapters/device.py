@@ -4,7 +4,10 @@ Device adapters abstract base classes
 
 import os
 import sys
+import time
 import logging
+from typing import Any
+from collections.abc import Callable
 from abc import ABC, abstractmethod
 
 if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
@@ -31,30 +34,30 @@ class Device(ABC):
     """Base class for all device adapters"""
 
     # The following property should be redefined in subclasses
-    MODEL_NAME = None
+    MODEL_NAME: str = None
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path = path
 
-    def get_model(self):
+    def get_model(self) -> str:
         """The implementation may redefine this method to return actual model name"""
         return self.MODEL_NAME
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
         """Subclasses may redefine this method to indicate disconnection"""
         return True
 
-    def init(self, nchannels=1):
+    def init(self, nchannels: int = 1):
         """
         Initialize device setting the number of channels we are going to read.
         Should be called before the first query_raw call.
         """
 
     @abstractmethod
-    def query_raw(self, tout, idle_sleep):
-        """Reads raw data packet from device and returns it"""
+    def query_raw(self, tout: float|None, idle_sleep: Callable[[float], None] = time.sleep) -> Any|None:
+        """Reads raw data packet from device and returns it. Returns None to indicate failure."""
 
-    def get_channels(self, data):
+    def get_channels(self, data: Any) -> int:
         """
         Get the number of channels contained in the raw data. In there there are more than 1 channel
         its index should be passed explicitly to get_value and get_mode method. Otherwise
@@ -62,7 +65,7 @@ class Device(ABC):
         """
         return 1
 
-    def get_channel(self, data):
+    def get_channel(self, data: Any) -> int:
         """
         The UT61E+ can measure DC and AC voltage alternately in DC voltage dial position.
         This function returns 1 in such mode (25) if the data belongs to the alternative
@@ -71,16 +74,19 @@ class Device(ABC):
         return 0
 
     @abstractmethod
-    def get_value(self, data, channel=None):
+    def get_value(self, data: Any, channel: int|None = None) -> float:
         """
         Converts raw data to the floating point value. Here we don't
         care about units since the caller should be aware of them.
         It set mode dial manually after all. So in the mV mode the
-        result is expressed in mV rather than volts.
+        result is expressed in mV rather than volts. The method may
+        return float('nan') to indicate failure to extract valid
+        value from the raw data. In particular it returns NaN if DMM
+        is overloaded.
         """
 
     @abstractmethod
-    def get_mode(self, data, channel=None):
+    def get_mode(self, data: Any, channel: int|None = None) -> str:
         """Returns measurement mode and units description string"""
 
     @abstractmethod
@@ -97,22 +103,22 @@ class Device(ABC):
 
 class USBMixin(ABC):
     """Methods specific for USB devices"""
-    IsBT = False
-    # The following properties should be redefined in subclasses
-    DEVICE_VID = None
-    DEVICE_PID = None
+    IsBT: bool = False
+    # Default VID, PID should be defined in subclasses
+    DEVICE_VID: int = None
+    DEVICE_PID: int = None
 
     @abstractmethod
-    def __init__(self, dev, path):
+    def __init__(self, dev: Any, path: str):
         """Constructor, called by open_path"""
 
     @classmethod
     @abstractmethod
-    def list_paths(cls, vid=None, pid=None):
+    def list_paths(cls, vid: int|None = None, pid: int|None = None) -> list[str]:
         """Returns the list of USB device paths"""
 
     @classmethod
-    def open_path(cls, path):
+    def open_path(cls, path: str) -> Any:
         """Opens device given the path"""
         dev = cls._open_path(path)
         if dev is None:
@@ -121,11 +127,11 @@ class USBMixin(ABC):
 
     @classmethod
     @abstractmethod
-    def _open_path(cls, path):
+    def _open_path(cls, path: str) -> Any:
         """Opens device given the path and returns it"""
 
     @classmethod
-    def open(cls, vid=None, pid=None):
+    def open(cls, vid: int|None = None, pid: int|None = None) -> Any:
         """Opens device instance given its VID, PID and returns it"""
         if vid is None:
             vid = cls.DEVICE_VID
@@ -140,13 +146,13 @@ class USBMixin(ABC):
             return None
         return cls.open_path(paths[0])
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '[' + self.MODEL_NAME + ' USB]'
 
 class HIDMixin(USBMixin):
     """Methods specific for USB HID devices"""
     @classmethod
-    def list_paths(cls, vid=None, pid=None):
+    def list_paths(cls, vid: int|None = None, pid: int|None = None) -> list[str]:
         """Returns the list of HID device paths"""
         import_hid()
         if vid is None:
@@ -156,7 +162,7 @@ class HIDMixin(USBMixin):
         return [dev['path'].decode('ascii') for dev in hid.enumerate(vid, pid)]
 
     @classmethod
-    def _open_path(cls, path):
+    def _open_path(cls, path: str) -> 'hid.device'|None:
         """Opens hid device given the path and returns it"""
         import_hid()
         if isinstance(path, str):
@@ -173,11 +179,11 @@ class HIDMixin(USBMixin):
 class CDCMixin(USBMixin):
     """Methods specific for USB CDC devices"""
     # The following properties may be redefined in subclasses
-    BAUD_RATE = 115200
-    WRITE_TIMEOUT = .1
+    BAUD_RATE: int = 115200
+    WRITE_TIMEOUT: float = .1
 
     @classmethod
-    def list_paths(cls, vid=None, pid=None):
+    def list_paths(cls, vid: int|None = None, pid: int|None = None) -> list[str]:
         """Returns the list of CDC device paths"""
         from serial.tools.list_ports import comports
         if vid is None:
@@ -187,7 +193,7 @@ class CDCMixin(USBMixin):
         return [port.device for port in comports() if port.vid == vid and port.pid == pid]
 
     @classmethod
-    def _open_path(cls, path):
+    def _open_path(cls, path: str) -> 'serial.Serial'|None:
         """Opens CDC device given the path and returns it"""
         import serial
         try:
@@ -198,12 +204,12 @@ class CDCMixin(USBMixin):
 
 class BTMixin(ABC):
     """Methods specific for BT devices"""
-    IsBT = True
-    # The following property should be redefined in subclasses
-    DEVICE_NAME = None
+    IsBT: bool = True
+    # Default BT device name should be defined in subclasses
+    DEVICE_NAME: str = None
 
     @classmethod
-    def list_addrs(cls, name=None):
+    def list_addrs(cls, name: str|None = None) -> list[str]:
         """Returns the list of BT device addresses"""
         if name is None:
             name = cls.DEVICE_NAME
@@ -211,11 +217,11 @@ class BTMixin(ABC):
 
     @classmethod
     @abstractmethod
-    def open_addr(cls, addr):
+    def open_addr(cls, addr: str) -> Any:
         """Opens BT device instance given its mac address and returns it"""
 
     @classmethod
-    def open(cls, name=None):
+    def open(cls, name: str|None = None) -> Any:
         """Opens BT device instance given its name and returns it"""
         if name is None:
             name = cls.DEVICE_NAME
@@ -228,5 +234,5 @@ class BTMixin(ABC):
             return None
         return cls.open_addr(addrs[0])
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '[' + self.MODEL_NAME + ' BT]'
