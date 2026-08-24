@@ -8,7 +8,6 @@ import time
 import logging
 from typing import Any
 from collections.abc import Callable
-from abc import ABC, abstractmethod
 
 if __package__: sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 
@@ -30,7 +29,7 @@ def import_hid():
     except ModuleNotFoundError:
         import hidapi as hid
 
-class Device(ABC):
+class Device:
     """Base class for all device adapters"""
 
     # The following property should be redefined in subclasses
@@ -53,9 +52,9 @@ class Device(ABC):
         Should be called before the first query_raw call.
         """
 
-    @abstractmethod
     def query_raw(self, tout: float|None, idle_sleep: Callable[[float], None] = time.sleep) -> Any|None:
         """Reads raw data packet from device and returns it. Returns None to indicate failure."""
+        raise NotImplementedError()
 
     def get_channels(self, data: Any) -> int:
         """
@@ -73,7 +72,6 @@ class Device(ABC):
         """
         return 0
 
-    @abstractmethod
     def get_value(self, data: Any, channel: int|None = None) -> float:
         """
         Converts raw data to the floating point value. Here we don't
@@ -84,14 +82,15 @@ class Device(ABC):
         value from the raw data. In particular it returns NaN if DMM
         is overloaded.
         """
+        raise NotImplementedError()
 
-    @abstractmethod
     def get_mode(self, data: Any, channel: int|None = None) -> str:
         """Returns measurement mode and units description string"""
+        raise NotImplementedError()
 
-    @abstractmethod
     def close(self):
         """Closes device"""
+        raise NotImplementedError()
 
     def __enter__(self):
         """Context manager protocol support"""
@@ -101,21 +100,21 @@ class Device(ABC):
         """Closes device on exiting 'with' block"""
         self.close()
 
-class USBMixin(ABC):
+class USBMixin:
     """Methods specific for USB devices"""
     IsBT: bool = False
     # Default VID, PID should be defined in subclasses
     DEVICE_VID: int = None
     DEVICE_PID: int = None
 
-    @abstractmethod
     def __init__(self, dev: Any, path: str):
         """Constructor, called by open_path"""
+        raise NotImplementedError()
 
     @classmethod
-    @abstractmethod
     def list_paths(cls, vid: int|None = None, pid: int|None = None) -> list[str]:
         """Returns the list of USB device paths"""
+        raise NotImplementedError()
 
     @classmethod
     def open_path(cls, path: str) -> Any:
@@ -126,9 +125,9 @@ class USBMixin(ABC):
         return cls(dev, path)
 
     @classmethod
-    @abstractmethod
     def _open_path(cls, path: str) -> Any:
         """Opens device given the path and returns it"""
+        raise NotImplementedError()
 
     @classmethod
     def open(cls, vid: int|None = None, pid: int|None = None) -> Any:
@@ -202,7 +201,7 @@ class CDCMixin(USBMixin):
             log.error('failed to open %s USB CDC device %s', cls.MODEL_NAME, path)
             return None
 
-class BTMixin(ABC):
+class BTMixin:
     """Methods specific for BT devices"""
     IsBT: bool = True
     # Default BT device name should be defined in subclasses
@@ -216,9 +215,9 @@ class BTMixin(ABC):
         return bt_engine.list_addrs(name)
 
     @classmethod
-    @abstractmethod
     def open_addr(cls, addr: str) -> Any:
         """Opens BT device instance given its mac address and returns it"""
+        raise NotImplementedError()
 
     @classmethod
     def open(cls, name: str|None = None) -> Any:
