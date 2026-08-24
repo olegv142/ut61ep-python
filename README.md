@@ -325,14 +325,14 @@ from ut61xpy.adapters.scpi import SCPIPowerSource
 if dev := SCPIPowerSource.open():
     with dev:
         dev.init(2)
-        dev._send(b'VOLTage 10')
-        dev._send(b'CURRent 1')
-        dev._send(b'OUTPut 1')
+        dev.scpi_send(b'VOLTage 10')
+        dev.scpi_send(b'CURRent 1')
+        dev.scpi_send(b'OUTPut 1')
         time.sleep(2)
         if data := dev.query_raw():
             print(dev.get_mode(data, dev.CURR_CHAN), ':', dev.get_value(data, dev.CURR_CHAN))
             print(dev.get_mode(data, dev.VOLT_CHAN), ':', dev.get_value(data, dev.VOLT_CHAN))
-        dev._send(b'OUTPut 0')
+        dev.scpi_send(b'OUTPut 0')
 ```
 Note that there are also VOLTage:LIMit and CURRent:LIMit parameters. If any of them is exceeded the OWON power source switches off its output showing warning on the screen. The error is cleared by switching output off either by OUTPut command or by button on the front panel. Therefore, if you need just current limiting, then take care to always have VOLTage:LIMit > VOLTage and CURRent:LIMit > CURRent.
 

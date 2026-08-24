@@ -1,6 +1,7 @@
 """
 Adapters communicating with device by SCPI commands.
-Tested with OWON multimeters and programmable power supplies.
+Currently tested only with OWON multimeters and programmable
+power supplies.
 """
 
 import os
@@ -28,7 +29,7 @@ class SCPIDevice(CDCMixin, Device):
         """The implementation may redefine this method to return actual model name"""
         if self.model:
             return self.model
-        if resp := self._call(b'*IDN?'):
+        if resp := self.scpi_call(b'*IDN?'):
             self.model = b' '.join(resp.split(b',')[:2]).decode('ascii')
             return self.model
         else:
@@ -38,10 +39,10 @@ class SCPIDevice(CDCMixin, Device):
     def is_connected(self):
         return self.dev and not self.disconnected
 
-    def _send(self, cmd):
+    def scpi_send(self, cmd):
         self.dev.write(cmd + b'\r')
 
-    def _receive(self, tout=None, idle_sleep=time.sleep):
+    def scpi_receive(self, tout=None, idle_sleep=time.sleep):
         wait = tout if tout is not None else self.DEF_READ_TOUT
         wait_step = 0.01
         resp = bytes()
@@ -54,10 +55,10 @@ class SCPIDevice(CDCMixin, Device):
             if wait <= 0:
                 return None
 
-    def _call(self, cmd, tout=None, idle_sleep=time.sleep):
+    def scpi_call(self, cmd, tout=None, idle_sleep=time.sleep):
         try:
-            self._send(cmd)
-            return self._receive(tout, idle_sleep)
+            self.scpi_send(cmd)
+            return self.scpi_receive(tout, idle_sleep)
         except Exception as e:
             self.disconnected = True
             log.debug(e)
@@ -92,17 +93,17 @@ class SCPIDmm(SCPIDevice):
         """
         assert nchannels in (1, 2)
         self.channels = nchannels
-        funcs = [self._call(b'FUNC%d?' % (i+1)) for i in range(nchannels)]
+        funcs = [self.scpi_call(b'FUNC%d?' % (i+1)) for i in range(nchannels)]
         self.modes = [f.decode('ascii') if f and f != self.NO_VALUE else self.DEF_MODE for f in funcs]
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data from device"""
-        resp = self._call(b'MEAS?', tout, idle_sleep)
+        resp = self.scpi_call(b'MEAS?', tout, idle_sleep)
         if not resp:
             return None
         vals = resp.split(b',')
         if len(vals) < self.channels:
-            if val2 := self._call(b'MEAS2?', tout, idle_sleep):
+            if val2 := self.scpi_call(b'MEAS2?', tout, idle_sleep):
                 vals.append(val2)
         return vals
 
@@ -146,9 +147,9 @@ class SCPIPowerSource(SCPIDevice):
     def query_raw(self, tout=None, idle_sleep=time.sleep):
         """Queries raw data from device"""
         if self.channels < 2:
-            resp = self._call(b'MEAS:CURR?', tout, idle_sleep)
+            resp = self.scpi_call(b'MEAS:CURR?', tout, idle_sleep)
             return (resp,) if resp else None
-        resp = self._call(b'MEAS:ALL?', tout, idle_sleep)
+        resp = self.scpi_call(b'MEAS:ALL?', tout, idle_sleep)
         if not resp:
             return None
         return tuple(reversed(resp.split(b',')[:2]))
