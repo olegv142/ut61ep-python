@@ -286,8 +286,12 @@ To add new device you should implement its adapter class inherited from *Device*
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
 
 # Integration with your own code
-Just add this project as the sub-module to your source tree and import the necessary device adapter from it.
+Just add this project as the sub-module to your source tree and import the necessary device adapter from it. 
 
+## Code examples
+The code examples below will illustrate techniques that can be used while working with various devices.
+
+### Reading from OWON Bluetooth multimeter
 The following code will read data from OWON Bluetooth multimeter continuously. It will discover the multimeter automatically provided that you have single one nearby.
 ```
 from ut61xpy.adapters.owon import OwonBtDevice
@@ -302,6 +306,7 @@ if dev := OwonBtDevice.open():
                 break
 ```
 
+### Reading from Aneng Bluetooth multimeter with known address
 If you know the Bluetooth device mac address, you can open it faster without scanning. It will also work if you have several multimeters. The following code will read Aaneng AN9002 or compatible ZOTEK/BSIDE ZT-300AB with particular address.
 ```
 from ut61xpy.adapters.aneng import AnengBtDevice
@@ -316,6 +321,27 @@ if dev := AnengBtDevice.open_addr('C4:A9:B8:3A:5B:A2'):
                 break
 ```
 
+### Working with OWON desktop multimeter
+While working with OWON desktop multimeter, you can not only read measured values, but also configure measuring mode and input range. The following code
+will set mode to DC voltage with 5V range and then read samples continuously two times per second. Note that reading with maximum possible rate does not make
+sense in such case. The OWON multimeter does not refresh returned value faster than several times per second even if the sampling rate is much higher on specs.
+```
+import time
+from ut61xpy.adapters.scpi import SCPIDmm
+
+if dev := SCPIDmm.open():
+    with dev:
+        dev.scpi_send(b'CONF:VOLT:DC 5')
+        dev.init()
+        while dev.is_connected():
+            if data := dev.query_raw():
+                print(dev.get_value(data), dev.get_mode(data))
+                time.sleep(.5)
+            else:
+                break
+```
+
+### Working with OWON programmable power source
 While working with OWON programmable power source, you can not only read voltage and current, but also configure the power source output.
 The following code will configure OWON power source, turn on its output, wait 2 seconds, print current and voltage and switch output off.
 ```
@@ -336,6 +362,7 @@ if dev := SCPIPowerSource.open():
 ```
 Note that there are also VOLTage:LIMit and CURRent:LIMit parameters. If any of them is exceeded the OWON power source switches off its output showing warning on the screen. The error is cleared by switching output off either by OUTPut command or by button on the front panel. Therefore, if you need just current limiting, then take care to always have VOLTage:LIMit > VOLTage and CURRent:LIMit > CURRent.
 
+### Reading voltage and current from FNIRSI USB tester
 Similarly, you can read voltage and current from FNIRSI USB tester with the following code:
 ```
 from ut61xpy.adapters.fnirsi import FNB58Usb
@@ -354,7 +381,8 @@ if dev := FNB58Usb.open():
 ```
 To communicate with FNB58 via Bluetooth one can just replace FNB58Usb -> FNB58Bt.
 
-The next code example illustrates reading data from several devices simultaneously.
+### Reading data from several devices simultaneously
+The next code example illustrates reading data from Aneng and OWON Bluetooth multimeters simultaneously.
 ```
 from ut61xpy.adapters.aneng import AnengBtDevice
 from ut61xpy.adapters.owon  import OwonBtDevice
