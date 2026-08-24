@@ -18,6 +18,7 @@ log = logging.getLogger('DEV')
 class SCPIDevice(CDCMixin, Device):
     """Base class for adapters using SCPI commands over CDC link"""
     DEF_READ_TOUT = 1
+    EOL_SYMBOL = b'\n'
 
     def __init__(self, dev, path):
         Device.__init__(self, path)
@@ -40,7 +41,7 @@ class SCPIDevice(CDCMixin, Device):
         return self.dev and not self.disconnected
 
     def scpi_send(self, cmd):
-        self.dev.write(cmd + b'\r')
+        self.dev.write(cmd + self.EOL_SYMBOL)
 
     def scpi_receive(self, tout=None, idle_sleep=time.sleep):
         wait = tout if tout is not None else self.DEF_READ_TOUT
@@ -49,7 +50,7 @@ class SCPIDevice(CDCMixin, Device):
         while True:
             idle_sleep(wait_step)
             resp += self.dev.read(64)
-            if resp and resp[-1:] == b'\n' or resp[-1:] == b'\r':
+            if resp and resp[-1:] == self.EOL_SYMBOL:
                 return resp.strip().strip(b'"')
             wait -= wait_step
             if wait <= 0:
