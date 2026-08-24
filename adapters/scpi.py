@@ -81,6 +81,7 @@ class SCPIDmm(SCPIDevice):
 
     NO_VALUE = b'NONe'
     DEF_MODE = 'DUTY%'
+    OVERLOAD_VAL = 1e9
 
     def __init__(self, dev, path):
         SCPIDevice.__init__(self, dev, path)
@@ -113,9 +114,12 @@ class SCPIDmm(SCPIDevice):
 
     def get_value(self, data, channel=0):
         try:
-            return float(data[channel])
+            val = float(data[channel])
+            if val == self.OVERLOAD_VAL:
+                return Device.INVALID_VALUE
+            return val
         except ValueError:
-            return float('nan')
+            return Device.INVALID_VALUE
 
     def get_mode(self, data, channel=0):
         return self.modes[channel]
@@ -162,7 +166,7 @@ class SCPIPowerSource(SCPIDevice):
         try:
             return float(data[channel])
         except ValueError:
-            return float('nan')
+            return Device.INVALID_VALUE
 
     def get_mode(self, data, channel=0):
         return ('CURR', 'VOLT')[channel]

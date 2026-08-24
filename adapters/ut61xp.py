@@ -79,7 +79,7 @@ class UTDevice(Device):
             space = ord(' ')
             val = float(''.join([chr(d) for d in data[2:9] if d != space]))
         except ValueError:
-            return float('nan')
+            return Device.INVALID_VALUE
         # Apply range multiplier
         mode, rng = data[0], data[1] - ord('0')
         # There are 3 positions of the decimal place on display.

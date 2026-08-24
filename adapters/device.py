@@ -34,6 +34,7 @@ class Device:
 
     # The following property should be redefined in subclasses
     MODEL_NAME: str = None
+    INVALID_VALUE: float = float('nan')
 
     def __init__(self, path: str):
         self.path = path
@@ -78,8 +79,8 @@ class Device:
         care about units since the caller should be aware of them.
         It set mode dial manually after all. So in the mV mode the
         result is expressed in mV rather than volts. The method may
-        return float('nan') to indicate failure to extract valid
-        value from the raw data. In particular it returns NaN if DMM
+        return INVALID_VALUE = float('nan') to indicate failure to extract
+        valid value from the raw data. In particular it returns NaN if DMM
         is overloaded.
         """
         raise NotImplementedError()

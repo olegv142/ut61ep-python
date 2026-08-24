@@ -76,7 +76,7 @@ class OwonBtDevice(BTMixin, Device):
         _, scale = self._scale_map.get(mt, (mt, 0))
         shift = data[0] & 7
         if shift == 7:
-            return float('nan')
+            return Device.INVALID_VALUE
         val = data[-2] + 256 * (data[-1] & 0x7f)
         if data[-1] & 0x80:
             val = -val

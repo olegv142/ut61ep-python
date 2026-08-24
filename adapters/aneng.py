@@ -124,7 +124,7 @@ class AnengBtDevice(BTMixin, Device):
         try:
             val = float(val_str)
         except ValueError:
-            return float('nan')
+            return Device.INVALID_VALUE
         # Apply scale to some auto ranged values, Ohm and nF in particular.
         # We don't want the units and hence the value scale to be voluntary changed
         # as a result of auto range selection.
