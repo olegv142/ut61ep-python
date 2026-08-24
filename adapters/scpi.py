@@ -19,6 +19,7 @@ class SCPIDevice(CDCMixin, Device):
     """Base class for adapters using SCPI commands over CDC link"""
     DEF_READ_TOUT = 1
     EOL_SYMBOL = b'\n'
+    IDLE_DELAY = .01
 
     def __init__(self, dev, path):
         Device.__init__(self, path)
@@ -45,14 +46,13 @@ class SCPIDevice(CDCMixin, Device):
 
     def scpi_receive(self, tout=None, idle_sleep=time.sleep):
         wait = tout if tout is not None else self.DEF_READ_TOUT
-        wait_step = 0.01
         resp = bytes()
         while True:
-            idle_sleep(wait_step)
+            idle_sleep(self.IDLE_DELAY)
             resp += self.dev.read(64)
             if resp and resp[-1:] == self.EOL_SYMBOL:
                 return resp.strip().strip(b'"')
-            wait -= wait_step
+            wait -= self.IDLE_DELAY
             if wait <= 0:
                 return None
 
@@ -64,6 +64,15 @@ class SCPIDevice(CDCMixin, Device):
             self.disconnected = True
             log.debug(e)
             return None
+
+    def scpi_query(self, cmd, tout=None, idle_sleep=time.sleep):
+        sval = self.scpi_call(cmd, tout, idle_sleep)
+        if not sval:
+            return None
+        try:
+            return float(sval)
+        except ValueError:
+            return Device.INVALID_VALUE
 
     def close(self):
         """Closes device if its still open"""
