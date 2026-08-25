@@ -63,7 +63,7 @@ class Device:
         its index should be passed explicitly to get_value and get_mode method. Otherwise
         the channel number may be retrieved by get_channel method.
         """
-        return 1
+        return 1 if data else 0
 
     def get_channel(self, data: Any) -> int:
         """

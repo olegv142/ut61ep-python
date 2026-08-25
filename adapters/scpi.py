@@ -119,6 +119,8 @@ class SCPIDmm(SCPIDevice):
         return vals
 
     def get_channels(self, data):
+        if not data:
+            return 0
         return min(self.channels, len(data))
 
     def get_value(self, data, channel=0):
@@ -173,6 +175,8 @@ class SCPIPowerSource(SCPIDevice):
         return tuple(reversed(resp.split(b',')[:2]))
 
     def get_channels(self, data):
+        if not data:
+            return 0
         return min(self.channels, len(data))
 
     def get_value(self, data, channel=0):

@@ -61,6 +61,8 @@ class FnirsiUsbDevice(HIDMixin, Device):
 
     def get_channels(self, data):
         """Get the number of channels contained in the raw data"""
+        if not data:
+            return 0
         return self.channels
 
     def query_raw(self, tout=None, idle_sleep=time.sleep):
@@ -150,6 +152,8 @@ class FnirsiBtDevice(BTMixin, Device):
 
     def get_channels(self, data):
         """Get the number of channels contained in the raw data"""
+        if not data:
+            return 0
         return self.channels
 
     def _notify_cb(self, char, val):
