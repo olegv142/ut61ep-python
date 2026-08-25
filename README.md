@@ -431,6 +431,7 @@ if dev := SCPIDevice.open_path('COM42'):
         time.sleep(CMD_DELAY)
         dev.scpi_send(b'INP 1')
         time.sleep(CMD_DELAY)
+
         curr = 0
         print('Set\tCurr\tVolt')
         for i in range(STEPS+1):
@@ -438,6 +439,7 @@ if dev := SCPIDevice.open_path('COM42'):
             time.sleep(STEP_DELAY)
             print('%.2f\t%.3f\t%.4f' % (curr, dev.scpi_query(b'MEAS:CURR?'), dev.scpi_query(b'MEAS:VOLT?')))
             curr += STEP
+
         dev.scpi_send(b'INP 0')
         time.sleep(CMD_DELAY)
         dev.scpi_send(b'SYST:LOC')
@@ -471,9 +473,9 @@ if dmm and el:
     for i in range(STEPS+1):
         el.scpi_send(b'CURR %f' % curr)
         time.sleep(STEP_DELAY)
-        I = el.scpi_query(b'MEAS:CURR?')
-        measured = dmm.scpi_query(b'MEAS?')
-        print('%.2f\t%.4f\t%.4f' % (curr, I, I - measured))
+        curr_el = el.scpi_query(b'MEAS:CURR?')
+        curr_dmm = dmm.scpi_query(b'MEAS?')
+        print('%.2f\t%.4f\t%.4f' % (curr, curr_el, curr_el - curr_dmm))
         curr += STEP
 
     el.scpi_send(b'INP 0')
