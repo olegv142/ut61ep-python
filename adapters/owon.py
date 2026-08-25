@@ -72,6 +72,8 @@ class OwonBtDevice(BTMixin, Device):
         It set mode dial manually after all. So in the mV mode the
         result is expressed in mV rather than volts.
         """
+        if not data:
+            return Device.INVALID_VALUE
         mt = self.mode_tag(data)
         _, scale = self._scale_map.get(mt, (mt, 0))
         shift = data[0] & 7

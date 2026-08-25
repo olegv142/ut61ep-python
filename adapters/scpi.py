@@ -122,6 +122,8 @@ class SCPIDmm(SCPIDevice):
         return min(self.channels, len(data))
 
     def get_value(self, data, channel=0):
+        if not data:
+            return Device.INVALID_VALUE
         try:
             val = float(data[channel])
             if val == self.OVERLOAD_VAL:
@@ -172,6 +174,8 @@ class SCPIPowerSource(SCPIDevice):
         return min(self.channels, len(data))
 
     def get_value(self, data, channel=0):
+        if not data:
+            return Device.INVALID_VALUE
         try:
             return float(data[channel])
         except ValueError:

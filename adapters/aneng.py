@@ -107,6 +107,8 @@ class AnengBtDevice(BTMixin, Device):
         """
         Converts raw data to the floating point value.
         """
+        if not data:
+            return Device.INVALID_VALUE
         digit_codes = [
             (data[0] & 0xf0) | (data[1] & 0xf),
             (data[1] & 0xf0) | (data[2] & 0xf),

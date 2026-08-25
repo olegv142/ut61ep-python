@@ -88,6 +88,8 @@ class FnirsiUsbDevice(HIDMixin, Device):
 
     def get_value(self, data, channel=0):
         """Converts raw data to the floating point value"""
+        if not data:
+            return Device.INVALID_VALUE
         samples = self._get_samples(data, (4, 0)[channel])
         return sum(samples) / len(samples)
 
@@ -196,6 +198,8 @@ class FnirsiBtDevice(BTMixin, Device):
 
     def get_value(self, data, channel=0):        
         """Converts raw data to the floating point value"""
+        if not data:
+            return Device.INVALID_VALUE
         return struct.unpack_from('<H', data, (2, 0)[channel])[0] / 1000
 
     def get_mode(self, data, channel=0):

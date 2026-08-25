@@ -75,6 +75,8 @@ class UTDevice(Device):
         It set mode dial manually after all. So in the mV mode the
         result is expressed in mV rather than volts.
         """
+        if not data:
+            return Device.INVALID_VALUE
         try:
             space = ord(' ')
             val = float(''.join([chr(d) for d in data[2:9] if d != space]))
