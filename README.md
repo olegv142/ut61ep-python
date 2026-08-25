@@ -296,7 +296,7 @@ The code examples below will illustrate techniques that can be used while workin
 
 ### Reading from OWON Bluetooth multimeter
 The following code will read data from OWON Bluetooth multimeter continuously. It will discover the multimeter automatically provided that you have single one nearby.
-```
+```python
 from ut61xpy.adapters.owon import OwonBtDevice
 
 if dev := OwonBtDevice.open():
@@ -311,7 +311,7 @@ if dev := OwonBtDevice.open():
 
 ### Reading from Aneng Bluetooth multimeter with known address
 If you know the Bluetooth device mac address, you can open it faster without scanning. It will also work if you have several multimeters. The following code will read Aaneng AN9002 or compatible ZOTEK/BSIDE ZT-300AB with particular address.
-```
+```python
 from ut61xpy.adapters.aneng import AnengBtDevice
 
 if dev := AnengBtDevice.open_addr('C4:A9:B8:3A:5B:A2'):
@@ -328,7 +328,7 @@ if dev := AnengBtDevice.open_addr('C4:A9:B8:3A:5B:A2'):
 While working with OWON desktop multimeter, you can not only read measured values, but also configure measuring mode and input range. The following code
 will set mode to DC voltage with 5V range and then read samples continuously two times per second. Note that reading with maximum possible rate does not make
 sense in such case. The OWON multimeter does not refresh returned value faster than several times per second even if the sampling rate is much higher on specs.
-```
+```python
 import time
 from ut61xpy.adapters.scpi import SCPIDmm
 
@@ -347,7 +347,7 @@ if dev := SCPIDmm.open():
 ### Working with OWON programmable power source
 While working with OWON programmable power source, you can not only read voltage and current, but also configure the power source output.
 The following code will configure OWON power source, turn on its output, wait 2 seconds, print current and voltage and switch output off.
-```
+```python
 import time
 from ut61xpy.adapters.scpi import SCPIPowerSource
 
@@ -367,7 +367,7 @@ Note that there are also VOLTage:LIMit and CURRent:LIMit parameters. If any of t
 
 ### Reading voltage and current from FNIRSI USB tester
 Similarly to programmable power source, you can read voltage and current from FNIRSI USB tester with the following code:
-```
+```python
 from ut61xpy.adapters.fnirsi import FNB58Usb
 
 if dev := FNB58Usb.open():
@@ -386,7 +386,7 @@ To communicate with FNB58 via Bluetooth one can just replace FNB58Usb -> FNB58Bt
 
 ### Reading data from several devices simultaneously
 The next code example illustrates reading data from Aneng and OWON Bluetooth multimeters simultaneously.
-```
+```python
 from ut61xpy.adapters.aneng import AnengBtDevice
 from ut61xpy.adapters.owon  import OwonBtDevice
 
@@ -413,7 +413,7 @@ for d in devs:
 ### Working with OWON programmable electronic load
 The OWON OEL series electronic loads are not directly supported by **ut61xp-get** and **ut61xp-start** tools, but you can interact with them using your own code. The following code will open connection to such device
 given the port name ('COM42'). Then it will configure it in constant current mode and run test sequence linearly increasing load current and printing measured current and voltage. The code is tested with OEL1515 model.
-```
+```python
 import time
 from ut61xpy.adapters.scpi import SCPIDevice
 
@@ -446,7 +446,7 @@ if dev := SCPIDevice.open_path('COM42'):
 ```
 
 The next code example illustrates interfacing with electronic load in similar setup but with OWON desktop multimeter (XDM1041, XDM1241) measuring current between power source and electronic load. The script prints current set, current reported by electronic load and the current error with respect to the value reported by multimeter. Note that unlike other examples the code uses SCPIDevice class and its scpi_query method for interacting with multimeter instead of generic query_raw/get_value API.
-```
+```python
 import time
 from ut61xpy.adapters.scpi import SCPIDevice
 
