@@ -365,39 +365,6 @@ if dev := SCPIPowerSource.open():
 ```
 Note that there are also VOLTage:LIMit and CURRent:LIMit parameters. If any of them is exceeded the OWON power source switches off its output showing warning on the screen. The error is cleared by switching output off either by OUTPut command or by button on the front panel. Therefore, if you need just current limiting, then take care to always have VOLTage:LIMit > VOLTage and CURRent:LIMit > CURRent.
 
-### Working with OWON programmable electronic load
-The OWON OEL series electronic loads are not directly supported by **ut61xp-get** and **ut61xp-start** tools, but you can interact with them using your own code. The following code will open connection to such device
-given the port name ('COM42'). Then it will configure it in constant current mode and run test sequence linearly increasing load current and printing measured current and voltage. The code is tested with OEL1515 model.
-```
-import time
-from ut61xpy.adapters.scpi import SCPIDevice
-
-CMD_DELAY  = .1
-STEP_DELAY = .5
-STEP  = .1
-STEPS = 20
-
-if dev := SCPIDevice.open_path('COM42'):
-    with dev:
-        print('connected to', dev.get_model())
-        dev.scpi_send(b'SYST:REM')
-        time.sleep(CMD_DELAY)
-        dev.scpi_send(b'FUNC CURR')
-        time.sleep(CMD_DELAY)
-        dev.scpi_send(b'INP 1')
-        time.sleep(CMD_DELAY)
-        curr = 0
-        print('Set\tCurr\tVolt')
-        for i in range(STEPS+1):
-            dev.scpi_send(b'CURR %f' % curr)
-            time.sleep(STEP_DELAY)
-            print('%.2f\t%.3f\t%.4f' % (curr, dev.scpi_query(b'MEAS:CURR?'), dev.scpi_query(b'MEAS:VOLT?')))
-            curr += STEP
-        dev.scpi_send(b'INP 0')
-        time.sleep(CMD_DELAY)
-        dev.scpi_send(b'SYST:LOC')
-```
-
 ### Reading voltage and current from FNIRSI USB tester
 Similarly to programmable power source, you can read voltage and current from FNIRSI USB tester with the following code:
 ```
@@ -441,4 +408,80 @@ if all(devs):
 for d in devs:
     if d:
         d.close()
+```
+
+### Working with OWON programmable electronic load
+The OWON OEL series electronic loads are not directly supported by **ut61xp-get** and **ut61xp-start** tools, but you can interact with them using your own code. The following code will open connection to such device
+given the port name ('COM42'). Then it will configure it in constant current mode and run test sequence linearly increasing load current and printing measured current and voltage. The code is tested with OEL1515 model.
+```
+import time
+from ut61xpy.adapters.scpi import SCPIDevice
+
+CMD_DELAY  = .1
+STEP_DELAY = .5
+STEP  = .1
+STEPS = 20
+
+if dev := SCPIDevice.open_path('COM42'):
+    with dev:
+        print('connected to', dev.get_model())
+        dev.scpi_send(b'SYST:REM')
+        time.sleep(CMD_DELAY)
+        dev.scpi_send(b'FUNC CURR')
+        time.sleep(CMD_DELAY)
+        dev.scpi_send(b'INP 1')
+        time.sleep(CMD_DELAY)
+        curr = 0
+        print('Set\tCurr\tVolt')
+        for i in range(STEPS+1):
+            dev.scpi_send(b'CURR %f' % curr)
+            time.sleep(STEP_DELAY)
+            print('%.2f\t%.3f\t%.4f' % (curr, dev.scpi_query(b'MEAS:CURR?'), dev.scpi_query(b'MEAS:VOLT?')))
+            curr += STEP
+        dev.scpi_send(b'INP 0')
+        time.sleep(CMD_DELAY)
+        dev.scpi_send(b'SYST:LOC')
+```
+
+The next code example illustrates interfacing with electronic load in similar setup but with OWON desktop multimeter (XDM1041, XDM1241) measuring current between power source and electronic load. The script prints current set, current reported by electronic load and the current error with respect to the value reported by multimeter. Note that unlike other examples the code uses SCPIDevice class and its scpi_query method for interacting with multimeter instead of generic query_raw/get_value API.
+```
+import time
+from ut61xpy.adapters.scpi import SCPIDevice
+
+CMD_DELAY  = .1
+STEP_DELAY = 1.5
+STEP  = .1
+STEPS = 20
+
+dmm = SCPIDevice.open_path('COM11')
+el  = SCPIDevice.open_path('COM42')
+
+if dmm and el:
+    dmm.scpi_send(b'CONF:CURR:DC 5')
+
+    el.scpi_send(b'SYST:REM')
+    time.sleep(CMD_DELAY)
+    el.scpi_send(b'FUNC CURR')
+    time.sleep(CMD_DELAY)
+    el.scpi_send(b'INP 1')
+    time.sleep(CMD_DELAY)
+
+    curr = 0
+    print('Set\tCurr\tErr')
+    for i in range(STEPS+1):
+        el.scpi_send(b'CURR %f' % curr)
+        time.sleep(STEP_DELAY)
+        I = el.scpi_query(b'MEAS:CURR?')
+        measured = dmm.scpi_query(b'MEAS?')
+        print('%.2f\t%.4f\t%.4f' % (curr, I, I - measured))
+        curr += STEP
+
+    el.scpi_send(b'INP 0')
+    time.sleep(CMD_DELAY)
+    el.scpi_send(b'SYST:LOC')
+
+if dmm:
+    dmm.close()
+if el:
+    el.close()
 ```
