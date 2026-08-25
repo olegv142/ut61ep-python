@@ -291,6 +291,9 @@ In case the device is using already supported protocol but having different USB 
 # Integration with your own code
 Just add this project as the sub-module to your source tree and import the necessary device adapter from it. 
 
+## Base classes
+![Base classes hierarchy](/misc/base_classes.png)
+
 ## Code examples
 The code examples below will illustrate techniques that can be used while working with various devices.
 
