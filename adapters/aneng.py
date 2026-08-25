@@ -144,6 +144,8 @@ class AnengBtDevice(BTMixin, Device):
         """
         Returns measurement mode and units description string.
         """
+        if not data:
+            return ''
         mode = ''
         if data[5] & 8:
             mode += 'ac '

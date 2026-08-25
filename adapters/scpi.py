@@ -133,6 +133,8 @@ class SCPIDmm(SCPIDevice):
             return Device.INVALID_VALUE
 
     def get_mode(self, data, channel=0):
+        if not data:
+            return ''
         return self.modes[channel]
 
 class SCPIPowerSource(SCPIDevice):
@@ -182,4 +184,6 @@ class SCPIPowerSource(SCPIDevice):
             return Device.INVALID_VALUE
 
     def get_mode(self, data, channel=0):
+        if not data:
+            return ''
         return ('CURR', 'VOLT')[channel]

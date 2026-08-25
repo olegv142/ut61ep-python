@@ -140,6 +140,8 @@ class UTDevice(Device):
 
     def get_mode(self, data, channel=None):
         """Returns measurement mode and units description string"""
+        if not data:
+            return ''
         mode = self._mode_map[self.get_channel(data)].get(data[0], '')
         f1, f2, f3 = data[self.DATA_LEN-3:]
         if f1 & 2:

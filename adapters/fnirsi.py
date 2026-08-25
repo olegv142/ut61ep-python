@@ -95,6 +95,8 @@ class FnirsiUsbDevice(HIDMixin, Device):
 
     def get_mode(self, data, channel=0):
         """Returns measurement mode and units description string"""
+        if not data:
+            return ''
         return ('A', 'V')[channel]
 
     def close(self):
@@ -204,6 +206,8 @@ class FnirsiBtDevice(BTMixin, Device):
 
     def get_mode(self, data, channel=0):
         """Returns measurement mode and units description string"""
+        if not data:
+            return ''
         return ('A', 'V')[channel]
 
     def close(self):

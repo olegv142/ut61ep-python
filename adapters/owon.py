@@ -131,6 +131,8 @@ class OwonBtDevice(BTMixin, Device):
         """
         Returns measurement mode and units description string.
         """
+        if not data:
+            return ''
         mt = self.mode_tag(data)
         # Different vendors use different approaches to reporting measurement mode. The UNI-T reports
         # mode set by user. OWON reports units chosen by auto-range (say millivolts) within the mode
