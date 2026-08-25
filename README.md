@@ -292,7 +292,14 @@ In case the device is using already supported protocol but having different USB 
 Just add this project as the sub-module to your source tree and import the necessary device adapter from it. 
 
 ## Base classes
+Every supported device is represented by an instance of its adapter class. There are 2 major families of such adapters - USB and Bluetooth adapters. There is also a specialized case of USB devices that uses SCPI protocol for communication. The following figure provides the simplified view of the class hierarchy.
 ![Base classes hierarchy](/misc/base_classes.png)
+
+The *Device* class (from adapters/device.py) is the ancestor of all multimeter adapters regardless of the communication protocol used. It defines several methods that should be used for communicating with the target device. The *init* method initializes communication session. The *query_raw* method reads data from the device and returns them as opaque object. The get_value method extracts floating point value from the data returned by *query_raw* method. The *get_mode* method returns measurement mode and/or units description string. The source of this information may vary. Some implementation may query and store it in *init* call. Others may extract it from the raw data returned by *query_raw* method.
+
+The *USBMixin* and *BTMixin* classes are used as second base class for USB and Bluetooth spectrometer adapters respectively. They provide methods for device discovery and adapter instance creation. The *list_paths* and *list_addrs* methods return list of USB device paths and Bluetooth device addresses that may be related to corresponding devices. The *open_path* and *open_addr* methods create device adapter instance given USB path or Bluetooth address respectively. The *open* method auto detects the device and creates its adapter instance provided that there is a single such device connected to USB or reachable via Bluetooth.
+
+The *SCPIDevice* is specialized base class for multimeters and other devices using SCPI protocol for communicating with the host. It implements several methods that can be used to directly call SCPI API of the particular device. The *scpi_send* method sends SCPI command to the device, the *scpi_receive* method reads the response from the device. The *scpi_call* method just does *scpi_send* and *scpi_receive* calls and returns the response. The *scpi_query* method invokes *scpi_call* and convert the response to the floating point value. We will consider using this methods for accessing SCPI device not supported by **ut61xp-get** and **ut61xp-start** tools in the example of [working with OWON programmable electronic load](#working-with-owon-programmable-electronic-load).
 
 ## Code examples
 The code examples below will illustrate techniques that can be used while working with various devices.
