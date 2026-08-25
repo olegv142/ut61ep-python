@@ -293,6 +293,7 @@ Just add this project as the sub-module to your source tree and import the neces
 
 ## Base classes
 Every supported device is represented by an instance of its adapter class. There are 2 major families of such adapters - USB and Bluetooth adapters. There is also a specialized case of USB devices that uses SCPI protocol for communication. The following figure provides the simplified view of the class hierarchy.
+
 ![Base classes hierarchy](/misc/base_classes.png)
 
 The *Device* class (from adapters/device.py) is the ancestor of all multimeter adapters regardless of the communication protocol used. It defines several methods that should be used for communicating with the target device. The *init* method initializes communication session. The *query_raw* method reads data from the device and returns them as opaque object. The get_value method extracts floating point value from the data returned by *query_raw* method. The *get_mode* method returns measurement mode and/or units description string. The source of this information may vary. Some implementation may query and store it in *init* call. Others may extract it from the raw data returned by *query_raw* method.
