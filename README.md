@@ -318,7 +318,7 @@ The *USBMixin* and *BTMixin* classes are used as a second base class for USB and
 The *SCPIDevice* is specialized base class for multimeters and other devices using SCPI protocol for communicating with the host. It implements several methods that can be used to directly call SCPI API of the particular device. The *scpi_send* method sends SCPI command to the device, the *scpi_receive* method reads the response from the device. The *scpi_call* method just does *scpi_send* and *scpi_receive* calls and returns the response. The *scpi_query* method invokes *scpi_call* and converts the response to the floating point value. We will consider using this methods for accessing SCPI device not supported by **ut61xp-get** and **ut61xp-start** tools in the example of [working with OWON programmable electronic load](#working-with-owon-programmable-electronic-load).
 
 ## Code examples
-The code examples below will illustrate techniques that can be used while working with various devices.
+The code examples below illustrate techniques that can be used while working with various devices.
 
 ### Reading from OWON Bluetooth multimeter
 The following code will read data from OWON Bluetooth multimeter continuously. It will discover the multimeter automatically provided that you have single one nearby.
