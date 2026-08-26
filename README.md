@@ -284,6 +284,19 @@ The auto power off feature powers off device after 15 min of inactivity. The Ane
 ## The *Windows protected your PC* warning always appears on attempt to run self extracting distribution archive
 This happens because Windows flags all unsigned executables downloaded from the web as untrusted. There are two ways to overcome it. You can click *More info* and press *Run anyway* button. Otherwise you can clean this flag in advance by right clicking the executable and checking *Unblock* on the *General tab* of the file *Properties*. The release notes contain a link to VirusTotal analysis of the self extracting archive so you can make sure its safe to run. You can even launch validation again if you wish.
 
+## Unable to find OWON desktop multimeter or programmable power source on Linux
+There are several system services used to be installed by default that may open connected device preventing its discovery by **ut61xp-get** or **ut61xp-start** tools. Try to the execute the following commands in the terminal and reconnect your device.
+```
+sudo apt remove brltty
+sudo systemctl stop ModemManager
+sudo systemctl disable ModemManager
+```
+Note also that an attempt to access the device as plain user may fail on Linux due to restrictive permissions. You either have to run the **ut61xp-get** or **ut61xp-start** tool as a root or add iself to *dialout* group:
+```
+sudo usermod -a -G dialout $USER
+```
+However, the last approach does not work with HID devices. They require creating a custom udev rule or running as a root.
+
 # Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *USBMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
