@@ -300,7 +300,7 @@ sudo usermod -aG dialout $USER
 You have to re-login or reboot to apply new group membership properly. However, this approach does not work with HID devices. They require creating a custom udev rule or running as a root.
 
 # Adding your own device
-To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *USBMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
+To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *USBMixin* from **device.py** (see [Base classes](#base-classes) below). Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
 
 # Integration with your own code
