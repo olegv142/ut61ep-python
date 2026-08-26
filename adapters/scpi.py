@@ -42,28 +42,34 @@ class SCPIDevice(CDCMixin, Device):
         return self.dev and not self.disconnected
 
     def scpi_send(self, cmd):
-        self.dev.write(cmd + self.EOL_SYMBOL)
+        try:
+            self.dev.write(cmd + self.EOL_SYMBOL)
+        except Exception as e:
+            self.disconnected = True
+            log.debug(e)
 
     def scpi_receive(self, tout=None, idle_sleep=time.sleep):
         wait = tout if tout is not None else self.DEF_READ_TOUT
         resp = bytes()
         while True:
             idle_sleep(self.IDLE_DELAY)
-            resp += self.dev.read(64)
-            if resp and resp[-1:] == self.EOL_SYMBOL:
-                return resp.strip().strip(b'"')
+            try:
+                rd = self.dev.read(64)
+            except Exception as e:
+                self.disconnected = True
+                log.debug(e)
+                return None
+            if rd:
+                resp += rd
+                if resp[-1:] == self.EOL_SYMBOL:
+                    return resp.strip().strip(b'"')
             wait -= self.IDLE_DELAY
             if wait <= 0:
                 return None
 
     def scpi_call(self, cmd, tout=None, idle_sleep=time.sleep):
-        try:
-            self.scpi_send(cmd)
-            return self.scpi_receive(tout, idle_sleep)
-        except Exception as e:
-            self.disconnected = True
-            log.debug(e)
-            return None
+        self.scpi_send(cmd)
+        return self.scpi_receive(tout, idle_sleep)
 
     def scpi_query(self, cmd, tout=None, idle_sleep=time.sleep):
         sval = self.scpi_call(cmd, tout, idle_sleep)
