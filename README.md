@@ -291,11 +291,13 @@ sudo apt remove brltty
 sudo systemctl stop ModemManager
 sudo systemctl disable ModemManager
 ```
-Note also that an attempt to access the device as plain user may fail on Linux due to restrictive permissions. You either have to run the **ut61xp-get** or **ut61xp-start** tool as a root or add iself to *dialout* group:
+
+## Unable to open device USB port on Linux
+An attempt to access the device as plain user may fail on Linux due to restrictive permissions. To be able to access the USB serial port you either have to run the **ut61xp-get** or **ut61xp-start** tool as a root or add iself to *dialout* group:
 ```
-sudo usermod -a -G dialout $USER
+sudo usermod -aG dialout $USER
 ```
-However, the last approach does not work with HID devices. They require creating a custom udev rule or running as a root.
+You have to re-login or reboot to apply new group membership properly. However, this approach does not work with HID devices. They require creating a custom udev rule or running as a root.
 
 # Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *USBMixin* from **device.py**. Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
