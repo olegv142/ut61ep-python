@@ -106,16 +106,6 @@ class FnirsiUsbDevice(HIDMixin, Device):
         self.dev.close()
         self.dev = None
 
-class FNB48pUsb(FnirsiUsbDevice):
-    DEVICE_VID = 0x2e3c
-    DEVICE_PID = 0x0049
-    MODEL_NAME = 'FNB48P'
-
-class FNB58Usb(FnirsiUsbDevice):
-    DEVICE_VID = 0x2e3c
-    DEVICE_PID = 0x5558
-    MODEL_NAME = 'FNB58'
-
 
 class FnirsiBtDevice(BTMixin, Device):
     """BLE adapter for FNIRSI USB testers"""
@@ -220,6 +210,17 @@ class FnirsiBtDevice(BTMixin, Device):
             return
         bt_engine.async_exec(self.dev.disconnect())
         self.dev = None
+
+
+class FNB48pUsb(FnirsiUsbDevice):
+    DEVICE_VID = 0x2e3c
+    DEVICE_PID = 0x0049
+    MODEL_NAME = 'FNB48P'
+
+class FNB58Usb(FnirsiUsbDevice):
+    DEVICE_VID = 0x2e3c
+    DEVICE_PID = 0x5558
+    MODEL_NAME = 'FNB58'
 
 class FNB48pBt(FnirsiBtDevice):
     MODEL_NAME = 'FNB48P'
