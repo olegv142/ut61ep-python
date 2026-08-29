@@ -14,7 +14,7 @@ from adapters.ut61xp import UTDevice, UT61XpUsbDevice, UT61XpBtDevice, UT60BTDev
 from adapters.owon import OwonBtDevice
 from adapters.aneng import AnengBtDevice
 from adapters.scpi import SCPIDmm, SCPIPowerSource
-from adapters.fnirsi import FNB48pUsb, FNB48pBt, FNB58Usb, FNB58Bt
+from adapters.fnirsi import FNB48pUsb, FNB48pBt, FNB58Usb, FNB58Bt, FNAC28
 from data_stat import StatCollector, histogram
 from version import version_str
 from datetime import datetime
@@ -29,6 +29,7 @@ _supported_devices = (
     SCPIDmm, SCPIPowerSource,
     FNB48pUsb, FNB48pBt,
     FNB58Usb, FNB58Bt,
+	FNAC28,
 )
 
 class Plotter:

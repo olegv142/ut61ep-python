@@ -18,8 +18,6 @@ log = logging.getLogger('DEV')
 
 class FnirsiUsbDevice(HIDMixin, Device):
     """USB HID adapter for FNIRSI USB testers"""
-    DEVICE_VID = 0x2e3c
-
     CMD_INIT  = [0xaa, 0x81] + [0] * 61 + [0x8e]
     CMD_START = [0xaa, 0x82] + [0] * 61 + [0x96]
     CMD_POLL  = [0xaa, 0x83] + [0] * 61 + [0x9e]
@@ -109,10 +107,12 @@ class FnirsiUsbDevice(HIDMixin, Device):
         self.dev = None
 
 class FNB48pUsb(FnirsiUsbDevice):
+    DEVICE_VID = 0x2e3c
     DEVICE_PID = 0x0049
     MODEL_NAME = 'FNB48P'
 
 class FNB58Usb(FnirsiUsbDevice):
+    DEVICE_VID = 0x2e3c
     DEVICE_PID = 0x5558
     MODEL_NAME = 'FNB58'
 
@@ -229,13 +229,18 @@ class FNB58Bt(FnirsiBtDevice):
     MODEL_NAME = 'FNB58'
     DEVICE_NAME = 'FNB58*'
 
+class FNAC28(FnirsiUsbDevice):
+    DEVICE_VID = 0x0483
+    DEVICE_PID = 0x003B
+    MODEL_NAME = 'FNAC28'
+
 
 if __name__ == '__main__':
     if '--bt' in sys.argv[1:]:
-        dev = FNB48pBt.open() if '--48' in sys.argv[1:] else FNB58Bt.open()
+        devT = FNB48pBt if '--48' in sys.argv[1:] else FNB58Bt
     else:
-        dev = FNB48pUsb.open() if '--48' in sys.argv[1:] else FNB58Usb.open()
-    if dev:
+        devT = FNB48pUsb if '--48' in sys.argv[1:] else FNAC28 if '--28' in sys.argv[1:] else FNB58Usb
+    if dev := devT.open():
         print(dev)
         with dev:
             dev.init(1)
