@@ -587,7 +587,7 @@ def main_impl(argv=None):
     data_parser.add_argument('-f', '--file', type=str, required=False, metavar='FILENAME',
             help='output file (optional, stdout by default), may have folder part and/or date time pattern and model name, like %%Y-%%m-%%d/%%H%%M%%S-${MODEL}.data')
     data_parser.add_argument('-a', '--alt-file', type=str, required=False, metavar='FILENAME',
-            help='alternative channel output file name (for storing AC voltage in DC mode)')
+            help='alternative channel output file name')
     data_parser.add_argument('--keep-nan', action='store_true',
             help='keep invalid data values (NaN) resulting from overload (optional, discarding them by default)')
     data_parser.add_argument('-p', '--progress', action='store_true',
