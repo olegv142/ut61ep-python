@@ -29,7 +29,7 @@ _supported_devices = (
     SCPIDmm, SCPIPowerSource,
     FNB48pUsb, FNB48pBt,
     FNB58Usb, FNB58Bt,
-	FNAC28,
+    FNAC28,
 )
 
 class Plotter:
@@ -300,8 +300,18 @@ def get_fname(dev, fname, dt):
             pass
     return fname
 
-def write_data_info(out_file, dev, data, chan):
-    print('#', dev.get_mode(data, chan), '|', dev.get_model(), file=out_file)
+def write_file_info(out_file, dev, data, chan, title):
+    if title:
+        print('#', dev.get_mode(data, chan), '|', dev.get_model(), '|', title, file=out_file)
+    else:
+        print('#', dev.get_mode(data, chan), '|', dev.get_model(), file=out_file)
+
+def split_file_info(info):
+    """Returns units, model, title tuple"""
+    if not info:
+        return '', '', ''
+    infos = info.split('|')
+    return infos[0].strip(), (infos[1].strip() if len(infos) > 1 else ''), (infos[2].strip() if len(infos) > 2 else '')
 
 def do_data(args):
     """
@@ -367,11 +377,11 @@ def do_data(args):
                         val = (val - args.offset) * args.mult
                     if fname:
                         if not out_file.tell():
-                            write_data_info(out_file, dev, data, val_chan)
+                            write_file_info(out_file, dev, data, val_chan, args.plot_title)
                     print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=out_file)
                 elif alt_file:
                     if not alt_file.tell():
-                        write_data_info(alt_file, dev, data, val_chan)
+                        write_file_info(alt_file, dev, data, val_chan, args.alt_title)
                     print(out_fmt % (ts if args.epoch else t, args.delimiter, val), file=alt_file)
                 # Update stat
                 stat[val_chan].account(t, val)
@@ -426,13 +436,6 @@ def load_data_file(fname, skip_nan=False):
             ydata.append(y)
     return xdata, ydata, info
 
-def split_file_info(info):
-    """Returns units, model pair"""
-    if not info:
-        return '', ''
-    infos = info.split('|')
-    return infos[0].strip(), (infos[1].strip() if len(infos) > 1 else '')
-
 def get_file_base_name(fname):
     """Returns file base name without extension"""
     if not fname:
@@ -443,16 +446,17 @@ def get_file_base_name(fname):
 def plot_data(Xs, Ys, Names, Infos, yticks=None, no_stat=False, title_suffix=''):
     """Plot one or more datasets"""
     import matplotlib.pyplot as plt
+    title = None
     models = {}
     for xdata, ydata, name, info in zip(Xs, Ys, Names, Infos):
         if info:
-            units, model = split_file_info(info)
+            units, model, title = split_file_info(info)
             name += ' [' + units + ']'
             if model:
                 models[model] = None
         plt.plot(xdata, ydata, label=name)
     if len(Names) == 1:
-        plt.title(Names[0])
+        plt.title(Names[0] if not title else title)
     else:
         plt.legend()
     if yticks is not None:
