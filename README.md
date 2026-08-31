@@ -273,19 +273,19 @@ The **ut61xp-start** tool creates several files and directories next to executab
 
 # Known issues
 
-## Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
+### Unable to connect to Bluetooth multimeter after closing **ut61xp-start** application
 The multimeter becomes available for reconnect after dropping of the previous connection. The problem here is that its the operating system that maintains connection. It may not drop connection if application that initiated it was terminated not gracefully, especially on Linux. So the multimeter thinks its still connected to already terminated application. The problem occurs if one close **ut61xp-start** window while some data acquisition windows are still open. In case all such windows are closed before closing **ut61xp-start** window the Bluetooth connections are terminated as expected.
 
-## Data was not saved to the output file after closing **ut61xp-start** application
+### Data was not saved to the output file after closing **ut61xp-start** application
 Closing **ut61xp-start** window while acquisition is still active terminates acquisition process without saving anything. Therefore, if you need the collected data, please close the acquisition plot window first.
 
-## Aneng (ZOTEK/BSIDE) multimeter is powering off automatically after some time while data collection is running
+### Aneng (ZOTEK/BSIDE) multimeter is powering off automatically after some time while data collection is running
 The auto power off feature powers off device after 15 min of inactivity. The Aneng (ZOTEK/BSIDE) multimeters don't consider Bluetooth connection as 'activity'. To disable auto powering off you should press and hold the SEL button while powering on multimeter and selecting desired mode with mode dial. The SEL button should be held until you hear four beeps. The auto power off feature will be disabled until the next power on. With power off disabled the multimeter will still emit alarming beeps periodically but will not power off.
 
-## The *Windows protected your PC* warning always appears on attempt to run self extracting distribution archive
+### The *Windows protected your PC* warning always appears on attempt to run self extracting distribution archive
 This happens because Windows flags all unsigned executables downloaded from the web as untrusted. There are two ways to overcome it. You can click *More info* and press *Run anyway* button. Otherwise you can clean this flag in advance by right clicking the executable and checking *Unblock* on the *General tab* of the file *Properties*. The release notes contain a link to VirusTotal analysis of the self extracting archive so you can make sure its safe to run. You can even launch validation again if you wish.
 
-## Unable to find OWON desktop multimeter or programmable power source on Linux
+### Unable to find OWON desktop multimeter or programmable power source on Linux
 There are several system services used to be installed by default that may open connected device preventing its discovery by **ut61xp-get** or **ut61xp-start** tools. Try to the execute the following commands in the terminal and reconnect your device.
 ```
 sudo apt remove brltty
@@ -293,7 +293,7 @@ sudo systemctl stop ModemManager
 sudo systemctl disable ModemManager
 ```
 
-## Unable to open device USB port on Linux
+### Unable to open device USB port on Linux
 An attempt to access the device as plain user may fail on Linux due to restrictive permissions. To be able to access the USB serial port you either have to run the **ut61xp-get** or **ut61xp-start** tool as a root or add iself to *dialout* group:
 ```
 sudo usermod -aG dialout $USER
