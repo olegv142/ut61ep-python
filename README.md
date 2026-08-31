@@ -308,8 +308,6 @@ You have to re-login or reboot to apply new group membership properly. However, 
 - Aneng AN9002 gives you the best value for money.
 - OWON CM2100B is the unique choice for wireless current measurements.
 
-Stay away from B41T+ since its just overpriced and has a terrible design in terms of ergonomics.
-
 ## Adding your own device
 To add new device you should implement its adapter class inherited from *Device* and *BTMixin* or *USBMixin* from **device.py** (see [Base classes](#base-classes) below). Then the class type should be added to *_supported_devices* from **ut61xp-get** and that's it.
 In case the device is using already supported protocol but having different USB VIP/PID or Bluetooth device name, one can try to connect to it by tweaking these parameters specifying *--VID, --PID, --name* command line options.
