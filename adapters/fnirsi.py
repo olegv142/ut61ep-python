@@ -235,6 +235,10 @@ class FNAC28(FnirsiUsbDevice):
     DEVICE_PID = 0x003B
     MODEL_NAME = 'FNAC28'
 
+class FNBC2(FnirsiUsbDevice):
+    DEVICE_VID = 0x2e3c
+    DEVICE_PID = 0x5558
+    MODEL_NAME = 'FNB-C2'
 
 if __name__ == '__main__':
     if '--bt' in sys.argv[1:]:

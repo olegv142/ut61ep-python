@@ -44,7 +44,7 @@ This tool supports Aneng AN9002 model also sold as ZOTEK/BSIDE ZT-300AB. It has 
 The Zotek/Aneng multimeters use display segment based encoding for BT communications. So there are as many protocol variants as there are displays in use. Therefore, this tool will not work with other 'Bluetooth DMM' devices like ZT-5B, ZT-5BQ, ZT-5566. Yet the AN9002 is the most interesting model considering the ergonomics and price / performance. The price of this device is smaller than the cost of the single UNI-T Bluetooth adapter.
 
 ### FNIRSI USB testers
-FNIRSI produces a line of USB testers capable of measuring USB bus voltage, load current and some other parameters. The tool supports reading USB bus current and optionally voltage in alternative measuring channel. Currently supported devices are FNB48P, FNB58 and FNAC28. The data can be read either via USB or Bluetooth connection (if supported by device). While Bluetooth is convenient the USB connection provides significantly better resolution and reliability.
+FNIRSI produces a line of USB testers capable of measuring USB bus voltage, load current and some other parameters. The tool supports reading USB bus current and optionally voltage in alternative measuring channel. Currently supported devices are FNAC28, FNB48P, FNB58 and FNB-C2. The data can be read either via USB or Bluetooth connection (if supported by device). While Bluetooth is convenient the USB connection provides significantly better resolution and reliability.
 
 ## Installation
 ### Working with sources
@@ -212,11 +212,12 @@ By default, the **ut61xp-get** tool expects the UT61X+ multimeter as the target 
 |         | Programmable power supply with USB port      | -M SCPI-CV            | SCPI-CV USB                        |
 | ANENG   | AN9002 Bluetooth multimeter                  | -M ANENG -B           | ANENG BT                           |
 | ZOTEK/BSIDE | ZT-300AB Bluetooth multimeter            | -M ANENG -B           | ANENG BT                           |
-| FNIRSI  | FNB48P USB tester via USB connection         | -M FNB48P             | FNB48P USB                         |
+| FNIRSI  | FNAC28 USB tester                            | -M FNAC28             | FNAC28 USB                         |
+|         | FNB48P USB tester via USB connection         | -M FNB48P             | FNB48P USB                         |
 |         | FNB48P USB tester via Bluetooth              | -M FNB48P -B          | FNB48P BT                          |
 |         | FNB58 USB tester via USB connection          | -M FNB58              | FNB58 USB                          |
 |         | FNB58 USB tester via Bluetooth               | -M FNB58 -B           | FNB58 BT                           |
-|         | FNAC28 USB tester                            | -M FNAC28             | FNAC28 USB                         |
+|         | FNB-C2 USB tester                            | -M FNB-C2             | FNB-C2 USB                         |
 
 # Working with GUI
 The GUI workflow is built around **ut61xp-start** script that provides convenient UI for setting **ut61xp-get** options and launching data acquisition in separate processes. The single instance of **ut61xp-start** UI can launch any number of data acquisition processes working in parallel, saving data to separate files and showing collected data in their own data plot windows. The following figure illustrates using data acquisition GUI reading data from 3 multimeters simultaneously on Raspberry Pi5.
